@@ -1,0 +1,587 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hollow Hill House</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Grenze+Gotisch:wght@500;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+[hidden]{display:none!important} body{margin:0}
+
+/* Layout: a house you walk through — arched doors as room tabs, one lit room at a time, candles track progress. Single cozy-night theme by choice. */
+:root{
+  --night:#221822; --wall:#2f222d; --wall-2:#3a2a37; --line:#57404f;
+  --paper:#f4e7d0; --muted:#bfa999; --ember:#ec9548; --ember-soft:#ec954826;
+  --moss:#a6bb8f; --moss-soft:#a6bb8f22; --rose:#e07a7f; --rose-soft:#e07a7f22;
+  --display:"Grenze Gotisch", "Palatino Linotype", Georgia, serif;
+  --body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--night);color:var(--paper);font-family:var(--body);font-size:17px;line-height:1.55;
+  background-image:radial-gradient(1200px 500px at 50% -120px,#ec95481f,transparent 70%);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 64px}
+.wrap{max-width:980px;margin:0 auto;display:flex;flex-direction:column;gap:28px}
+h1,h2,h3{font-family:var(--display);font-weight:700;text-wrap:balance;margin:0;line-height:1.05}
+h1{font-size:clamp(44px,8vw,76px);color:var(--ember);letter-spacing:.5px}
+h2{font-size:clamp(34px,5vw,48px);color:var(--paper)}
+h3{font-size:26px;color:var(--ember)}
+p{margin:0}
+.eyebrow{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.lede{color:var(--muted);max-width:60ch}
+header.top{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap}
+.candles{display:flex;gap:10px;align-items:flex-end}
+.candle{width:14px;height:38px;border-radius:3px 3px 2px 2px;background:var(--wall-2);position:relative;border:1px solid var(--line)}
+.candle::before{content:"";position:absolute;left:50%;top:-14px;width:9px;height:13px;transform:translateX(-50%);border-radius:50% 50% 50% 50%/60% 60% 40% 40%;background:transparent;transition:.4s}
+.candle.lit{background:var(--paper);border-color:var(--paper)}
+.candle.lit::before{background:var(--ember);box-shadow:0 0 14px 4px #ec954880;animation:flick 2.4s infinite ease-in-out}
+@keyframes flick{0%,100%{transform:translateX(-50%) scale(1)}45%{transform:translateX(-52%) scale(1.08,.94)}70%{transform:translateX(-48%) scale(.95,1.05)}}
+.candle-label{font-size:13px;color:var(--muted);margin-top:6px;text-align:right}
+
+/* doors */
+nav.doors{display:grid;grid-template-columns:repeat(7,1fr);gap:10px}
+.door{appearance:none;cursor:pointer;font:inherit;color:var(--paper);background:var(--wall);border:1px solid var(--line);
+  border-radius:60px 60px 6px 6px;padding:22px 8px 12px;display:flex;flex-direction:column;align-items:center;gap:4px;min-height:118px;justify-content:flex-end;transition:transform .15s,background .2s,border-color .2s;position:relative}
+.door:hover{transform:translateY(-2px);border-color:var(--ember)}
+.door:focus-visible{outline:2px solid var(--ember);outline-offset:3px}
+.door .num{font-family:var(--display);font-size:26px;color:var(--muted)}
+.door .name{font-weight:700;font-size:15px;text-align:center;line-height:1.2}
+.door .mins{font-size:12px;color:var(--muted)}
+.door[aria-selected="true"]{background:linear-gradient(180deg,#ec954833,var(--wall) 70%);border-color:var(--ember)}
+.door[aria-selected="true"] .num{color:var(--ember)}
+.door.done::after{content:"✓";position:absolute;top:12px;right:50%;transform:translateX(50%);font-size:13px;color:var(--moss)}
+@media (max-width:720px){nav.doors{grid-template-columns:repeat(4,1fr)}.door{min-height:96px}}
+
+/* rooms */
+section.room{background:var(--wall);border:1px solid var(--line);border-radius:18px;padding:clamp(20px,4vw,40px);display:flex;flex-direction:column;gap:26px}
+.room-head{display:flex;flex-direction:column;gap:8px}
+.goal{display:inline-flex;gap:8px;align-items:center;font-size:14px;color:var(--moss);background:var(--moss-soft);border-radius:999px;padding:4px 12px;width:fit-content}
+.block{display:flex;flex-direction:column;gap:14px}
+.btn{appearance:none;cursor:pointer;font:inherit;font-weight:700;font-size:16px;border-radius:999px;padding:10px 20px;border:1px solid var(--ember);background:var(--ember);color:#2a1a10;transition:filter .15s,transform .1s}
+.btn:hover{filter:brightness(1.08)}.btn:active{transform:scale(.98)}
+.btn.ghost{background:transparent;color:var(--ember)}
+.btn:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--paper);outline-offset:2px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.room-foot{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;border-top:1px dashed var(--line);padding-top:18px}
+.tip{font-size:14px;color:var(--muted);font-style:italic;max-width:62ch}
+
+/* warm-up */
+.pumpkin-stage{display:grid;grid-template-columns:auto 1fr;gap:24px;align-items:center}
+@media (max-width:600px){.pumpkin-stage{grid-template-columns:1fr;justify-items:center;text-align:center}}
+.pumpkin{width:150px;height:130px;cursor:pointer;border:none;background:none;padding:0}
+.pumpkin svg{width:100%;height:100%;transition:transform .5s}
+.pumpkin.spin svg{transform:rotate(360deg)}
+.pumpkin .face{fill:var(--wall);transition:fill .3s}
+.pumpkin.on .face{fill:#ffd27a;filter:drop-shadow(0 0 6px #ffb347)}
+.question{font-size:clamp(22px,3.2vw,30px);line-height:1.3;font-weight:700;min-height:3em}
+.counter{font-size:14px;color:var(--muted)}
+
+/* vocab */
+.match{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr);gap:12px 18px}
+.col{display:flex;flex-direction:column;gap:8px;min-width:0}
+.chip{appearance:none;cursor:pointer;font:inherit;text-align:left;color:var(--paper);background:var(--wall-2);border:1px solid var(--line);border-radius:10px;padding:10px 14px;transition:.15s}
+.chip:hover{border-color:var(--ember)}
+.chip.sel{border-color:var(--ember);background:var(--ember-soft)}
+.chip.ok{border-color:var(--moss);background:var(--moss-soft);color:var(--moss);cursor:default}
+.chip.no{animation:shake .35s;border-color:var(--rose)}
+.chip.word{font-weight:700}
+@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+@media (max-width:600px){.match{grid-template-columns:1fr}}
+
+/* story */
+.story{background:var(--paper);color:#3a2620;border-radius:4px 16px 4px 16px;padding:26px 28px;font-size:18px;line-height:1.7;max-width:70ch;box-shadow:0 10px 30px #0006;position:relative}
+.story p+p{margin-top:12px}
+.story .title{font-family:var(--display);font-size:30px;color:#8a3b17;margin-bottom:8px;display:block}
+.story b{color:#8a3b17}
+.rule{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.rule div{background:var(--wall-2);border:1px solid var(--line);border-radius:12px;padding:14px}
+.rule strong{font-family:var(--display);font-size:24px;color:var(--ember);display:block}
+.rule span{font-size:14px;color:var(--muted)}
+.gloss strong{font-size:21px}
+@media (max-width:600px){.rule{grid-template-columns:1fr}}
+.clues{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+@media (max-width:700px){.clues{grid-template-columns:1fr}}
+.clue{background:var(--wall-2);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.clue .n{font-size:13px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
+.clue .s{font-weight:700}
+.opts{display:flex;gap:6px;flex-wrap:wrap}
+.opt{appearance:none;cursor:pointer;font:inherit;font-size:15px;border-radius:8px;padding:6px 12px;background:transparent;color:var(--paper);border:1px solid var(--line)}
+.opt:hover{border-color:var(--ember)}
+.opt.ok{background:var(--moss-soft);border-color:var(--moss);color:var(--moss)}
+.opt.no{background:var(--rose-soft);border-color:var(--rose);color:var(--rose)}
+.why{font-size:14px;color:var(--muted)}
+.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+@media (max-width:700px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.flip{appearance:none;cursor:pointer;font:inherit;color:var(--paper);background:var(--wall-2);border:1px dashed var(--ember);border-radius:14px;min-height:120px;padding:14px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:15px;transition:.2s}
+.flip:not(.open){font-family:var(--display);font-size:26px;color:var(--ember)}
+.flip.open{border-style:solid;border-color:var(--line);font-style:italic}
+
+/* selects */
+.fill{display:flex;flex-direction:column;gap:10px;counter-reset:f}
+.fill li{list-style:none;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;padding:10px 14px;border-radius:10px;background:var(--wall-2);border:1px solid transparent}
+.fill li.ok{border-color:var(--moss)}.fill li.no{border-color:var(--rose)}
+.fill ul,.fill ol{padding:0;margin:0}
+select{font:inherit;font-size:16px;color:var(--paper);background:var(--night);border:1px solid var(--ember);border-radius:8px;padding:4px 8px;max-width:100%}
+.mark{font-size:14px;margin-left:auto}
+.mark.ok{color:var(--moss)}.mark.no{color:var(--rose)}
+.score{font-weight:700;color:var(--ember)}
+
+/* decks */
+.decks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+@media (max-width:700px){.decks{grid-template-columns:1fr}}
+.deck{background:var(--wall-2);border:1px solid var(--line);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:14px}
+.deck .q{font-size:20px;font-weight:700;min-height:3.2em;line-height:1.35}
+.tag{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ember)}
+
+/* final */
+.dice{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+@media (max-width:700px){.dice{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.die{background:var(--paper);color:#3a2620;border-radius:12px;padding:14px;min-height:96px;display:flex;flex-direction:column;gap:6px}
+.die .k{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#8a5a40}
+.die .v{font-weight:700;font-size:17px;line-height:1.3}
+.checks{display:flex;flex-wrap:wrap;gap:8px}
+.check{appearance:none;cursor:pointer;font:inherit;font-size:15px;border-radius:999px;padding:7px 14px;border:1px solid var(--line);background:transparent;color:var(--paper)}
+.check[aria-pressed="true"]{background:var(--moss-soft);border-color:var(--moss);color:var(--moss)}
+.check[aria-pressed="true"]::before{content:"✓ "}
+textarea{width:100%;min-height:160px;font:inherit;color:var(--paper);background:var(--night);border:1px solid var(--line);border-radius:12px;padding:14px;resize:vertical;line-height:1.6}
+.finale{text-align:center;color:var(--ember);font-family:var(--display);font-size:30px}
+
+.video{display:flex;gap:16px;align-items:center;padding:18px 20px;border-radius:14px;background:var(--wall-2);border:1px solid var(--ember);color:var(--paper);text-decoration:none;width:fit-content;max-width:100%}
+.video:hover{background:var(--ember-soft)}
+.video strong{display:block;font-size:18px}
+.play{width:48px;height:48px;border-radius:50%;background:var(--ember);flex:none;position:relative}
+.play::after{content:"";position:absolute;left:19px;top:14px;border-left:14px solid #2a1a10;border-top:10px solid transparent;border-bottom:10px solid transparent}
+.chip.picked{opacity:.45;cursor:default}
+.chip .ord{display:inline-block;min-width:1.6em;font-weight:700;color:var(--ember)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <span class="eyebrow">A Halloween lesson</span>
+      <h1>Hollow Hill House</h1>
+      <p class="lede">Seven rooms, one spooky night. Open a door, finish what's inside, and light a candle. Can you light all seven before midnight?</p>
+    </div>
+    <div>
+      <div class="candles" id="candles" aria-label="Rooms finished"></div>
+      <div class="candle-label" id="candleLabel">0 of 7 candles lit</div>
+    </div>
+  </header>
+
+  <nav class="doors" role="tablist" id="doors"></nav>
+
+  <!-- 1 PORCH -->
+  <section class="room" id="room-porch" role="tabpanel">
+    <div class="room-head">
+      <span class="eyebrow">Room 1 · The Front Porch</span>
+      <h2>Knock, knock…</h2>
+      <span class="goal">Warm-up: talk about Halloween, fears and spooky stories</span>
+    </div>
+    <div class="pumpkin-stage">
+      <button class="pumpkin" id="pumpkin" aria-label="Light the pumpkin for a new question">
+        <svg viewBox="0 0 150 130" aria-hidden="true">
+          <path d="M72 18 q2-14 14-16" stroke="#6f8a4e" stroke-width="6" fill="none" stroke-linecap="round"/>
+          <ellipse cx="45" cy="72" rx="34" ry="50" fill="#d9792f"/>
+          <ellipse cx="105" cy="72" rx="34" ry="50" fill="#d9792f"/>
+          <ellipse cx="75" cy="72" rx="36" ry="54" fill="#ec9548"/>
+          <path class="face" d="M48 58 l14-12 l6 16z M102 58 l-14-12 l-6 16z"/>
+          <path class="face" d="M42 86 q33 26 66 0 q-6 4 -12 2 l-6 8 l-8-6 l-7 7 l-7-7 l-8 6 l-6-8 q-6 2-12-2z"/>
+        </svg>
+      </button>
+      <div class="block">
+        <p class="question" id="question">Click the pumpkin to get your first question.</p>
+        <div class="row">
+          <button class="btn" id="nextQ">Next question</button>
+          <span class="counter" id="qCount"></span>
+        </div>
+      </div>
+    </div>
+    <p class="tip">Take turns: one student answers, the other asks one follow-up question (Why? When? How did you feel?).</p>
+    <div class="room-foot"><span class="tip">Next: the Library</span><button class="btn ghost" data-done="porch">Light the candle</button></div>
+  </section>
+
+  <!-- 2 LIBRARY -->
+  <section class="room" id="room-library" role="tabpanel" hidden>
+    <div class="room-head">
+      <span class="eyebrow">Room 2 · The Library</span>
+      <h2>Words from the dusty shelf</h2>
+      <span class="goal">Vocabulary: 10 spooky words for describing scenes and feelings</span>
+    </div>
+    <p class="lede">Click a word, then click its meaning. Wrong pairs will shake.</p>
+    <div class="match">
+      <div class="col" id="vWords"></div>
+      <div class="col" id="vDefs"></div>
+    </div>
+    <div class="row"><span class="score" id="vScore">0 / 10</span><button class="btn ghost" id="vReset">Shuffle again</button></div>
+    <div class="block">
+      <h3>Use them</h3>
+      <p>Choose 3 words and describe the scariest place you know: an old building, a forest, a basement, a hospital at night…</p>
+    </div>
+    <div class="room-foot"><span class="tip">Next: the Parlour</span><button class="btn ghost" data-done="library">Light the candle</button></div>
+  </section>
+
+  <!-- 3 PARLOUR -->
+  <section class="room" id="room-parlour" role="tabpanel" hidden>
+    <div class="room-head">
+      <span class="eyebrow">Room 3 · The Parlour</span>
+      <h2>The legend of Stingy Jack</h2>
+      <span class="goal">Listening: why do we carve pumpkins on Halloween?</span>
+    </div>
+    <div class="block">
+      <h3>Before you watch</h3>
+      <p>Why do people carve scary faces into pumpkins? Guess with <i>might</i> and <i>must</i>: "It might be to scare away…", "It must be an old tradition from…"</p>
+      <p>Who do you think Jack was? A farmer, a ghost, a hero, a thief?</p>
+    </div>
+    <div class="block">
+      <h3>Words you'll hear</h3>
+      <div class="rule gloss">
+        <div><strong>stingy</strong><span>doesn't like to spend or share money</span></div>
+        <div><strong>to trick</strong><span>to make someone believe something that isn't true</span></div>
+        <div><strong>to persuade</strong><span>to make someone agree to do something</span></div>
+        <div><strong>a soul</strong><span>the part of a person that lives after death</span></div>
+        <div><strong>a turnip</strong><span>a round white vegetable</span></div>
+        <div><strong>to wander</strong><span>to walk around with no plan or place to go</span></div>
+      </div>
+    </div>
+    <a class="video" href="https://www.youtube.com/watch?v=StBd35QCq4A" target="_blank" rel="noopener">
+      <span class="play" aria-hidden="true"></span>
+      <span><strong>Watch the video</strong><span class="why">Opens on YouTube in a new tab</span></span>
+    </a>
+    <div class="block">
+      <h3>True or false?</h3>
+      <div class="clues" id="tf"></div>
+      <span class="score" id="tfScore"></span>
+    </div>
+    <div class="block">
+      <h3>Put the story in order</h3>
+      <p class="lede">Click the events in the order they happen. Then retell the legend together: one sentence each.</p>
+      <div class="col" id="order"></div>
+      <div class="row"><span class="score" id="oScore"></span><button class="btn ghost" id="oReset">Start again</button></div>
+    </div>
+    <div class="block">
+      <h3>Talk about it</h3>
+      <div class="cards" id="jackTalk"></div>
+    </div>
+    <div class="room-foot"><span class="tip">Next: the Kitchen</span><button class="btn ghost" data-done="parlour">Light the candle</button></div>
+  </section>
+
+  <!-- 4 KITCHEN -->
+  <section class="room" id="room-kitchen" role="tabpanel" hidden>
+    <div class="room-head">
+      <span class="eyebrow">Room 4 · The Kitchen</span>
+      <h2>Who's been in the kitchen?</h2>
+      <span class="goal">Grammar: modals of deduction — must / might / can't</span>
+    </div>
+    <div class="story">
+      <span class="title">The House on Willow Lane</span>
+      <p>Victoria and Diana wanted a quiet Halloween weekend, so they rented an old house in a village through an app. It was strangely cheap. The owner, Mrs Grey, sent them the code for the door and then stopped answering messages.</p>
+      <p>The house was cold and dark. There were <b>cobwebs</b> in every corner, and the furniture was covered with white sheets. Only the kitchen was perfectly clean, as if somebody had just tidied it.</p>
+      <p>At midnight, the girls heard slow <b>footsteps</b> downstairs. The old floor <b>creaked</b>. Diana felt a <b>shiver</b> down her back. "We're the only people here," she <b>whispered</b>. "Aren't we?"</p>
+      <p>They went down to the kitchen. A candle <b>flickered</b> on the table. The table was set for three, and the tea in the third cup was still warm. Next to it was an old photo of two girls who looked exactly like Victoria and Diana. On the back somebody had written: <i>"Vera and Dina, Willow Lane, 1926."</i></p>
+      <p>Then, very slowly, the third chair moved away from the table, as if someone invisible wanted to sit down.</p>
+    </div>
+    <div class="block">
+      <h3>How sure are you?</h3>
+      <div class="rule">
+        <div><strong>must</strong><span>I'm almost 100% sure it's true.</span></div>
+        <div><strong>might / could</strong><span>It's possible. Maybe.</span></div>
+        <div><strong>can't</strong><span>I'm almost 100% sure it's impossible.</span></div>
+      </div>
+      <p class="tip">Form: modal + infinitive. It must <u>be</u> the wind. She might <u>be</u> a witch. It can't <u>be</u> Aunt Rose.</p>
+    </div>
+    <div class="block">
+      <h3>The clues</h3>
+      <p class="lede">Choose the best modal. Then say <i>why</i> — and argue if your partner disagrees!</p>
+      <div class="clues" id="clues"></div>
+      <span class="score" id="cScore"></span>
+      <p><b>Solve the mystery:</b> Who sat down in the third chair? Who were Vera and Dina? Give your theory using <i>must, might</i> and <i>can't</i>, then decide together: should the girls stay or leave right now?</p>
+    </div>
+    <div class="block">
+      <h3>Strange signs</h3>
+      <p class="lede">Open a card. What's going on? Why is this happening? Give at least two explanations: one with <i>must</i> or <i>can't</i>, one with <i>might</i>. Bonus: what would you do?</p>
+      <div class="cards" id="sounds"></div>
+    </div>
+    <div class="room-foot"><span class="tip">Next: the Attic</span><button class="btn ghost" data-done="kitchen">Light the candle</button></div>
+  </section>
+
+  <!-- 4 ATTIC -->
+  <section class="room" id="room-attic" role="tabpanel" hidden>
+    <div class="room-head">
+      <span class="eyebrow">Room 5 · The Attic</span>
+      <h2>Hotel for Monsters: house rules</h2>
+      <span class="goal">Grammar: must / have to / mustn't / don't have to</span>
+    </div>
+    <div class="rule">
+      <div><strong>must / have to</strong><span>It's necessary. A rule or obligation.</span></div>
+      <div><strong>mustn't</strong><span>It's forbidden. Don't do it!</span></div>
+      <div><strong>don't have to</strong><span>It isn't necessary. You can choose.</span></div>
+    </div>
+    <p class="lede">Aunt Rose found an old sign in the attic. Complete the rules.</p>
+    <ol class="fill" id="rules"></ol>
+    <div class="row"><button class="btn" id="rulesCheck">Check answers</button><span class="score" id="rScore"></span></div>
+    <div class="block">
+      <h3>Your turn</h3>
+      <p>Together, write 4 rules for your own haunted hotel: two with <i>must / have to</i>, one with <i>mustn't</i>, one with <i>don't have to</i>.</p>
+      <p>Then: what do you <i>have to</i> do on holidays in your family? What <i>don't</i> you <i>have to</i> do?</p>
+    </div>
+    <div class="room-foot"><span class="tip">Next: the Cellar</span><button class="btn ghost" data-done="attic">Light the candle</button></div>
+  </section>
+
+  <!-- 5 CELLAR -->
+  <section class="room" id="room-cellar" role="tabpanel" hidden>
+    <div class="room-head">
+      <span class="eyebrow">Room 6 · The Cellar</span>
+      <h2>What if…?</h2>
+      <span class="goal">Grammar: first conditional (real) and second conditional (imaginary)</span>
+    </div>
+    <div class="rule" style="grid-template-columns:repeat(2,1fr)">
+      <div><strong>If + present, will</strong><span>Real, possible future. If it rains on Halloween, we'll stay at home.</span></div>
+      <div><strong>If + past, would</strong><span>Imaginary or unlikely. If I were a vampire, I'd sleep all day.</span></div>
+    </div>
+    <p class="lede">Match the beginnings and endings. Careful: first and second conditional are mixed!</p>
+    <ol class="fill" id="conds"></ol>
+    <div class="row"><button class="btn" id="condCheck">Check answers</button><span class="score" id="cdScore"></span></div>
+    <div class="decks">
+      <div class="deck">
+        <span class="tag">First conditional · real plans</span>
+        <p class="q" id="deck1">What will you do if…?</p>
+        <button class="btn" id="draw1">Draw a card</button>
+      </div>
+      <div class="deck">
+        <span class="tag">Second conditional · imagine</span>
+        <p class="q" id="deck2">What would you do if…?</p>
+        <button class="btn" id="draw2">Draw a card</button>
+      </div>
+    </div>
+    <p class="tip">Ask each other. Answer with a full sentence, then add one more detail.</p>
+    <div class="room-foot"><span class="tip">Next: the Garden</span><button class="btn ghost" data-done="cellar">Light the candle</button></div>
+  </section>
+
+  <!-- 6 GARDEN -->
+  <section class="room" id="room-garden" role="tabpanel" hidden>
+    <div class="room-head">
+      <span class="eyebrow">Room 7 · The Garden at Midnight</span>
+      <h2>Tell the ghost story</h2>
+      <span class="goal">Speaking: use everything from tonight in one story</span>
+    </div>
+    <p class="lede">Roll the story. Take turns: each person adds one or two sentences. Tick a box when someone uses that grammar.</p>
+    <div class="dice" id="dice"></div>
+    <div class="row"><button class="btn" id="roll">Roll the story</button></div>
+    <div class="checks" id="checks"></div>
+    <label for="storyBox" class="eyebrow">Write your story here</label>
+    <textarea id="storyBox" placeholder="It was a dark, cold night when…"></textarea>
+    <div class="block">
+      <h3>By the fire: bonus questions</h3>
+      <p class="lede">For the last minutes, or for the next lesson. Open a card, answer, and ask your partner a follow-up.</p>
+      <div class="cards" id="fire"></div>
+    </div>
+    <p class="finale" id="finale" hidden>All seven candles are lit. Happy Halloween!</p>
+    <div class="room-foot"><span class="tip">Last room</span><button class="btn ghost" data-done="garden">Light the candle</button></div>
+  </section>
+</div>
+
+<script>
+const ROOMS=[["porch","Front Porch",10],["library","Library",10],["parlour","Parlour",15],["kitchen","Kitchen",15],["attic","Attic",15],["cellar","Cellar",15],["garden","Garden",10]];
+const done=new Set();
+const doorsEl=document.getElementById("doors"), candlesEl=document.getElementById("candles");
+ROOMS.forEach(([id,name,m],i)=>{
+  const b=document.createElement("button");b.className="door";b.setAttribute("role","tab");b.id="door-"+id;
+  b.innerHTML=`<span class="num">${["I","II","III","IV","V","VI","VII"][i]}</span><span class="name">${name}</span>`;
+  b.onclick=()=>openRoom(id);doorsEl.appendChild(b);
+  const c=document.createElement("span");c.className="candle";c.id="candle-"+id;candlesEl.appendChild(c);
+});
+function openRoom(id){
+  ROOMS.forEach(([r])=>{document.getElementById("room-"+r).hidden=r!==id;document.getElementById("door-"+r).setAttribute("aria-selected",r===id)});
+  if(location.hash!=="#"+id)history.replaceState(null,"","#"+id);
+}
+document.querySelectorAll("[data-done]").forEach(b=>b.onclick=()=>{
+  const id=b.dataset.done;done.add(id);
+  document.getElementById("candle-"+id).classList.add("lit");document.getElementById("door-"+id).classList.add("done");
+  document.getElementById("candleLabel").textContent=`${done.size} of ${ROOMS.length} candles lit`;
+  b.textContent="Candle lit";
+  if(done.size===ROOMS.length)document.getElementById("finale").hidden=false;
+  const i=ROOMS.findIndex(r=>r[0]===id);
+  if(i<ROOMS.length-1)setTimeout(()=>{openRoom(ROOMS[i+1][0]);window.scrollTo({top:0,behavior:"smooth"})},500);
+});
+const start=location.hash.slice(1);openRoom(ROOMS.some(r=>r[0]===start)?start:"porch");
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+
+/* 1 warm-up */
+const QS=shuffle([
+ "Is Halloween popular among your friends? Do you think Russia should celebrate it, or is it someone else's holiday?",
+ "What scared you as a child that seems funny now?",
+ "What scares you more now: ghosts, or adult things like deadlines, bills and phone calls?",
+ "What's the best horror film or series you've seen? What made it good: the story, the music, the actors?",
+ "Do you believe in ghosts? Do you know anyone who says they've seen one?",
+ "If you went to a costume party tonight, what or who would you dress up as?",
+ "What's a scary story or urban legend from your town or your childhood?",
+ "Would you spend a night alone in an abandoned hospital for 100,000 roubles?",
+ "Are you superstitious? Do you knock on wood, sit down before a trip or avoid black cats?",
+ "Have you ever had an experience you can't explain?"
+]);
+let qi=-1;const pumpkin=document.getElementById("pumpkin");
+function nextQ(){qi=(qi+1)%QS.length;document.getElementById("question").textContent=QS[qi];
+  document.getElementById("qCount").textContent=`Question ${qi+1} of ${QS.length}`;
+  pumpkin.classList.add("on");pumpkin.classList.remove("spin");void pumpkin.offsetWidth;pumpkin.classList.add("spin")}
+pumpkin.onclick=nextQ;document.getElementById("nextQ").onclick=nextQ;
+
+/* 2 vocab */
+const VOCAB=[
+ ["creepy","strange and a little scary, it makes you feel uncomfortable"],
+ ["to creak","to make a long, high sound, like an old door or floor"],
+ ["to flicker","to shine on and off, like a candle in the wind"],
+ ["footsteps","the sound of somebody walking"],
+ ["a shiver","a quick shake of your body when you're cold or scared"],
+ ["to whisper","to speak very, very quietly"],
+ ["a cobweb","an old, dusty spider's net in a corner"],
+ ["haunted","a place where people think ghosts live"],
+ ["to vanish","to disappear suddenly"],
+ ["a scream","a loud, high cry when you're frightened"]
+];
+let vSel=null,vOk=0;
+function buildVocab(){
+  vSel=null;vOk=0;document.getElementById("vScore").textContent="0 / 10";
+  const W=document.getElementById("vWords"),D=document.getElementById("vDefs");W.innerHTML="";D.innerHTML="";
+  shuffle(VOCAB).forEach(([w])=>{const b=document.createElement("button");b.className="chip word";b.textContent=w;b.dataset.k=w;
+    b.onclick=()=>{if(b.classList.contains("ok"))return;W.querySelectorAll(".sel").forEach(x=>x.classList.remove("sel"));b.classList.add("sel");vSel=b};W.appendChild(b)});
+  shuffle(VOCAB).forEach(([w,d])=>{const b=document.createElement("button");b.className="chip";b.textContent=d;b.dataset.k=w;
+    b.onclick=()=>{if(!vSel||b.classList.contains("ok"))return;
+      if(vSel.dataset.k===w){vSel.classList.remove("sel");vSel.classList.add("ok");b.classList.add("ok");vSel=null;vOk++;
+        document.getElementById("vScore").textContent=`${vOk} / 10`+(vOk===10?" — all found!":"")}
+      else{b.classList.add("no");setTimeout(()=>b.classList.remove("no"),400)}};D.appendChild(b)});
+}
+buildVocab();document.getElementById("vReset").onclick=buildVocab;
+
+/* 3 Jack */
+const TF=[
+ ["Jack was a kind and generous man.",false,"No: he was stingy and greedy, and he liked to hurt people."],
+ ["Jack invited the Devil to dinner, but he didn't want to pay.",true,"Yes, that's how the trouble started."],
+ ["Jack persuaded the Devil to turn into a coin.",true,"Yes, a clever trick!"],
+ ["Jack put the coin in his shoe.",false,"No: he put it in his pocket next to a silver cross, so the Devil couldn't change back."],
+ ["Jack let the Devil go for ten years of peace.",false,"No: only one year. Then the Devil came back."],
+ ["When Jack died, he went to heaven.",false,"No: heaven didn't accept him, and the Devil didn't let him into hell."],
+ ["Jack put the burning coal in a carved turnip.",true,"Yes. Later the turnip became a pumpkin."],
+ ["People wore costumes so ghosts would think they were ghosts too.",true,"Yes: ghosts wouldn't hurt 'one of their own'."]
+];
+let tfOk=0,tfTried=0;const tfEl=document.getElementById("tf");
+TF.forEach(([s,ans,why],i)=>{const d=document.createElement("div");d.className="clue";
+  d.innerHTML=`<span class="n">${i+1}</span><p class="s">${s}</p><div class="opts"></div><p class="why" hidden></p>`;
+  const opts=d.querySelector(".opts"),w=d.querySelector(".why");let answered=false;
+  [["True",true],["False",false]].forEach(([l,v])=>{const b=document.createElement("button");b.className="opt";b.textContent=l;
+    b.onclick=()=>{opts.querySelectorAll(".opt").forEach(x=>x.classList.remove("no"));
+      if(v===ans){b.classList.add("ok");w.hidden=false;w.textContent=why;if(!answered){answered=true;tfTried++;tfOk++}}
+      else{b.classList.add("no");if(!answered){answered=true;tfTried++}}
+      document.getElementById("tfScore").textContent=`First-try answers: ${tfOk} / ${tfTried}`};opts.appendChild(b)});
+  tfEl.appendChild(d)});
+const EVENTS=["Jack invites the Devil to dinner but doesn't want to pay.","Jack persuades the Devil to turn into a coin.","Jack puts the coin in his pocket next to a silver cross, and the Devil is trapped.","Jack lets the Devil go, but asks for one year of peace.","A year later the Devil comes back, and Jack tricks him again.","Jack dies. Heaven doesn't accept him, and the Devil doesn't let him into hell.","The Devil sends him into the dark night with a burning coal. Jack puts it in a carved turnip.","Jack's soul still wanders on Halloween night, stuck between two worlds."];
+const orderEl=document.getElementById("order");let oNext=0;
+function buildOrder(){oNext=0;orderEl.innerHTML="";document.getElementById("oScore").textContent="";
+  shuffle(EVENTS.map((e,i)=>[e,i])).forEach(([e,i])=>{const b=document.createElement("button");b.className="chip";b.innerHTML=`<span class="ord"></span>${e}`;
+    b.onclick=()=>{if(b.classList.contains("ok"))return;
+      if(i===oNext){b.classList.add("ok");b.querySelector(".ord").textContent=(i+1)+".";oNext++;
+        orderEl.appendChild(b);[...orderEl.children].filter(c=>!c.classList.contains("ok")).forEach(c=>orderEl.appendChild(c));
+        if(oNext===EVENTS.length)document.getElementById("oScore").textContent="The whole story is in order!"}
+      else{b.classList.add("no");setTimeout(()=>b.classList.remove("no"),400)}};orderEl.appendChild(b)})}
+buildOrder();document.getElementById("oReset").onclick=buildOrder;
+const JT=["If you met the Devil, what would you ask him for?","Jack must be very clever. Do you agree? Why?","If you were Jack, how would you trick the Devil?","Why did people wear costumes in the past? Would it work if you met a ghost?","If a ghost knocked on your door tonight, what would you give it?","If you carve a pumpkin this year, what face will you make?","Jack can't be a good person. Or can he? Discuss.","Do you know a similar legend from Russia?"];
+const jtEl=document.getElementById("jackTalk");
+JT.forEach((t,i)=>{const b=document.createElement("button");b.className="flip";b.textContent="?";b.setAttribute("aria-label","Open question card "+(i+1));
+  b.onclick=()=>{b.classList.add("open");b.textContent=t};jtEl.appendChild(b)});
+
+/* 4 deduction */
+const CLUES=[
+ ["The tea in the third cup is still warm. The girls didn't make any tea.","Someone ___ be in the house.","must","Warm tea doesn't make itself. Strong evidence."],
+ ["Mrs Grey lives in another city, 800 km away.","The person in the kitchen ___ be Mrs Grey.","can't","She's too far away, so it's impossible."],
+ ["The candle is flickering and the window is a little open.","It ___ be the wind.","might","Possible, but maybe it's something else."],
+ ["The photo was taken in 1926.","The girls in the photo ___ be Victoria and Diana.","can't","They weren't born in 1926. Impossible! Or is it?"],
+ ["The whole house is dusty, but the kitchen is perfectly clean.","Somebody ___ clean the kitchen regularly.","must","A clean room in a dusty house is strong evidence."],
+ ["Vera and Dina look exactly like the girls.","They ___ be Victoria and Diana's great-grandmothers.","might","It's possible, but we need more information. Discuss!"],
+ ["The reviews on the app say: 'Beautiful house! We left after the first night.'","There ___ be something strange about this house.","must","Everybody leaves early. That's a pattern."],
+ ["The house costs 900 roubles a night. Houses nearby cost 9,000.","The low price ___ be a mistake.","might","Maybe a mistake, maybe a trap. What do you think?"]
+];
+let cOk=0,cTried=0;const cluesEl=document.getElementById("clues");
+CLUES.forEach(([ctx,s,ans,why],i)=>{
+  const d=document.createElement("div");d.className="clue";
+  d.innerHTML=`<span class="n">Clue ${i+1}</span><p>${ctx}</p><p class="s">${s.replace("___","<u>&nbsp;?&nbsp;</u>")}</p><div class="opts"></div><p class="why" hidden></p>`;
+  const opts=d.querySelector(".opts"),w=d.querySelector(".why");let answered=false;
+  ["must","might","can't"].forEach(o=>{const b=document.createElement("button");b.className="opt";b.textContent=o;
+    b.onclick=()=>{opts.querySelectorAll(".opt").forEach(x=>x.classList.remove("no"));
+      if(o===ans){b.classList.add("ok");if(!answered){answered=true;cTried++;cOk++}
+        w.hidden=false;w.textContent=why;d.querySelector(".s u").innerHTML=`&nbsp;${ans}&nbsp;`}
+      else{b.classList.add("no");if(!answered){answered=true;cTried++}}
+      document.getElementById("cScore").textContent=`First-try answers: ${cOk} / ${cTried}`};opts.appendChild(b)});
+  cluesEl.appendChild(d);
+});
+const SOUNDS=["Tap… tap… tap… on the window. It's very windy tonight.","Your boss texts you at 11 p.m.: 'Can we talk tomorrow?'","Your phone rings at 3 a.m. Nobody is there.","Your friend has read your message but hasn't answered for six hours.","Someone you dated years ago likes your photo from 2019. At 2 a.m.","Music is playing from the empty flat next door.","A dog is barking and barking at the empty corner of the room.","Your name is written in the dust on the mirror."];
+const soundsEl=document.getElementById("sounds");
+shuffle(SOUNDS).forEach((t,i)=>{const b=document.createElement("button");b.className="flip";b.textContent="?";
+  b.setAttribute("aria-label","Open mystery card "+(i+1));b.onclick=()=>{b.classList.add("open");b.textContent=t};soundsEl.appendChild(b)});
+
+/* 4 rules */
+const RULES=[
+ ["Vampires","come back to their coffins before sunrise.",["must","have to"]],
+ ["Guests","feed the werewolf after midnight. It's dangerous!",["mustn't"]],
+ ["Ghosts","use the doors. They can walk through walls.",["don't have to"]],
+ ["Zombies","wipe their feet before they come in. The carpet is new.",["must","have to"]],
+ ["You","wear a costume, but it's more fun if you do.",["don't have to"]],
+ ["Guests","open Room 13. Never, ever!",["mustn't"]],
+ ["Skeletons","pay for dinner. They don't eat anything.",["don't have to"]],
+ ["Witches","park their brooms in the garden, not in the hall.",["must","have to"]]
+];
+const RO=["must","have to","mustn't","don't have to"];
+const rulesEl=document.getElementById("rules");
+RULES.forEach(([sub,rest],i)=>{const li=document.createElement("li");
+  li.innerHTML=`<span>${i+1}. ${sub}</span><select id="rule-${i}" aria-label="Rule ${i+1}"><option value="">…</option>${RO.map(o=>`<option>${o}</option>`).join("")}</select><span>${rest}</span><span class="mark"></span>`;rulesEl.appendChild(li)});
+document.getElementById("rulesCheck").onclick=()=>{let ok=0;
+  RULES.forEach(([, ,ans],i)=>{const li=rulesEl.children[i],v=li.querySelector("select").value,m=li.querySelector(".mark");
+    const good=ans.includes(v);li.className=v?(good?"ok":"no"):"";m.className="mark "+(good?"ok":"no");
+    m.textContent=!v?"":good?(ans.length>1?"✓ (must / have to both work)":"✓"):"try again";if(good)ok++});
+  document.getElementById("rScore").textContent=`${ok} / ${RULES.length}`};
+
+/* 5 conditionals */
+const CONDS=[
+ ["If you knock on the witch's door,","she will give you a candy apple."],
+ ["If it rains on Halloween night,","we'll watch horror films at home."],
+ ["If you drink coffee this late,","you won't sleep tonight."],
+ ["If the cat sees a ghost,","it will run under the bed."],
+ ["If I were a vampire,","I would sleep all day and never get a tan."],
+ ["If I saw a ghost in my bedroom,","I'd scream and call my best friend."],
+ ["If I could be invisible for one day,","I would fly to Paris without a ticket."],
+ ["If we lived in a haunted castle,","we wouldn't sleep at night."]
+];
+const endings=shuffle(CONDS.map(c=>c[1]));const condsEl=document.getElementById("conds");
+CONDS.forEach(([a],i)=>{const li=document.createElement("li");
+  li.innerHTML=`<span>${a}</span><select id="cond-${i}" aria-label="Ending ${i+1}"><option value="">choose an ending…</option>${endings.map(e=>`<option>${e}</option>`).join("")}</select><span class="mark"></span>`;condsEl.appendChild(li)});
+document.getElementById("condCheck").onclick=()=>{let ok=0;
+  CONDS.forEach(([,b],i)=>{const li=condsEl.children[i],v=li.querySelector("select").value,m=li.querySelector(".mark"),good=v===b;
+    li.className=v?(good?"ok":"no"):"";m.className="mark "+(good?"ok":"no");m.textContent=!v?"":good?(i<4?"✓ 1st":"✓ 2nd"):"try again";if(good)ok++});
+  document.getElementById("cdScore").textContent=`${ok} / ${CONDS.length}`};
+function deck(list,el,btn){let d=shuffle(list),i=0;document.getElementById(btn).onclick=()=>{if(i>=d.length){d=shuffle(list);i=0}document.getElementById(el).textContent=d[i++]}}
+deck(["If it's cold and rainy on October 31st, what will you do?","If a friend invites you to a horror-film marathon, will you go?","If you get a job offer abroad next year, will you take it?","If you have some free time this weekend, what will you do?","If you don't sleep enough tonight, how will you feel tomorrow?","If you start a new hobby this winter, what will it be?","If you have some extra money this month, what will you spend it on?"],"deck1","draw1");
+deck(["What would you do if you found a secret room in your flat?","If you found out your flat was haunted, would you move out or stay? What if the rent were half the price?","If you could know the date of your death, would you want to know?","If you could delete one fear from your brain, which one would you choose?","If you could live forever, would you say yes?","If you could read a friend's thoughts for one day, would you do it?","If you woke up and everyone else had vanished, what would you do first?","If you could live in any century for a year, which one would you choose?"],"deck2","draw2");
+
+/* 6 story */
+const DICE={
+ "Who":["an old lighthouse keeper","two cousins on holiday","a lonely little ghost","a witch who's afraid of cats","a teacher who never sleeps","a vampire who loves garlic"],
+ "Where":["an empty hospital at night","a train in the mountains","a library after closing time","a cottage in a dark forest","a school on Halloween night","a hotel with no guests"],
+ "Object":["an old key","a red umbrella","a phone with no battery","a box of pumpkin cookies","a photo from 1890","a music box"],
+ "Problem":["the lights go out","someone is knocking","a door won't open","a friend vanishes","the clock stops at midnight","a strange voice whispers a name"]
+};
+const diceEl=document.getElementById("dice");
+function roll(){diceEl.innerHTML="";Object.entries(DICE).forEach(([k,v])=>{const d=document.createElement("div");d.className="die";
+  d.innerHTML=`<span class="k">${k}</span><span class="v">${v[Math.floor(Math.random()*v.length)]}</span>`;diceEl.appendChild(d)})}
+roll();document.getElementById("roll").onclick=roll;
+["must / might / can't","must / have to","mustn't / don't have to","If… will…","If… would…","3 new words from the Library"].forEach(t=>{
+  const b=document.createElement("button");b.className="check";b.textContent=t;b.setAttribute("aria-pressed","false");
+  b.onclick=()=>b.setAttribute("aria-pressed",b.getAttribute("aria-pressed")!=="true");document.getElementById("checks").appendChild(b)});
+
+const FIRE=["Why do people enjoy being scared? Is it the adrenaline, or the feeling that we're safe?","True crime podcasts are very popular, especially with women. Why do you think that is?","Is it OK to scare children with monsters to make them behave, like Babayka?","What's a 'red flag' on a first date that would scare you more than any ghost?","Which is scarier: being alone forever, or being with the wrong person?","Do horror films reflect what a society is afraid of? What are people afraid of today?","Would you live in a flat where something terrible happened if it were very cheap?","What's the scariest thing about being an adult?","Do you think fear is useful? When has fear helped you?","Would you rather know the truth about something scary, or not know at all?"];
+const fireEl=document.getElementById("fire");
+shuffle(FIRE).forEach((t,i)=>{const b=document.createElement("button");b.className="flip";b.textContent="?";b.setAttribute("aria-label","Open bonus card "+(i+1));
+  b.onclick=()=>{b.classList.add("open");b.textContent=t};fireEl.appendChild(b)});
+</script>
+</body>
+</html>
