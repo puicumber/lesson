@@ -1,0 +1,486 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>St. Hollow's Hospital</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Grenze+Gotisch:wght@500;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+[hidden]{display:none!important} body{margin:0}
+
+/* Layout: a house you walk through — arched doors as room tabs, one lit room at a time, candles track progress. Single cozy-night theme by choice. */
+:root{
+  --night:#221822; --wall:#2f222d; --wall-2:#3a2a37; --line:#57404f;
+  --paper:#f4e7d0; --muted:#bfa999; --ember:#ec9548; --ember-soft:#ec954826;
+  --moss:#a6bb8f; --moss-soft:#a6bb8f22; --rose:#e07a7f; --rose-soft:#e07a7f22;
+  --mist:#b9a3dd;
+  --display:"Grenze Gotisch", "Palatino Linotype", Georgia, serif;
+  --body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--night);color:var(--paper);font-family:var(--body);font-size:17px;line-height:1.55;
+  background-image:radial-gradient(1200px 500px at 50% -120px,#ec95481f,transparent 70%);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 64px}
+.wrap{max-width:980px;margin:0 auto;display:flex;flex-direction:column;gap:28px}
+h1,h2,h3{font-family:var(--display);font-weight:700;text-wrap:balance;margin:0;line-height:1.05}
+h1{font-size:clamp(44px,8vw,76px);color:var(--ember);letter-spacing:.5px}
+h2{font-size:clamp(34px,5vw,48px);color:var(--paper)}
+h3{font-size:26px;color:var(--ember)}
+p{margin:0}
+.eyebrow{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.lede{color:var(--muted);max-width:60ch}
+header.top{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap}
+.candles{display:flex;gap:10px;align-items:flex-end}
+.candle{width:14px;height:38px;border-radius:3px 3px 2px 2px;background:var(--wall-2);position:relative;border:1px solid var(--line)}
+.candle::before{content:"";position:absolute;left:50%;top:-14px;width:9px;height:13px;transform:translateX(-50%);border-radius:50% 50% 50% 50%/60% 60% 40% 40%;background:transparent;transition:.4s}
+.candle.lit{background:var(--paper);border-color:var(--paper)}
+.candle.lit::before{background:var(--ember);box-shadow:0 0 14px 4px #ec954880;animation:flick 2.4s infinite ease-in-out}
+@keyframes flick{0%,100%{transform:translateX(-50%) scale(1)}45%{transform:translateX(-52%) scale(1.08,.94)}70%{transform:translateX(-48%) scale(.95,1.05)}}
+.candle-label{font-size:13px;color:var(--muted);margin-top:6px;text-align:right}
+
+/* doors */
+nav.doors{display:grid;grid-template-columns:repeat(7,1fr);gap:10px}
+.door{appearance:none;cursor:pointer;font:inherit;color:var(--paper);background:var(--wall);border:1px solid var(--line);
+  border-radius:60px 60px 6px 6px;padding:22px 8px 12px;display:flex;flex-direction:column;align-items:center;gap:4px;min-height:118px;justify-content:flex-end;transition:transform .15s,background .2s,border-color .2s;position:relative}
+.door:hover{transform:translateY(-2px);border-color:var(--ember)}
+.door:focus-visible{outline:2px solid var(--ember);outline-offset:3px}
+.door .num{font-family:var(--display);font-size:26px;color:var(--muted)}
+.door .name{font-weight:700;font-size:15px;text-align:center;line-height:1.2}
+.door .mins{font-size:12px;color:var(--muted)}
+.door[aria-selected="true"]{background:linear-gradient(180deg,#ec954833,var(--wall) 70%);border-color:var(--ember)}
+.door[aria-selected="true"] .num{color:var(--ember)}
+.door.done::after{content:"✓";position:absolute;top:12px;right:50%;transform:translateX(50%);font-size:13px;color:var(--moss)}
+@media (max-width:720px){nav.doors{grid-template-columns:repeat(4,1fr)}.door{min-height:96px}}
+
+/* rooms */
+section.room{background:var(--wall);border:1px solid var(--line);border-radius:18px;padding:clamp(20px,4vw,40px);display:flex;flex-direction:column;gap:26px}
+.room-head{display:flex;flex-direction:column;gap:8px}
+.goal{display:inline-flex;gap:8px;align-items:center;font-size:14px;color:var(--moss);background:var(--moss-soft);border-radius:999px;padding:4px 12px;width:fit-content}
+.block{display:flex;flex-direction:column;gap:14px}
+.btn{appearance:none;cursor:pointer;font:inherit;font-weight:700;font-size:16px;border-radius:999px;padding:10px 20px;border:1px solid var(--ember);background:var(--ember);color:#2a1a10;transition:filter .15s,transform .1s}
+.btn:hover{filter:brightness(1.08)}.btn:active{transform:scale(.98)}
+.btn.ghost{background:transparent;color:var(--ember)}
+.btn:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--paper);outline-offset:2px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.room-foot{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;border-top:1px dashed var(--line);padding-top:18px}
+.tip{font-size:14px;color:var(--muted);font-style:italic;max-width:62ch}
+
+/* warm-up */
+.pumpkin-stage{display:grid;grid-template-columns:auto 1fr;gap:24px;align-items:center}
+@media (max-width:600px){.pumpkin-stage{grid-template-columns:1fr;justify-items:center;text-align:center}}
+.pumpkin{width:150px;height:130px;cursor:pointer;border:none;background:none;padding:0}
+.pumpkin svg{width:100%;height:100%;transition:transform .5s}
+.pumpkin.spin svg{transform:rotate(360deg)}
+.pumpkin .face{fill:var(--wall);transition:fill .3s}
+.pumpkin.on .face{fill:#ffd27a;filter:drop-shadow(0 0 6px #ffb347)}
+.question{font-size:clamp(22px,3.2vw,30px);line-height:1.3;font-weight:700;min-height:3em}
+.counter{font-size:14px;color:var(--muted)}
+
+/* vocab */
+.match{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr);gap:12px 18px}
+.col{display:flex;flex-direction:column;gap:8px;min-width:0}
+.chip{appearance:none;cursor:pointer;font:inherit;text-align:left;color:var(--paper);background:var(--wall-2);border:1px solid var(--line);border-radius:10px;padding:10px 14px;transition:.15s}
+.chip:hover{border-color:var(--ember)}
+.chip.sel{border-color:var(--ember);background:var(--ember-soft)}
+.chip.ok{border-color:var(--moss);background:var(--moss-soft);color:var(--moss);cursor:default}
+.chip.no{animation:shake .35s;border-color:var(--rose)}
+.chip.word{font-weight:700}
+@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+@media (max-width:600px){.match{grid-template-columns:1fr}}
+
+/* story */
+.story{background:var(--paper);color:#3a2620;border-radius:4px 16px 4px 16px;padding:26px 28px;font-size:18px;line-height:1.7;max-width:70ch;box-shadow:0 10px 30px #0006;position:relative}
+.story p+p{margin-top:12px}
+.story .title{font-family:var(--display);font-size:30px;color:#8a3b17;margin-bottom:8px;display:block}
+.story b{color:#8a3b17}
+.rule{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.rule div{background:var(--wall-2);border:1px solid var(--line);border-radius:12px;padding:14px}
+.rule strong{font-family:var(--display);font-size:24px;color:var(--ember);display:block}
+.rule span{font-size:14px;color:var(--muted)}
+.gloss strong{font-size:21px}
+@media (max-width:600px){.rule{grid-template-columns:1fr}}
+.clues{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+@media (max-width:700px){.clues{grid-template-columns:1fr}}
+.clue{background:var(--wall-2);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.clue .n{font-size:13px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
+.clue .s{font-weight:700}
+.opts{display:flex;gap:6px;flex-wrap:wrap}
+.opt{appearance:none;cursor:pointer;font:inherit;font-size:15px;border-radius:8px;padding:6px 12px;background:transparent;color:var(--paper);border:1px solid var(--line)}
+.opt:hover{border-color:var(--ember)}
+.opt.ok{background:var(--moss-soft);border-color:var(--moss);color:var(--moss)}
+.opt.no{background:var(--rose-soft);border-color:var(--rose);color:var(--rose)}
+.why{font-size:14px;color:var(--muted)}
+.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+@media (max-width:700px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.flip{appearance:none;cursor:pointer;font:inherit;color:var(--paper);background:var(--wall-2);border:1px dashed var(--ember);border-radius:14px;min-height:120px;padding:14px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:15px;transition:.2s}
+.flip:not(.open){font-family:var(--display);font-size:26px;color:var(--ember)}
+.flip.open{border-style:solid;border-color:var(--line);font-style:italic}
+
+/* selects */
+.fill{display:flex;flex-direction:column;gap:10px;counter-reset:f}
+.fill li{list-style:none;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;padding:10px 14px;border-radius:10px;background:var(--wall-2);border:1px solid transparent}
+.fill li.ok{border-color:var(--moss)}.fill li.no{border-color:var(--rose)}
+.fill ul,.fill ol{padding:0;margin:0}
+select{font:inherit;font-size:16px;color:var(--paper);background:var(--night);border:1px solid var(--ember);border-radius:8px;padding:4px 8px;max-width:100%}
+.mark{font-size:14px;margin-left:auto}
+.mark.ok{color:var(--moss)}.mark.no{color:var(--rose)}
+.score{font-weight:700;color:var(--ember)}
+
+/* decks */
+.decks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+@media (max-width:700px){.decks{grid-template-columns:1fr}}
+.deck{background:var(--wall-2);border:1px solid var(--line);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:14px}
+.deck .q{font-size:20px;font-weight:700;min-height:3.2em;line-height:1.35}
+.tag{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ember)}
+
+/* final */
+.dice{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+@media (max-width:700px){.dice{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.die{background:var(--paper);color:#3a2620;border-radius:12px;padding:14px;min-height:96px;display:flex;flex-direction:column;gap:6px}
+.die .k{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#8a5a40}
+.die .v{font-weight:700;font-size:17px;line-height:1.3}
+.checks{display:flex;flex-wrap:wrap;gap:8px}
+.check{appearance:none;cursor:pointer;font:inherit;font-size:15px;border-radius:999px;padding:7px 14px;border:1px solid var(--line);background:transparent;color:var(--paper)}
+.check[aria-pressed="true"]{background:var(--moss-soft);border-color:var(--moss);color:var(--moss)}
+.check[aria-pressed="true"]::before{content:"✓ "}
+textarea{width:100%;min-height:160px;font:inherit;color:var(--paper);background:var(--night);border:1px solid var(--line);border-radius:12px;padding:14px;resize:vertical;line-height:1.6}
+.finale{text-align:center;color:var(--ember);font-family:var(--display);font-size:30px}
+
+.video{display:flex;gap:16px;align-items:center;padding:18px 20px;border-radius:14px;background:var(--wall-2);border:1px solid var(--ember);color:var(--paper);text-decoration:none;width:fit-content;max-width:100%}
+.video:hover{background:var(--ember-soft)}
+.video strong{display:block;font-size:18px}
+.play{width:48px;height:48px;border-radius:50%;background:var(--ember);flex:none;position:relative}
+.play::after{content:"";position:absolute;left:19px;top:14px;border-left:14px solid #2a1a10;border-top:10px solid transparent;border-bottom:10px solid transparent}
+.chip.picked{opacity:.45;cursor:default}
+.chip .ord{display:inline-block;min-width:1.6em;font-weight:700;color:var(--ember)}
+
+nav.doors{grid-template-columns:repeat(5,1fr)}
+@media (max-width:720px){nav.doors{grid-template-columns:repeat(5,1fr)}.door{padding:18px 4px 10px;min-height:92px}.door .name{font-size:12px}}
+.opt.picked{background:var(--ember-soft);border-color:var(--ember);color:var(--ember)}
+.result{border:1px solid var(--ember);background:var(--ember-soft);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:8px}
+.result h3{font-size:34px}
+.ball-stage{display:grid;grid-template-columns:auto 1fr;gap:28px;align-items:center}
+@media (max-width:600px){.ball-stage{grid-template-columns:1fr;justify-items:center;text-align:center}}
+.ball{width:180px;height:180px;border-radius:50%;border:none;cursor:pointer;flex:none;
+  background:radial-gradient(circle at 34% 28%,#ffffffb0 0 6%,transparent 18%),radial-gradient(circle at 50% 55%,#cdb8ef,#8d6fb8 45%,#3b2a5c 80%);
+  box-shadow:0 0 50px #b9a3dd55,inset 0 -12px 30px #0005;transition:box-shadow .4s,transform .4s}
+.ball:hover{box-shadow:0 0 70px #b9a3dd88,inset 0 -12px 30px #0005}
+.ball.glow{animation:glow 1s ease}
+@keyframes glow{50%{transform:scale(1.05);box-shadow:0 0 90px #ec9548aa,inset 0 -12px 30px #0005}}
+.ball:focus-visible{outline:2px solid var(--paper);outline-offset:6px}
+.prophecy{font-size:clamp(21px,3vw,27px);font-style:italic;line-height:1.35;color:var(--mist);min-height:2.8em}
+.diary-wrap{overflow-x:auto}
+.diary{width:100%;border-collapse:collapse;background:var(--paper);color:#3a2620;border-radius:6px;overflow:hidden;min-width:420px}
+.diary th,.diary td{text-align:left;padding:10px 14px;border-bottom:1px solid #d9c6a8;vertical-align:top}
+.diary th{font-family:var(--display);font-size:22px;color:#8a3b17;font-weight:700;width:9em}
+.diary td.t{font-size:14px;color:#8a5a40;width:7em;white-space:nowrap}
+.diary caption{caption-side:top;text-align:left;font-family:var(--display);font-size:28px;color:var(--ember);padding-bottom:8px}
+
+.patients{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+@media (max-width:760px){.patients{grid-template-columns:1fr}}
+.patient{background:var(--paper);color:#3a2620;border-radius:6px 6px 16px 16px;padding:20px 22px;display:flex;flex-direction:column;gap:10px;box-shadow:0 10px 26px #0005;position:relative}
+.patient::before{content:"";position:absolute;top:-7px;left:50%;width:60px;height:14px;transform:translateX(-50%);border-radius:4px;background:var(--line)}
+.patient .bed{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#8a5a40}
+.patient h3{color:#8a3b17;font-size:28px}
+.patient .says{font-style:italic;line-height:1.6}
+.patient .notes{border-top:1px dashed #c9b392;padding-top:10px;font-size:15px;color:#4a3328}
+.patient .notes b{color:#8a3b17}
+.patient .btn.ghost{color:#8a3b17;border-color:#8a3b17;align-self:flex-start;font-size:14px;padding:7px 14px}
+.bank{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+@media (max-width:640px){.bank{grid-template-columns:1fr}}
+.bank > div{display:flex;flex-direction:column;gap:8px;min-width:0}
+.bank .eyebrow{color:var(--ember)}
+.upgrade{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+@media (max-width:760px){.upgrade{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.up{appearance:none;cursor:pointer;font:inherit;color:var(--paper);background:var(--wall-2);border:1px dashed var(--ember);border-radius:14px;min-height:92px;padding:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;text-align:center}
+.up .from{font-size:16px;color:var(--muted)}
+.up .to{font-family:var(--display);font-size:26px;color:var(--ember);line-height:1}
+.up.open{border-style:solid;border-color:var(--moss)}
+.up.open .from{text-decoration:line-through;font-size:13px}
+.phrases{display:flex;flex-wrap:wrap;gap:8px}
+.phrase{font-size:15px;border:1px solid var(--line);border-radius:999px;padding:5px 12px;color:var(--paper);background:var(--wall-2)}
+.award{display:flex;flex-direction:column;gap:6px}
+.award .q{min-height:0}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <span class="eyebrow">A Halloween lesson for Sasha</span>
+      <h1>St. Hollow's Hospital</h1>
+      <p class="lede">Your night shift starts at 11 p.m. Five wards, five strange cases. Finish each ward and light a candle. Try to make it to sunrise, Dr Sasha.</p>
+    </div>
+    <div>
+      <div class="candles" id="candles" aria-label="Wards finished"></div>
+      <div class="candle-label" id="candleLabel">0 of 5 candles lit</div>
+    </div>
+  </header>
+
+  <nav class="doors" role="tablist" id="doors"></nav>
+
+  <!-- 1 ADMISSIONS -->
+  <section class="room" id="room-admissions" role="tabpanel">
+    <div class="room-head">
+      <span class="eyebrow">Ward 1 · Admissions</span>
+      <h2>Before your shift</h2>
+      <span class="goal">Warm-up: talk for at least a minute on each question</span>
+    </div>
+    <div class="pumpkin-stage">
+      <button class="pumpkin" id="pumpkin" aria-label="Light the pumpkin for a new question">
+        <svg viewBox="0 0 150 130" aria-hidden="true">
+          <path d="M72 18 q2-14 14-16" stroke="#6f8a4e" stroke-width="6" fill="none" stroke-linecap="round"/>
+          <ellipse cx="45" cy="72" rx="34" ry="50" fill="#d9792f"/>
+          <ellipse cx="105" cy="72" rx="34" ry="50" fill="#d9792f"/>
+          <ellipse cx="75" cy="72" rx="36" ry="54" fill="#ec9548"/>
+          <path class="face" d="M48 58 l14-12 l6 16z M102 58 l-14-12 l-6 16z"/>
+          <path class="face" d="M42 86 q33 26 66 0 q-6 4 -12 2 l-6 8 l-8-6 l-7 7 l-7-7 l-8 6 l-6-8 q-6 2-12-2z"/>
+        </svg>
+      </button>
+      <div class="block">
+        <p class="question" id="question">Click the pumpkin to get your first question.</p>
+        <div class="row"><button class="btn" id="nextQ">Next question</button><span class="counter" id="qCount"></span></div>
+      </div>
+    </div>
+    <p class="tip">Don't stop at one sentence: add a story, an example or a reason.</p>
+    <div class="room-foot"><span class="tip">Next: Ward 13</span><button class="btn ghost" data-done="admissions">Light the candle</button></div>
+  </section>
+
+  <!-- 2 WARD 13 -->
+  <section class="room" id="room-ward" role="tabpanel" hidden>
+    <div class="room-head">
+      <span class="eyebrow">Ward 2 · Ward 13</span>
+      <h2>Tonight's patients</h2>
+      <span class="goal">Medical vocabulary: symptoms, diagnosis, treatment</span>
+    </div>
+    <p class="lede">Read each patient's complaint out loud. Then, as the doctor on duty, talk it through: What are the symptoms? What's your diagnosis? What treatment will you prescribe? Would you admit this patient? Only then open the night nurse's notes and compare.</p>
+    <div class="bank">
+      <div><span class="eyebrow">Symptoms</span><div class="checks" id="bankS"></div></div>
+      <div><span class="eyebrow">Treatment</span><div class="checks" id="bankT"></div></div>
+    </div>
+    <p class="tip">Tick every word you use. Try to tick them all by the end of the ward.</p>
+    <div class="patients" id="patients"></div>
+    <div class="block">
+      <h3>After the ward round</h3>
+      <p>Which patient would you refuse to treat, and why? Which one would you like as a neighbour?</p>
+    </div>
+    <div class="room-foot"><span class="tip">Next: Case History</span><button class="btn ghost" data-done="ward">Light the candle</button></div>
+  </section>
+
+  <!-- 3 CASE HISTORY -->
+  <section class="room" id="room-history" role="tabpanel" hidden>
+    <div class="room-head">
+      <span class="eyebrow">Ward 3 · Case History</span>
+      <h2>How long has this been going on?</h2>
+      <span class="goal">Present perfect vs present perfect continuous</span>
+    </div>
+    <div class="rule" style="grid-template-columns:repeat(2,1fr)">
+      <div><strong>have done</strong><span>The result, how many, how much: I've broken my wrist. I've taken three pills today.<br>Stative verbs: I've had this rash since Halloween.</span></div>
+      <div><strong>have been doing</strong><span>The process and how long: I've been coughing for a week.<br>Visible evidence: Your eyes are red. Have you been crying?</span></div>
+    </div>
+    <div class="block">
+      <h3>Overheard on the ward</h3>
+      <p class="lede">Choose the best form, then say why.</p>
+      <div class="clues" id="pp"></div>
+      <span class="score" id="ppScore"></span>
+    </div>
+    <div class="block">
+      <h3>Now you're the patient</h3>
+      <p>Choose a monster from Ward 13, or invent your own spooky illness. Describe your problem to the doctor for two minutes. Cover all four questions:</p>
+      <div class="dice">
+        <div class="die"><span class="k">What's wrong?</span><span class="v">What symptoms have you had?</span></div>
+        <div class="die"><span class="k">How long?</span><span class="v">How long have you been feeling like this?</span></div>
+        <div class="die"><span class="k">What have you tried?</span><span class="v">What have you taken or done so far?</span></div>
+        <div class="die"><span class="k">What's been happening?</span><span class="v">What have you been doing differently lately?</span></div>
+      </div>
+    </div>
+    <div class="block">
+      <h3>Real-life check-up</h3>
+      <p class="lede">Open a card and answer about your own life.</p>
+      <div class="cards" id="checkup"></div>
+    </div>
+    <div class="room-foot"><span class="tip">Next: the Morgue</span><button class="btn ghost" data-done="history">Light the candle</button></div>
+  </section>
+
+  <!-- 4 MORGUE -->
+  <section class="room" id="room-morgue" role="tabpanel" hidden>
+    <div class="room-head">
+      <span class="eyebrow">Ward 4 · The Morgue</span>
+      <h2>Body No. 7 is missing</h2>
+      <span class="goal">Prepositions of time and place: the tricky ones</span>
+    </div>
+    <div class="rule">
+      <div><strong>at night / in the night</strong><span>at night: usually, in general. in the night: during one particular night.</span></div>
+      <div><strong>on time / in time</strong><span>on time: at the planned time. in time: early enough, not too late.</span></div>
+      <div><strong>at the end / in the end</strong><span>at the end of something: the last part. in the end: finally, after everything.</span></div>
+    </div>
+    <div class="block">
+      <h3>The security log</h3>
+      <p class="lede">The night guard wrote everything down, but the ink is smudged. Fill in the gaps.</p>
+      <ol class="fill" id="log"></ol>
+      <div class="row"><button class="btn" id="logCheck">Check answers</button><span class="score" id="logScore"></span></div>
+    </div>
+    <div class="block">
+      <h3>Solve the case</h3>
+      <p>You're the detective. Using the log, tell the whole story of that night: what happened, when and where. Then give your theory: what really happened to Body No. 7? Who or what took it, and why was it in the chapel on Sunday morning?</p>
+    </div>
+    <div class="room-foot"><span class="tip">Next: the Awards</span><button class="btn ghost" data-done="morgue">Light the candle</button></div>
+  </section>
+
+  <!-- 5 AWARDS -->
+  <section class="room" id="room-awards" role="tabpanel" hidden>
+    <div class="room-head">
+      <span class="eyebrow">Ward 5 · The Staff Room</span>
+      <h2>The St. Hollow's Halloween Awards</h2>
+      <span class="goal">Adjectives: extreme adjectives, comparatives and superlatives</span>
+    </div>
+    <div class="block">
+      <h3>Upgrade your adjectives</h3>
+      <p class="lede">Doctors at St. Hollow's are never "very scared". Guess the stronger adjective, then click to check. Remember: <i>very</i> scared, but <i>absolutely</i> terrified.</p>
+      <div class="upgrade" id="upgrade"></div>
+    </div>
+    <div class="block">
+      <h3>And the award goes to…</h3>
+      <p class="lede">Draw a category. Name your winner, explain why, and compare it with at least one runner-up.</p>
+      <div class="phrases">
+        <span class="phrase">by far the most…</span><span class="phrase">the … I've ever…</span><span class="phrase">far / much worse than…</span><span class="phrase">slightly less … than</span><span class="phrase">not nearly as … as</span><span class="phrase">the more…, the more…</span>
+      </div>
+      <div class="deck award">
+        <span class="tag">Category</span>
+        <p class="q" id="award">Draw a category.</p>
+        <button class="btn" id="drawAward">Draw a category</button>
+      </div>
+    </div>
+    <div class="block">
+      <h3>Patient of the Year</h3>
+      <p>Look back at Ward 13. Which patient was the strangest? The most dangerous? The easiest to treat? Compare them and choose the Patient of the Year. Tick what you use:</p>
+      <div class="checks" id="checks"></div>
+    </div>
+    <p class="finale" id="finale" hidden>The sun is rising. Your shift is over, Dr Sasha. Happy Halloween!</p>
+    <div class="room-foot"><span class="tip">Last ward</span><button class="btn ghost" data-done="awards">Light the candle</button></div>
+  </section>
+</div>
+
+<script>
+const ROOMS=[["admissions","Admissions"],["ward","Ward 13"],["history","Case History"],["morgue","Morgue"],["awards","Awards"]];
+const done=new Set();
+const doorsEl=document.getElementById("doors"), candlesEl=document.getElementById("candles");
+ROOMS.forEach(([id,name],i)=>{
+  const b=document.createElement("button");b.className="door";b.setAttribute("role","tab");b.id="door-"+id;
+  b.innerHTML=`<span class="num">${["I","II","III","IV","V"][i]}</span><span class="name">${name}</span>`;
+  b.onclick=()=>openRoom(id);doorsEl.appendChild(b);
+  const c=document.createElement("span");c.className="candle";c.id="candle-"+id;candlesEl.appendChild(c);
+});
+function openRoom(id){
+  ROOMS.forEach(([r])=>{document.getElementById("room-"+r).hidden=r!==id;document.getElementById("door-"+r).setAttribute("aria-selected",r===id)});
+  try{if(location.hash!=="#"+id)history.replaceState(null,"","#"+id)}catch(e){}
+}
+document.querySelectorAll("[data-done]").forEach(b=>b.onclick=()=>{
+  const id=b.dataset.done;done.add(id);
+  document.getElementById("candle-"+id).classList.add("lit");document.getElementById("door-"+id).classList.add("done");
+  document.getElementById("candleLabel").textContent=`${done.size} of ${ROOMS.length} candles lit`;
+  b.textContent="Candle lit";
+  if(done.size===ROOMS.length)document.getElementById("finale").hidden=false;
+  const i=ROOMS.findIndex(r=>r[0]===id);
+  if(i<ROOMS.length-1)setTimeout(()=>{openRoom(ROOMS[i+1][0]);window.scrollTo({top:0,behavior:"smooth"})},500);
+});
+const start=location.hash.slice(1);openRoom(ROOMS.some(r=>r[0]===start)?start:"admissions");
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+function toggles(elId,list){const el=document.getElementById(elId);list.forEach(t=>{const b=document.createElement("button");b.className="check";b.textContent=t;b.setAttribute("aria-pressed","false");
+  b.onclick=()=>b.setAttribute("aria-pressed",b.getAttribute("aria-pressed")!=="true");el.appendChild(b)})}
+
+/* 1 admissions */
+const QS=shuffle([
+ "Have you ever spent a night in hospital? What was it like?",
+ "Which scares you more: a horror film or a dentist's chair? Why?",
+ "Do you google your symptoms? Has it ever scared you more than it should have?",
+ "Hospitals at night are a classic horror setting. Why do you think that is?",
+ "What's the worst injury you've ever had? How did it happen?",
+ "When you're ill, do you look after yourself or ignore it until it gets worse?",
+ "Would you work night shifts? Which job would you never do at night?",
+ "Do you trust old home remedies: honey, garlic, hot tea with raspberry jam?",
+ "What do you think was the most frightening disease in history? Why?",
+ "Would you donate your body to science? Why or why not?"
+]);
+let qi=-1;const pumpkin=document.getElementById("pumpkin");
+function nextQ(){qi=(qi+1)%QS.length;document.getElementById("question").textContent=QS[qi];
+  document.getElementById("qCount").textContent=`Question ${qi+1} of ${QS.length}`;
+  pumpkin.classList.add("on");pumpkin.classList.remove("spin");void pumpkin.offsetWidth;pumpkin.classList.add("spin")}
+pumpkin.onclick=nextQ;document.getElementById("nextQ").onclick=nextQ;
+
+/* 2 ward 13 */
+toggles("bankS",["a rash","swelling","numbness","dizziness","nausea","fatigue","insomnia","a fever","joint pain","sensitive to light","loss of appetite","a wound that won't heal","to faint"]);
+toggles("bankT",["prescribe","painkillers","antibiotics","ointment","a dressing","stitches","a blood test","an X-ray","put on a drip","refer to a specialist","bed rest","admit to hospital"]);
+const PATIENTS=[
+ ["Bed 1","Count Varga, 412","\"I can't stand sunlight. After five seconds I get a terrible rash. I'm pale, I'm exhausted all day and I can't sleep at night. Oh, and garlic makes my throat swell up.\"","<b>Notes:</b> severe sensitivity to light, chronic insomnia, garlic allergy. Probably anaemic. Blood test ordered. (He offered to take the blood himself. Declined.)"],
+ ["Bed 2","Mr Wolfe, 34","\"Once a month my joints ache terribly, I get a fever, I'm starving and I lose my temper over nothing. My wife says I snore like a wolf. And there's hair growing in very strange places.\"","<b>Notes:</b> monthly joint pain and fever, mood swings, extreme appetite. Painkillers, anti-inflammatories and a very strong lead. Review at the next full moon."],
+ ["Bed 3","Lady Nefer, 3,200","\"My skin is so dry that it's peeling off. My joints are so stiff that I can hardly bend my knees. And nobody has changed these bandages since 1200 BC.\"","<b>Notes:</b> severe dehydration, stiff joints. Change all dressings immediately (bring a lot), moisturising ointment, physiotherapy twice a week."],
+ ["Bed 4","Dave, 27","\"I cut my arm months ago, and the wound just won't heal. I can't feel my left foot at all. I've lost my appetite… well, for normal food.\"","<b>Notes:</b> infected wound, numbness in the foot, unusual appetite. Antibiotics, stitches, refer to neurology. Keep him away from the staff canteen."],
+ ["Bed 5","The Grey Lady, age unknown","\"I'm cold all the time. I feel dizzy, I've fainted three times this week, and people say they can see through me. Sometimes I walk through walls by accident.\"","<b>Notes:</b> possible hypothermia, dizziness, fainting. Warm blankets, blood pressure check, X-ray. (The X-ray came out completely blank.)"]
+];
+const pEl=document.getElementById("patients");
+PATIENTS.forEach(([bed,name,says,notes])=>{const d=document.createElement("article");d.className="patient";
+  d.innerHTML=`<span class="bed">${bed}</span><h3>${name}</h3><p class="says">${says}</p><button class="btn ghost">Show the night nurse's notes</button><p class="notes" hidden>${notes}</p>`;
+  const b=d.querySelector("button"),n=d.querySelector(".notes");b.onclick=()=>{n.hidden=false;b.hidden=true};pEl.appendChild(d)});
+
+/* 3 case history */
+const PP=[
+ ["Doctor, I ___ for three days. My throat is killing me.",["have coughed","have been coughing"],"have been coughing","How long, the process: continuous."],
+ ["I ___ six painkillers today, and nothing helps!",["have taken","have been taking"],"have taken","How many: simple."],
+ ["Why are you so pale and out of breath? — I ___ from something in the basement.",["have run","have been running"],"have been running","Visible evidence of an activity: continuous."],
+ ["I ___ this strange rash since Halloween.",["have had","have been having"],"have had","'Have' meaning possess is a stative verb: simple."],
+ ["The nurse ___ three bodies in the wrong rooms tonight.",["has found","has been finding"],"has found","A number of finished actions: simple."],
+ ["Look at the mud on your hands! You ___ in the cemetery again, haven't you?",["have dug","have been digging"],"have been digging","Visible evidence of a recent activity: continuous."],
+ ["I ___ this patient before. He comes in every full moon.",["have seen","have been seeing"],"have seen","Experience, a finished action: simple."],
+ ["She ___ the same lullaby in Room 13 for hours. Make her stop!",["has sung","has been singing"],"has been singing","Duration of an ongoing, annoying activity: continuous."]
+];
+let ok=0,tried=0;const ppEl=document.getElementById("pp");
+PP.forEach(([s,opts,ans,why],i)=>{const d=document.createElement("div");d.className="clue";
+  d.innerHTML=`<span class="n">${i+1}</span><p class="s">${s.replace("___","<u>&nbsp;?&nbsp;</u>")}</p><div class="opts"></div><p class="why" hidden></p>`;
+  const o=d.querySelector(".opts"),w=d.querySelector(".why");let answered=false;
+  opts.forEach(t=>{const b=document.createElement("button");b.className="opt";b.textContent=t;
+    b.onclick=()=>{o.querySelectorAll(".opt").forEach(x=>x.classList.remove("no"));
+      if(t===ans){b.classList.add("ok");w.hidden=false;w.textContent=why;d.querySelector(".s u").innerHTML=`&nbsp;${ans}&nbsp;`;if(!answered){answered=true;tried++;ok++}}
+      else{b.classList.add("no");if(!answered){answered=true;tried++}}
+      document.getElementById("ppScore").textContent=`First-try answers: ${ok} / ${tried}`};o.appendChild(b)});
+  ppEl.appendChild(d)});
+const CHK=["What have you been doing lately that makes you tired?","What have you been worrying about this autumn?","Have you been sleeping well recently? Why or why not?","What's the best thing you've done for your health this year?","What new habit have you started this year? How long have you been doing it?","What series have you been watching lately? Would you recommend it?","Have you ever had a strange or scary experience in a hospital?","What have you been putting off for too long?"];
+const ckEl=document.getElementById("checkup");
+CHK.forEach((t,i)=>{const b=document.createElement("button");b.className="flip";b.textContent="?";b.setAttribute("aria-label","Open question card "+(i+1));
+  b.onclick=()=>{b.classList.add("open");b.textContent=t};ckEl.appendChild(b)});
+
+/* 4 morgue */
+const LOG=[
+ ["23:00 · The night shift started","time, at exactly 11 p.m.","on"],
+ ["23:40 · Body No. 7 was","the morgue, on table three.","in"],
+ ["00:00 · All the lights went off","midnight.","at"],
+ ["00:15 · A nurse saw a tall figure","the end of the corridor.","at"],
+ ["01:30 · The patient in Room 13 woke up","the night, screaming that 'he' was coming.","in"],
+ ["02:10 · The lift stopped","the fourth floor. The hospital has only three.","on"],
+ ["02:45 · The guard got to the morgue just","time to see the door close.","in"],
+ ["03:00 · Muddy footprints were found","the floor of the chapel.","on"],
+ ["Sunday · Body No. 7 was found again","Sunday morning, sitting in the chapel.","on"],
+ ["","the end, nobody could explain what had happened.","in"]
+];
+const logEl=document.getElementById("log");
+LOG.forEach(([a,b],i)=>{const li=document.createElement("li");
+  li.innerHTML=`<span>${a||""}</span><select id="log-${i}" aria-label="Gap ${i+1}"><option value="">…</option><option>in</option><option>on</option><option>at</option></select><span>${b}</span><span class="mark"></span>`;logEl.appendChild(li)});
+document.getElementById("logCheck").onclick=()=>{let n=0;
+  LOG.forEach(([, ,ans],i)=>{const li=logEl.children[i],v=li.querySelector("select").value,m=li.querySelector(".mark"),good=v===ans;
+    li.className=v?(good?"ok":"no"):"";m.className="mark "+(good?"ok":"no");m.textContent=!v?"":good?"✓":"try again";if(good)n++});
+  document.getElementById("logScore").textContent=`${n} / ${LOG.length}`};
+
+/* 5 awards */
+const UP=[["very scared","terrified"],["very cold","freezing"],["very tired","exhausted"],["very big","enormous"],["very dirty","filthy"],["very bad","awful"],["very surprised","astonished"],["very ugly","hideous"],["very hungry","starving"],["very old","ancient"]];
+const upEl=document.getElementById("upgrade");
+UP.forEach(([a,b])=>{const btn=document.createElement("button");btn.className="up";btn.innerHTML=`<span class="from">${a}</span><span class="to" hidden>${b}</span>`;
+  btn.setAttribute("aria-label",`Upgrade: ${a}`);btn.onclick=()=>{btn.classList.add("open");btn.querySelector(".to").hidden=false};upEl.appendChild(btn)});
+(function(){const list=["The most terrifying horror film you've ever seen","The worst illness or injury you've ever had","The creepiest place in your town","The most disgusting food you've ever tried","The most overrated Halloween tradition","The scariest thing in real life: dentists, exams or job interviews?","The best and the worst job in a hospital","The most annoying habit a flatmate could have","The most stressful day of your life so far","The most useless invention ever"];
+  let d=shuffle(list),i=0;document.getElementById("drawAward").onclick=()=>{if(i>=d.length){d=shuffle(list);i=0}document.getElementById("award").textContent=d[i++]}})();
+toggles("checks",["an extreme adjective","by far the…","much / far + comparative","not as … as","the more…, the more…","present perfect","present perfect continuous","3 medical words"]);
+</script>
+</body>
+</html>
