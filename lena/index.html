@@ -1,0 +1,503 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dr Fang's Clinic</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Grenze+Gotisch:wght@500;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+[hidden]{display:none!important} body{margin:0}
+
+/* Layout: a house you walk through — arched doors as room tabs, one lit room at a time, candles track progress. Single cozy-night theme by choice. */
+:root{
+  --night:#221822; --wall:#2f222d; --wall-2:#3a2a37; --line:#57404f;
+  --paper:#f4e7d0; --muted:#bfa999; --ember:#ec9548; --ember-soft:#ec954826;
+  --moss:#a6bb8f; --moss-soft:#a6bb8f22; --rose:#e07a7f; --rose-soft:#e07a7f22;
+  --mist:#b9a3dd;
+  --display:"Grenze Gotisch", "Palatino Linotype", Georgia, serif;
+  --body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--night);color:var(--paper);font-family:var(--body);font-size:17px;line-height:1.55;
+  background-image:radial-gradient(1200px 500px at 50% -120px,#ec95481f,transparent 70%);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 64px}
+.wrap{max-width:980px;margin:0 auto;display:flex;flex-direction:column;gap:28px}
+h1,h2,h3{font-family:var(--display);font-weight:700;text-wrap:balance;margin:0;line-height:1.05}
+h1{font-size:clamp(44px,8vw,76px);color:var(--ember);letter-spacing:.5px}
+h2{font-size:clamp(34px,5vw,48px);color:var(--paper)}
+h3{font-size:26px;color:var(--ember)}
+p{margin:0}
+.eyebrow{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.lede{color:var(--muted);max-width:60ch}
+header.top{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap}
+.candles{display:flex;gap:10px;align-items:flex-end}
+.candle{width:14px;height:38px;border-radius:3px 3px 2px 2px;background:var(--wall-2);position:relative;border:1px solid var(--line)}
+.candle::before{content:"";position:absolute;left:50%;top:-14px;width:9px;height:13px;transform:translateX(-50%);border-radius:50% 50% 50% 50%/60% 60% 40% 40%;background:transparent;transition:.4s}
+.candle.lit{background:var(--paper);border-color:var(--paper)}
+.candle.lit::before{background:var(--ember);box-shadow:0 0 14px 4px #ec954880;animation:flick 2.4s infinite ease-in-out}
+@keyframes flick{0%,100%{transform:translateX(-50%) scale(1)}45%{transform:translateX(-52%) scale(1.08,.94)}70%{transform:translateX(-48%) scale(.95,1.05)}}
+.candle-label{font-size:13px;color:var(--muted);margin-top:6px;text-align:right}
+
+/* doors */
+nav.doors{display:grid;grid-template-columns:repeat(7,1fr);gap:10px}
+.door{appearance:none;cursor:pointer;font:inherit;color:var(--paper);background:var(--wall);border:1px solid var(--line);
+  border-radius:60px 60px 6px 6px;padding:22px 8px 12px;display:flex;flex-direction:column;align-items:center;gap:4px;min-height:118px;justify-content:flex-end;transition:transform .15s,background .2s,border-color .2s;position:relative}
+.door:hover{transform:translateY(-2px);border-color:var(--ember)}
+.door:focus-visible{outline:2px solid var(--ember);outline-offset:3px}
+.door .num{font-family:var(--display);font-size:26px;color:var(--muted)}
+.door .name{font-weight:700;font-size:15px;text-align:center;line-height:1.2}
+.door .mins{font-size:12px;color:var(--muted)}
+.door[aria-selected="true"]{background:linear-gradient(180deg,#ec954833,var(--wall) 70%);border-color:var(--ember)}
+.door[aria-selected="true"] .num{color:var(--ember)}
+.door.done::after{content:"✓";position:absolute;top:12px;right:50%;transform:translateX(50%);font-size:13px;color:var(--moss)}
+@media (max-width:720px){nav.doors{grid-template-columns:repeat(4,1fr)}.door{min-height:96px}}
+
+/* rooms */
+section.room{background:var(--wall);border:1px solid var(--line);border-radius:18px;padding:clamp(20px,4vw,40px);display:flex;flex-direction:column;gap:26px}
+.room-head{display:flex;flex-direction:column;gap:8px}
+.goal{display:inline-flex;gap:8px;align-items:center;font-size:14px;color:var(--moss);background:var(--moss-soft);border-radius:999px;padding:4px 12px;width:fit-content}
+.block{display:flex;flex-direction:column;gap:14px}
+.btn{appearance:none;cursor:pointer;font:inherit;font-weight:700;font-size:16px;border-radius:999px;padding:10px 20px;border:1px solid var(--ember);background:var(--ember);color:#2a1a10;transition:filter .15s,transform .1s}
+.btn:hover{filter:brightness(1.08)}.btn:active{transform:scale(.98)}
+.btn.ghost{background:transparent;color:var(--ember)}
+.btn:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--paper);outline-offset:2px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.room-foot{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;border-top:1px dashed var(--line);padding-top:18px}
+.tip{font-size:14px;color:var(--muted);font-style:italic;max-width:62ch}
+
+/* warm-up */
+.pumpkin-stage{display:grid;grid-template-columns:auto 1fr;gap:24px;align-items:center}
+@media (max-width:600px){.pumpkin-stage{grid-template-columns:1fr;justify-items:center;text-align:center}}
+.pumpkin{width:150px;height:130px;cursor:pointer;border:none;background:none;padding:0}
+.pumpkin svg{width:100%;height:100%;transition:transform .5s}
+.pumpkin.spin svg{transform:rotate(360deg)}
+.pumpkin .face{fill:var(--wall);transition:fill .3s}
+.pumpkin.on .face{fill:#ffd27a;filter:drop-shadow(0 0 6px #ffb347)}
+.question{font-size:clamp(22px,3.2vw,30px);line-height:1.3;font-weight:700;min-height:3em}
+.counter{font-size:14px;color:var(--muted)}
+
+/* vocab */
+.match{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr);gap:12px 18px}
+.col{display:flex;flex-direction:column;gap:8px;min-width:0}
+.chip{appearance:none;cursor:pointer;font:inherit;text-align:left;color:var(--paper);background:var(--wall-2);border:1px solid var(--line);border-radius:10px;padding:10px 14px;transition:.15s}
+.chip:hover{border-color:var(--ember)}
+.chip.sel{border-color:var(--ember);background:var(--ember-soft)}
+.chip.ok{border-color:var(--moss);background:var(--moss-soft);color:var(--moss);cursor:default}
+.chip.no{animation:shake .35s;border-color:var(--rose)}
+.chip.word{font-weight:700}
+@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+@media (max-width:600px){.match{grid-template-columns:1fr}}
+
+/* story */
+.story{background:var(--paper);color:#3a2620;border-radius:4px 16px 4px 16px;padding:26px 28px;font-size:18px;line-height:1.7;max-width:70ch;box-shadow:0 10px 30px #0006;position:relative}
+.story p+p{margin-top:12px}
+.story .title{font-family:var(--display);font-size:30px;color:#8a3b17;margin-bottom:8px;display:block}
+.story b{color:#8a3b17}
+.rule{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.rule div{background:var(--wall-2);border:1px solid var(--line);border-radius:12px;padding:14px}
+.rule strong{font-family:var(--display);font-size:24px;color:var(--ember);display:block}
+.rule span{font-size:14px;color:var(--muted)}
+.gloss strong{font-size:21px}
+@media (max-width:600px){.rule{grid-template-columns:1fr}}
+.clues{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+@media (max-width:700px){.clues{grid-template-columns:1fr}}
+.clue{background:var(--wall-2);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.clue .n{font-size:13px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
+.clue .s{font-weight:700}
+.opts{display:flex;gap:6px;flex-wrap:wrap}
+.opt{appearance:none;cursor:pointer;font:inherit;font-size:15px;border-radius:8px;padding:6px 12px;background:transparent;color:var(--paper);border:1px solid var(--line)}
+.opt:hover{border-color:var(--ember)}
+.opt.ok{background:var(--moss-soft);border-color:var(--moss);color:var(--moss)}
+.opt.no{background:var(--rose-soft);border-color:var(--rose);color:var(--rose)}
+.why{font-size:14px;color:var(--muted)}
+.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+@media (max-width:700px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.flip{appearance:none;cursor:pointer;font:inherit;color:var(--paper);background:var(--wall-2);border:1px dashed var(--ember);border-radius:14px;min-height:120px;padding:14px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:15px;transition:.2s}
+.flip:not(.open){font-family:var(--display);font-size:26px;color:var(--ember)}
+.flip.open{border-style:solid;border-color:var(--line);font-style:italic}
+
+/* selects */
+.fill{display:flex;flex-direction:column;gap:10px;counter-reset:f}
+.fill li{list-style:none;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;padding:10px 14px;border-radius:10px;background:var(--wall-2);border:1px solid transparent}
+.fill li.ok{border-color:var(--moss)}.fill li.no{border-color:var(--rose)}
+.fill ul,.fill ol{padding:0;margin:0}
+select{font:inherit;font-size:16px;color:var(--paper);background:var(--night);border:1px solid var(--ember);border-radius:8px;padding:4px 8px;max-width:100%}
+.mark{font-size:14px;margin-left:auto}
+.mark.ok{color:var(--moss)}.mark.no{color:var(--rose)}
+.score{font-weight:700;color:var(--ember)}
+
+/* decks */
+.decks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+@media (max-width:700px){.decks{grid-template-columns:1fr}}
+.deck{background:var(--wall-2);border:1px solid var(--line);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:14px}
+.deck .q{font-size:20px;font-weight:700;min-height:3.2em;line-height:1.35}
+.tag{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ember)}
+
+/* final */
+.dice{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+@media (max-width:700px){.dice{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.die{background:var(--paper);color:#3a2620;border-radius:12px;padding:14px;min-height:96px;display:flex;flex-direction:column;gap:6px}
+.die .k{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#8a5a40}
+.die .v{font-weight:700;font-size:17px;line-height:1.3}
+.checks{display:flex;flex-wrap:wrap;gap:8px}
+.check{appearance:none;cursor:pointer;font:inherit;font-size:15px;border-radius:999px;padding:7px 14px;border:1px solid var(--line);background:transparent;color:var(--paper)}
+.check[aria-pressed="true"]{background:var(--moss-soft);border-color:var(--moss);color:var(--moss)}
+.check[aria-pressed="true"]::before{content:"✓ "}
+textarea{width:100%;min-height:160px;font:inherit;color:var(--paper);background:var(--night);border:1px solid var(--line);border-radius:12px;padding:14px;resize:vertical;line-height:1.6}
+.finale{text-align:center;color:var(--ember);font-family:var(--display);font-size:30px}
+
+.video{display:flex;gap:16px;align-items:center;padding:18px 20px;border-radius:14px;background:var(--wall-2);border:1px solid var(--ember);color:var(--paper);text-decoration:none;width:fit-content;max-width:100%}
+.video:hover{background:var(--ember-soft)}
+.video strong{display:block;font-size:18px}
+.play{width:48px;height:48px;border-radius:50%;background:var(--ember);flex:none;position:relative}
+.play::after{content:"";position:absolute;left:19px;top:14px;border-left:14px solid #2a1a10;border-top:10px solid transparent;border-bottom:10px solid transparent}
+.chip.picked{opacity:.45;cursor:default}
+.chip .ord{display:inline-block;min-width:1.6em;font-weight:700;color:var(--ember)}
+
+nav.doors{grid-template-columns:repeat(5,1fr)}
+@media (max-width:720px){nav.doors{grid-template-columns:repeat(5,1fr)}.door{padding:18px 4px 10px;min-height:92px}.door .name{font-size:12px}}
+.opt.picked{background:var(--ember-soft);border-color:var(--ember);color:var(--ember)}
+.result{border:1px solid var(--ember);background:var(--ember-soft);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:8px}
+.result h3{font-size:34px}
+.ball-stage{display:grid;grid-template-columns:auto 1fr;gap:28px;align-items:center}
+@media (max-width:600px){.ball-stage{grid-template-columns:1fr;justify-items:center;text-align:center}}
+.ball{width:180px;height:180px;border-radius:50%;border:none;cursor:pointer;flex:none;
+  background:radial-gradient(circle at 34% 28%,#ffffffb0 0 6%,transparent 18%),radial-gradient(circle at 50% 55%,#cdb8ef,#8d6fb8 45%,#3b2a5c 80%);
+  box-shadow:0 0 50px #b9a3dd55,inset 0 -12px 30px #0005;transition:box-shadow .4s,transform .4s}
+.ball:hover{box-shadow:0 0 70px #b9a3dd88,inset 0 -12px 30px #0005}
+.ball.glow{animation:glow 1s ease}
+@keyframes glow{50%{transform:scale(1.05);box-shadow:0 0 90px #ec9548aa,inset 0 -12px 30px #0005}}
+.ball:focus-visible{outline:2px solid var(--paper);outline-offset:6px}
+.prophecy{font-size:clamp(21px,3vw,27px);font-style:italic;line-height:1.35;color:var(--mist);min-height:2.8em}
+.diary-wrap{overflow-x:auto}
+.diary{width:100%;border-collapse:collapse;background:var(--paper);color:#3a2620;border-radius:6px;overflow:hidden;min-width:420px}
+.diary th,.diary td{text-align:left;padding:10px 14px;border-bottom:1px solid #d9c6a8;vertical-align:top}
+.diary th{font-family:var(--display);font-size:22px;color:#8a3b17;font-weight:700;width:9em}
+.diary td.t{font-size:14px;color:#8a5a40;width:7em;white-space:nowrap}
+.diary caption{caption-side:top;text-align:left;font-family:var(--display);font-size:28px;color:var(--ember);padding-bottom:8px}
+
+.patients{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+@media (max-width:760px){.patients{grid-template-columns:1fr}}
+.patient{background:var(--paper);color:#3a2620;border-radius:6px 6px 16px 16px;padding:20px 22px;display:flex;flex-direction:column;gap:10px;box-shadow:0 10px 26px #0005;position:relative}
+.patient::before{content:"";position:absolute;top:-7px;left:50%;width:60px;height:14px;transform:translateX(-50%);border-radius:4px;background:var(--line)}
+.patient .bed{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#8a5a40}
+.patient h3{color:#8a3b17;font-size:28px}
+.patient .says{font-style:italic;line-height:1.6}
+.patient .notes{border-top:1px dashed #c9b392;padding-top:10px;font-size:15px;color:#4a3328}
+.patient .notes b{color:#8a3b17}
+.patient .btn.ghost{color:#8a3b17;border-color:#8a3b17;align-self:flex-start;font-size:14px;padding:7px 14px}
+.bank{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+@media (max-width:640px){.bank{grid-template-columns:1fr}}
+.bank > div{display:flex;flex-direction:column;gap:8px;min-width:0}
+.bank .eyebrow{color:var(--ember)}
+.upgrade{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+@media (max-width:760px){.upgrade{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.up{appearance:none;cursor:pointer;font:inherit;color:var(--paper);background:var(--wall-2);border:1px dashed var(--ember);border-radius:14px;min-height:92px;padding:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;text-align:center}
+.up .from{font-size:16px;color:var(--muted)}
+.up .to{font-family:var(--display);font-size:26px;color:var(--ember);line-height:1}
+.up.open{border-style:solid;border-color:var(--moss)}
+.up.open .from{text-decoration:line-through;font-size:13px}
+.phrases{display:flex;flex-wrap:wrap;gap:8px}
+.phrase{font-size:15px;border:1px solid var(--line);border-radius:999px;padding:5px 12px;color:var(--paper);background:var(--wall-2)}
+.award{display:flex;flex-direction:column;gap:6px}
+.award .q{min-height:0}
+.exhibits{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+@media (max-width:760px){.exhibits{grid-template-columns:1fr}}
+.exhibit{background:var(--paper);color:#3a2620;border-radius:4px 14px 4px 14px;padding:18px 20px;display:flex;flex-direction:column;gap:8px;box-shadow:0 10px 26px #0005}
+.exhibit .no{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#8a5a40}
+.exhibit h3{color:#8a3b17;font-size:26px}
+.exhibit p{font-size:16px;line-height:1.6}
+.glossary{background:var(--wall-2);border:1px solid var(--line);border-radius:14px;padding:14px 18px}
+.glossary summary{cursor:pointer;font-weight:700;color:var(--ember)}
+.glossary[open] summary{margin-bottom:14px}
+.terms{margin:0;display:flex;flex-direction:column;gap:10px}
+.terms dt{font-weight:700}
+.terms dd{margin:0;font-size:15px;color:var(--muted)}
+.ru{font-style:italic;opacity:.85}
+.patient .kw{margin:0;display:flex;flex-direction:column;gap:6px;font-size:14px;background:#00000008;border-radius:8px;padding:10px 12px}
+.patient .kw dt{font-weight:700;color:#8a3b17}
+.patient .kw dd{margin:0;color:#4a3328}
+.patient .kw .ru{color:#8a5a40}
+.patient .kwl{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#8a5a40}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <span class="eyebrow">A Halloween lesson for Lena</span>
+      <h1>Dr Fang's Clinic</h1>
+      <p class="lede">The clinic opens at midnight and closes at sunrise. Dr Fang has disappeared, and tonight you're in charge. Five rooms, five candles. Good luck, Dr Lena.</p>
+    </div>
+    <div>
+      <div class="candles" id="candles" aria-label="Rooms finished"></div>
+      <div class="candle-label" id="candleLabel">0 of 5 candles lit</div>
+    </div>
+  </header>
+
+  <nav class="doors" role="tablist" id="doors"></nav>
+
+  <!-- 1 RECEPTION -->
+  <section class="room" id="room-reception" role="tabpanel">
+    <div class="room-head">
+      <span class="eyebrow">Room 1 · Reception</span>
+      <h2>Please take a seat</h2>
+      <span class="goal">Warm-up: talk for at least a minute on each question</span>
+    </div>
+    <div class="pumpkin-stage">
+      <button class="pumpkin" id="pumpkin" aria-label="Light the pumpkin for a new question">
+        <svg viewBox="0 0 150 130" aria-hidden="true">
+          <path d="M72 18 q2-14 14-16" stroke="#6f8a4e" stroke-width="6" fill="none" stroke-linecap="round"/>
+          <ellipse cx="45" cy="72" rx="34" ry="50" fill="#d9792f"/>
+          <ellipse cx="105" cy="72" rx="34" ry="50" fill="#d9792f"/>
+          <ellipse cx="75" cy="72" rx="36" ry="54" fill="#ec9548"/>
+          <path class="face" d="M48 58 l14-12 l6 16z M102 58 l-14-12 l-6 16z"/>
+          <path class="face" d="M42 86 q33 26 66 0 q-6 4 -12 2 l-6 8 l-8-6 l-7 7 l-7-7 l-8 6 l-6-8 q-6 2-12-2z"/>
+        </svg>
+      </button>
+      <div class="block">
+        <p class="question" id="question">Click the pumpkin to get your first question.</p>
+        <div class="row"><button class="btn" id="nextQ">Next question</button><span class="counter" id="qCount"></span></div>
+      </div>
+    </div>
+    <p class="tip">Don't stop at one sentence: add a story, an example or a reason.</p>
+    <div class="room-foot"><span class="tip">Next: the Surgery</span><button class="btn ghost" data-done="reception">Light the candle</button></div>
+  </section>
+
+  <!-- 2 SURGERY -->
+  <section class="room" id="room-surgery" role="tabpanel" hidden>
+    <div class="room-head">
+      <span class="eyebrow">Room 2 · The Surgery</span>
+      <h2>Tonight's patients</h2>
+      <span class="goal">Medical English: consultations, diagnosis, treatment plans</span>
+    </div>
+    <p class="lede">Read each complaint out loud. Then give the consultation: What's the most likely diagnosis? What would you check first? What's your treatment plan? Then the hard part: explain it again in simple words, so a frightened monster can understand. After that, open Dr Fang's old notes and compare.</p>
+    <div class="bank">
+      <div><span class="eyebrow">Diagnosis</span><div class="checks" id="bankD"></div></div>
+      <div><span class="eyebrow">Treatment</span><div class="checks" id="bankT"></div></div>
+    </div>
+    <p class="tip">Tick every word you use.</p>
+    <details class="glossary">
+      <summary>Glossary: what do these words mean?</summary>
+      <div class="bank">
+        <div><span class="eyebrow">Diagnosis</span><dl class="terms" id="glossD"></dl></div>
+        <div><span class="eyebrow">Treatment</span><dl class="terms" id="glossT"></dl></div>
+      </div>
+    </details>
+    <div class="patients" id="patients"></div>
+    <div class="block">
+      <h3>After the consultations</h3>
+      <p>Which of these patients would be the most difficult in real life, and why? What's the hardest thing about explaining a diagnosis to a scared patient?</p>
+    </div>
+    <div class="room-foot"><span class="tip">Next: the Museum</span><button class="btn ghost" data-done="surgery">Light the candle</button></div>
+  </section>
+
+  <!-- 3 MUSEUM -->
+  <section class="room" id="room-museum" role="tabpanel" hidden>
+    <div class="room-head">
+      <span class="eyebrow">Room 3 · The Museum of Dental Horrors</span>
+      <h2>It was believed to be caused by worms</h2>
+      <span class="goal">Passive voice</span>
+    </div>
+    <p class="lede">Dr Fang keeps a small museum in the basement. Read the three exhibits.</p>
+    <div class="exhibits">
+      <article class="exhibit"><span class="no">Exhibit 1</span><h3>The tooth worm</h3><p>For thousands of years, toothache was believed to be caused by tiny worms living inside the tooth. The idea was first recorded in ancient Babylon, and it was still taken seriously by some doctors in the 18th century.</p></article>
+      <article class="exhibit"><span class="no">Exhibit 2</span><h3>Barber-surgeons</h3><p>In medieval Europe, teeth were usually pulled by barbers, who also cut hair and let blood. No anaesthetic was used. The red and white barber's pole is said to represent blood and bandages.</p></article>
+      <article class="exhibit"><span class="no">Exhibit 3</span><h3>Waterloo teeth</h3><p>After the Battle of Waterloo in 1815, thousands of teeth were taken from dead soldiers and sold to dentists. They were made into dentures, which became known as "Waterloo teeth". Teeth were also stolen from graves by body snatchers.</p></article>
+    </div>
+    <div class="block">
+      <h3>Choose the passive</h3>
+      <div class="clues" id="passive"></div>
+      <span class="score" id="pScore"></span>
+    </div>
+    <div class="block">
+      <h3>How is it done?</h3>
+      <p class="lede">You're the expert. Open a card and explain the procedure step by step, mostly in the passive: "First, the area is numbed. Then the tooth is…"</p>
+      <div class="cards" id="proc"></div>
+    </div>
+    <div class="block">
+      <h3>Breaking news</h3>
+      <p class="lede">Open a headline and turn it into a short news report. Use at least three passive forms: "A ghost has been seen… It is said that… Nobody has been arrested yet."</p>
+      <div class="cards" id="news"></div>
+    </div>
+    <div class="room-foot"><span class="tip">Next: the Reviews</span><button class="btn ghost" data-done="museum">Light the candle</button></div>
+  </section>
+
+  <!-- 4 REVIEWS -->
+  <section class="room" id="room-reviews" role="tabpanel" hidden>
+    <div class="room-head">
+      <span class="eyebrow">Room 4 · The Reviews</span>
+      <h2>What patients say about Dr Fang</h2>
+      <span class="goal">Adjectives vs adverbs</span>
+    </div>
+    <div class="rule">
+      <div><strong>adjective</strong><span>Describes a noun, and comes after linking verbs: look, seem, feel, sound, smell, taste, become. The room smelled strange.</span></div>
+      <div><strong>adverb</strong><span>Describes how something is done: The dentist smiled strangely.</span></div>
+      <div><strong>watch out</strong><span>hard / hardly · late / lately · high / highly · near / nearly · good / well</span></div>
+    </div>
+    <div class="block">
+      <h3>Online reviews</h3>
+      <p class="lede">Choose the correct word. Then say why.</p>
+      <div class="clues" id="adv"></div>
+      <span class="score" id="aScore"></span>
+    </div>
+    <div class="block">
+      <h3>Describe how…</h3>
+      <p class="lede">Open a card. Describe it in detail, using at least two adverbs and one linking verb + adjective (looks, seems, sounds…).</p>
+      <div class="cards" id="how"></div>
+    </div>
+    <div class="room-foot"><span class="tip">Next: the Night Shift</span><button class="btn ghost" data-done="reviews">Light the candle</button></div>
+  </section>
+
+  <!-- 5 NIGHT SHIFT -->
+  <section class="room" id="room-shift" role="tabpanel" hidden>
+    <div class="room-head">
+      <span class="eyebrow">Room 5 · The Night Shift</span>
+      <h2>The strangest patient</h2>
+      <span class="goal">Speaking: tell a story, use everything from tonight</span>
+    </div>
+    <p class="lede">Tell the story of the strangest patient you've ever had, a real one or one from tonight's dice. Set the scene: what had been happening before they arrived? Then tick what you use.</p>
+    <div class="dice" id="dice" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr))"></div>
+    <div class="row"><button class="btn" id="roll">Roll the story</button></div>
+    <div class="checks" id="checks"></div>
+    <p class="finale" id="finale" hidden>The sun is rising and the clinic is closed. Well done, Dr Lena!</p>
+    <div class="room-foot"><span class="tip">Last room</span><button class="btn ghost" data-done="shift">Light the candle</button></div>
+  </section>
+</div>
+
+<script>
+const ROOMS=[["reception","Reception"],["surgery","Surgery"],["museum","Museum"],["reviews","Reviews"],["shift","Night Shift"]];
+const done=new Set();
+const doorsEl=document.getElementById("doors"), candlesEl=document.getElementById("candles");
+ROOMS.forEach(([id,name],i)=>{
+  const b=document.createElement("button");b.className="door";b.setAttribute("role","tab");b.id="door-"+id;
+  b.innerHTML=`<span class="num">${["I","II","III","IV","V"][i]}</span><span class="name">${name}</span>`;
+  b.onclick=()=>openRoom(id);doorsEl.appendChild(b);
+  const c=document.createElement("span");c.className="candle";c.id="candle-"+id;candlesEl.appendChild(c);
+});
+function openRoom(id){
+  ROOMS.forEach(([r])=>{document.getElementById("room-"+r).hidden=r!==id;document.getElementById("door-"+r).setAttribute("aria-selected",r===id)});
+  try{if(location.hash!=="#"+id)history.replaceState(null,"","#"+id)}catch(e){}
+}
+document.querySelectorAll("[data-done]").forEach(b=>b.onclick=()=>{
+  const id=b.dataset.done;done.add(id);
+  document.getElementById("candle-"+id).classList.add("lit");document.getElementById("door-"+id).classList.add("done");
+  document.getElementById("candleLabel").textContent=`${done.size} of ${ROOMS.length} candles lit`;
+  b.textContent="Candle lit";
+  if(done.size===ROOMS.length)document.getElementById("finale").hidden=false;
+  const i=ROOMS.findIndex(r=>r[0]===id);
+  if(i<ROOMS.length-1)setTimeout(()=>{openRoom(ROOMS[i+1][0]);window.scrollTo({top:0,behavior:"smooth"})},500);
+});
+const start=location.hash.slice(1);openRoom(ROOMS.some(r=>r[0]===start)?start:"reception");
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+function toggles(elId,list){const el=document.getElementById(elId);list.forEach(t=>{const b=document.createElement("button");b.className="check";b.textContent=t;b.setAttribute("aria-pressed","false");
+  b.onclick=()=>b.setAttribute("aria-pressed",b.getAttribute("aria-pressed")!=="true");el.appendChild(b)})}
+function flips(elId,list,label){const el=document.getElementById(elId);list.forEach((t,i)=>{const b=document.createElement("button");b.className="flip";b.textContent="?";
+  b.setAttribute("aria-label",label+" "+(i+1));b.onclick=()=>{b.classList.add("open");b.textContent=t};el.appendChild(b)})}
+function choose(elId,data,scoreId){let ok=0,tried=0;const el=document.getElementById(elId);
+  data.forEach(([s,opts,ans,why],i)=>{const d=document.createElement("div");d.className="clue";
+    d.innerHTML=`<span class="n">${i+1}</span><p class="s">${s.replace("___","<u>&nbsp;?&nbsp;</u>")}</p><div class="opts"></div><p class="why" hidden></p>`;
+    const o=d.querySelector(".opts"),w=d.querySelector(".why");let answered=false;
+    opts.forEach(t=>{const b=document.createElement("button");b.className="opt";b.textContent=t;
+      b.onclick=()=>{o.querySelectorAll(".opt").forEach(x=>x.classList.remove("no"));
+        if(t===ans){b.classList.add("ok");w.hidden=false;w.textContent=why;d.querySelector(".s u").innerHTML=`&nbsp;${ans}&nbsp;`;if(!answered){answered=true;tried++;ok++}}
+        else{b.classList.add("no");if(!answered){answered=true;tried++}}
+        document.getElementById(scoreId).textContent=`First-try answers: ${ok} / ${tried}`};o.appendChild(b)});
+    el.appendChild(d)})}
+
+/* 1 reception */
+const QS=shuffle([
+ "Why are so many people terrified of dentists? What's the scariest part for them?",
+ "What's the strangest thing a patient has ever said or done in your chair?",
+ "Did you do anything for Halloween this year? Is it getting more popular in Russia?",
+ "Which medical horror film or series is the most (or least) realistic, in your opinion?",
+ "What's a dental myth that patients still believe?",
+ "If you weren't a dentist, what would you be doing now?",
+ "Would you agree to treat a vampire? What would you charge?",
+ "What's harder: a difficult operation or a difficult patient?",
+ "What do people get completely wrong about your job?",
+ "Which do you remember better from childhood: a visit to the dentist or a scary story? Tell it."
+]);
+let qi=-1;const pumpkin=document.getElementById("pumpkin");
+function nextQ(){qi=(qi+1)%QS.length;document.getElementById("question").textContent=QS[qi];
+  document.getElementById("qCount").textContent=`Question ${qi+1} of ${QS.length}`;
+  pumpkin.classList.add("on");pumpkin.classList.remove("spin");void pumpkin.offsetWidth;pumpkin.classList.add("spin")}
+pumpkin.onclick=nextQ;document.getElementById("nextQ").onclick=nextQ;
+
+/* 2 surgery */
+toggles("bankD",["decay","a cavity","an abscess","gum disease","a chipped tooth","an impacted wisdom tooth","sensitivity","inflammation","a misaligned bite","bad breath","swelling","a loose tooth"]);
+toggles("bankT",["an X-ray","a filling","a root canal","a crown","an extraction","an implant","a deep clean","local anaesthetic","antibiotics","a night guard","braces","stitches"]);
+const GD=[["decay","damage to a tooth caused by bacteria and sugar","кариес"],["a cavity","a hole in a tooth caused by decay","кариозная полость"],["an abscess","a painful pocket of pus caused by an infection","абсцесс"],["gum disease","infection of the gums; it can make teeth loose","пародонтит"],["a chipped tooth","a tooth with a small piece broken off","сколотый зуб"],["an impacted wisdom tooth","a wisdom tooth that can't grow through the gum properly","ретинированный зуб мудрости"],["sensitivity","sharp pain when a tooth touches something cold, hot or sweet","повышенная чувствительность"],["inflammation","redness, swelling and pain when the body fights an infection","воспаление"],["a misaligned bite","when the upper and lower teeth don't meet correctly","неправильный прикус"],["bad breath","an unpleasant smell from the mouth","неприятный запах изо рта"],["swelling","when part of the body gets bigger, often because of infection","отёк"],["a loose tooth","a tooth that moves","шатающийся зуб"]];
+const GT=[["an X-ray","a picture of the inside of the teeth and jaw","рентген"],["a filling","material that closes a cavity","пломба"],["a root canal","removing infected tissue from inside the tooth and its roots","лечение каналов"],["a crown","a cap that covers a damaged tooth","коронка"],["an extraction","removing a tooth","удаление зуба"],["an implant","an artificial root put into the jawbone to hold a new tooth","имплант"],["a deep clean","cleaning under the gums to remove plaque and tartar","глубокая чистка"],["local anaesthetic","medicine that makes one part of the body numb","местная анестезия"],["antibiotics","medicine that kills bacteria","антибиотики"],["a night guard","a plastic cover for the teeth, worn at night to stop grinding","ночная капа"],["braces","wires and brackets that straighten teeth","брекеты"],["stitches","threads that close a wound","швы"]];
+function terms(elId,list){document.getElementById(elId).innerHTML=list.map(([t,d,r])=>`<div><dt>${t}</dt><dd>${d} <span class="ru">(${r})</span></dd></div>`).join("")}
+terms("glossD",GD);terms("glossT",GT);
+const kw=l=>`<dl class="kw">${l.map(([t,d,r])=>`<div><dt>${t}</dt><dd>${d} <span class="ru">(${r})</span></dd></div>`).join("")}</dl>`;
+const PATIENTS=[
+ ["Patient 1","Count Varga, 412","\"I chipped my left fang on a very old, very hard neck. Now it's sensitive to cold, and I can't bite properly. It's ruining my social life.\"","<b>Dr Fang's notes:</b> chipped canine, sensitivity to cold. X-ray, then a crown. Patient refused a mirror for the 'after' photo.",
+  [["a fang","a long, sharp tooth, like a dog's or a vampire's","клык"],["chipped","with a small piece broken off","сколотый"],["to bite","to close your teeth on something","кусать"]],
+  [["a canine","the pointed tooth next to the front teeth","клык"],["a crown","a cap that covers a damaged tooth","коронка"]]],
+ ["Patient 2","Mr Wolfe, 34","\"Once a month my teeth seem to grow, my bite changes and my jaw clicks and aches. My wife says I grind my teeth all night.\"","<b>Dr Fang's notes:</b> bruxism, jaw pain, misaligned bite at the full moon. Night guard (extra strong). Refer to an orthodontist.",
+  [["a bite","the way the upper and lower teeth meet","прикус"],["a jaw","the bone that holds the teeth","челюсть"],["to grind your teeth","to rub your teeth together hard, often in your sleep","скрипеть зубами"]],
+  [["bruxism","the medical word for grinding your teeth","бруксизм"],["a night guard","a plastic cover worn at night to protect the teeth","ночная капа"],["an orthodontist","a dentist who straightens teeth and fixes the bite","ортодонт"]]],
+ ["Patient 3","Dave, 27","\"Two of my teeth are loose, my gums bleed when I brush, and people move away when I talk. To be fair, I am a zombie.\"","<b>Dr Fang's notes:</b> advanced gum disease, bad breath. Deep clean, possible extraction of two teeth. Hygiene advice (ignored).",
+  [["loose","moving, not fixed in place","шатающийся"],["gums","the pink tissue around the teeth","дёсны"]],
+  [["gum disease","infection of the gums that can make teeth loose","пародонтит"],["a deep clean","cleaning under the gums to remove plaque and tartar","глубокая чистка"],["an extraction","removing a tooth","удаление зуба"]]],
+ ["Patient 4","Agatha, the witch","\"I live in a gingerbread house, so I eat sugar all day. Now I've got holes in my teeth and a terrible pain at night that keeps me awake.\"","<b>Dr Fang's notes:</b> multiple cavities, one tooth needs a root canal. Fillings, diet advice, and maybe move house.",
+  [["toothache","pain in a tooth","зубная боль"],["to keep someone awake","to stop someone from sleeping","не давать спать"]],
+  [["a cavity","a hole in a tooth caused by decay","кариозная полость"],["a filling","material that closes a cavity","пломба"],["a root canal","removing infected tissue from inside the tooth","лечение каналов"]]],
+ ["Patient 5","Lady Nefer, 3,200","\"My wisdom tooth has been hurting for about three thousand years. The left side of my face is swollen, and it's hard to open my mouth.\"","<b>Dr Fang's notes:</b> impacted wisdom tooth with an abscess. Antibiotics first, then surgical extraction under local anaesthetic. Bring extra bandages.",
+  [["a wisdom tooth","one of the four back teeth that grow last, usually between 17 and 25","зуб мудрости"],["swollen","bigger than usual, often because of infection","опухший"]],
+  [["impacted","stuck under the gum or bone, unable to grow out properly","ретинированный"],["an abscess","a painful pocket of pus caused by infection","абсцесс"],["local anaesthetic","medicine that makes one part of the body numb","местная анестезия"]]]
+];
+const pEl=document.getElementById("patients");
+PATIENTS.forEach(([bed,name,says,notes,k1,k2])=>{const d=document.createElement("article");d.className="patient";
+  d.innerHTML=`<span class="bed">${bed}</span><h3>${name}</h3><p class="says">${says}</p><span class="kwl">Words to help</span>${kw(k1)}<button class="btn ghost">Show Dr Fang's notes</button><div class="notes" hidden><p>${notes}</p>${kw(k2)}</div>`;
+  const b=d.querySelector("button"),n=d.querySelector(".notes");b.onclick=()=>{n.hidden=false;b.hidden=true};pEl.appendChild(d)});
+
+/* 3 museum: passive */
+choose("passive",[
+ ["For centuries, toothache ___ by tiny worms.",["was believed to be caused","believed to cause","was believing to cause"],"was believed to be caused","Personal passive with 'believe': it was believed + to be + past participle."],
+ ["After Waterloo, thousands of teeth ___ from dead soldiers.",["pulled","were pulled","had pulled"],"were pulled","The teeth didn't pull anything: past simple passive."],
+ ["In the Middle Ages, teeth ___ by barbers.",["used to be pulled","used to pull","were pulling"],"used to be pulled","A past habit in the passive: used to be + past participle."],
+ ["The barber's pole ___ blood and bandages.",["is said to represent","says to represent","is saying to represent"],"is said to represent","'It is said' turned into a personal passive: X is said to…"],
+ ["Today, most bodies used in medical schools ___ by people who wanted to help science.",["are donated","donate","have donated"],"are donated","A general fact today: present simple passive."],
+ ["The patient's tooth ___ yet. He's still in the waiting room.",["hasn't been extracted","hasn't extracted","wasn't extracting"],"hasn't been extracted","Present perfect passive with 'yet'."],
+ ["She's going to ___ before the Halloween party.",["have her teeth whitened","whiten her teeth by someone","have whitened her teeth"],"have her teeth whitened","Have something done: someone else does it for you."],
+ ["He ___ while he was walking through the cemetery.",["got bitten","bit","was biting"],"got bitten","Get + past participle: informal passive, often for bad things that happen suddenly."],
+ ["The clinic ___ when the police arrived. Everything was gone.",["had already been emptied","had already emptied","was already emptying"],"had already been emptied","Past perfect passive: it happened before another past event."]
+],"pScore");
+flips("proc",["How is a root canal done?","How is an implant placed?","How is a wisdom tooth removed surgically?","How is a cavity filled?","How are dentures made today?","How is a patient prepared for surgery?"],"Open procedure card");
+flips("news",["GHOST SEEN IN DENTAL CLINIC AFTER MIDNIGHT","VAMPIRE ARRESTED AT BLOOD BANK","200-YEAR-OLD DENTURES FOUND IN ATTIC","HAUNTED DENTIST'S CHAIR SOLD FOR £1 MILLION","WEREWOLF REFUSED ENTRY TO HALLOWEEN PARTY","MYSTERY TEETH DISCOVERED INSIDE OLD WALL"],"Open headline");
+
+/* 4 reviews: adj vs adv */
+choose("adv",[
+ ["★☆☆☆☆ The waiting room smelled ___, like old flowers and something else.",["strange","strangely"],"strange","'Smell' is a linking verb here, so it takes an adjective."],
+ ["★★☆☆☆ Dr Fang smiled ___ and picked up the drill.",["strange","strangely"],"strangely","How did he smile? An adverb describes the action."],
+ ["★★★☆☆ I've ___ slept since my appointment.",["hard","hardly"],"hardly","Hardly = almost not. It's not the adverb of 'hard'."],
+ ["★★★★★ The nurse works really ___. She never takes a break. Or blinks.",["hard","hardly"],"hard","Hard is both an adjective and an adverb: work hard."],
+ ["★★★★☆ Dr Fang is ___ recommended by all his patients. Well, the ones who survived.",["high","highly"],"highly","Highly = very much. High is about height."],
+ ["★★☆☆☆ My appointment was at midnight, but he arrived very ___.",["late","lately"],"late","Late is the adverb here. Lately means recently."],
+ ["★☆☆☆☆ Has anyone else been feeling strange ___? I keep dreaming about teeth.",["late","lately"],"lately","Lately = recently, often with the present perfect."],
+ ["★★★☆☆ I felt ___ about leaving without paying, but I was terrified.",["bad","badly"],"bad","'Feel' is a linking verb, so it takes an adjective."],
+ ["★★★★★ The anaesthetic worked ___. I didn't feel a thing for three days.",["good","well"],"well","How did it work? Well is the adverb of good."],
+ ["★☆☆☆☆ I ___ fainted when I saw the bill.",["near","nearly"],"nearly","Nearly = almost."]
+],"aScore");
+flips("how",["how a vampire dentist greets a new patient","how a very nervous patient behaves in your chair","how you work when you're running late","how your worst boss or teacher used to speak","how people dance at a party where nobody knows anyone","how a ghost moves through an old house"],"Open card");
+
+/* 5 night shift */
+const DICE={
+ "Who":["a man who swallowed his own crown","a vampire with a broken fang","a famous actress in dark glasses","a child who bit the previous dentist","a patient who never takes off his mask","an old woman with 1815 dentures"],
+ "When":["at 3 a.m. on Halloween","during a power cut","five minutes before closing time","on your first day at work","during a terrible storm","on a Friday the 13th"],
+ "Problem":["the anaesthetic doesn't work","the X-ray shows something impossible","the patient disappears from the chair","the lights keep going off","the tooth is not human","someone is knocking from inside the cupboard"]
+};
+const diceEl=document.getElementById("dice");
+function roll(){diceEl.innerHTML="";Object.entries(DICE).forEach(([k,v])=>{const d=document.createElement("div");d.className="die";
+  d.innerHTML=`<span class="k">${k}</span><span class="v">${v[Math.floor(Math.random()*v.length)]}</span>`;diceEl.appendChild(d)})}
+roll();document.getElementById("roll").onclick=roll;
+toggles("checks",["2 passive forms","3 adverbs","a linking verb + adjective","past perfect continuous","5 dental words"]);
+</script>
+</body>
+</html>
