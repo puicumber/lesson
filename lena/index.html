@@ -156,8 +156,8 @@ textarea{width:100%;min-height:160px;font:inherit;color:var(--paper);background:
 .chip.picked{opacity:.45;cursor:default}
 .chip .ord{display:inline-block;min-width:1.6em;font-weight:700;color:var(--ember)}
 
-nav.doors{grid-template-columns:repeat(5,1fr)}
-@media (max-width:720px){nav.doors{grid-template-columns:repeat(5,1fr)}.door{padding:18px 4px 10px;min-height:92px}.door .name{font-size:12px}}
+nav.doors{grid-template-columns:repeat(6,1fr)}
+@media (max-width:720px){nav.doors{grid-template-columns:repeat(3,1fr)}.door{padding:18px 4px 10px;min-height:92px}.door .name{font-size:12px}}
 .opt.picked{background:var(--ember-soft);border-color:var(--ember);color:var(--ember)}
 .result{border:1px solid var(--ember);background:var(--ember-soft);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:8px}
 .result h3{font-size:34px}
@@ -237,11 +237,11 @@ nav.doors{grid-template-columns:repeat(5,1fr)}
     <div style="display:flex;flex-direction:column;gap:10px">
       <span class="eyebrow">A Halloween lesson for Lena</span>
       <h1>Dr Fang's Clinic</h1>
-      <p class="lede">The clinic opens at midnight and closes at sunrise. Dr Fang has disappeared, and tonight you're in charge. Five rooms, five candles. Good luck, Dr Lena.</p>
+      <p class="lede">The clinic opens at midnight and closes at sunrise. Dr Fang has disappeared, and tonight you're in charge. Six rooms, six candles. Good luck, Dr Lena.</p>
     </div>
     <div>
       <div class="candles" id="candles" aria-label="Rooms finished"></div>
-      <div class="candle-label" id="candleLabel">0 of 5 candles lit</div>
+      <div class="candle-label" id="candleLabel">0 of 6 candles lit</div>
     </div>
   </header>
 
@@ -391,17 +391,30 @@ nav.doors{grid-template-columns:repeat(5,1fr)}
     <div class="row"><button class="btn" id="roll">Roll the story</button></div>
     <div class="checks" id="checks"></div>
     <p class="finale" id="finale" hidden>The sun is rising and the clinic is closed. Well done, Dr Lena!</p>
-    <div class="room-foot"><span class="tip">Last room</span><button class="btn ghost" data-done="shift">Light the candle</button></div>
+    <div class="room-foot"><span class="tip">Bonus: the Attic</span><button class="btn ghost" data-done="shift">Light the candle</button></div>
+  </section>
+
+  <!-- 6 ATTIC -->
+  <section class="room" id="room-attic" role="tabpanel" hidden>
+    <div class="room-head">
+      <span class="eyebrow">Room 6 · The Attic · just for fun</span>
+      <h2>Real or fake?</h2>
+      <span class="goal">Strange facts from Dr Fang's old box</span>
+    </div>
+    <p class="lede">Read a fact out loud. Before you click, argue your case: is it real or fake, and why? "I'm pretty sure…", "There's no way…", "It sounds crazy, but…"</p>
+    <div class="clues" id="rf"></div>
+    <span class="score" id="rfScore"></span>
+    <div class="room-foot"><span class="tip">Last room</span><button class="btn ghost" data-done="attic">Light the candle</button></div>
   </section>
 </div>
 
 <script>
-const ROOMS=[["reception","Reception"],["surgery","Surgery"],["museum","Museum"],["reviews","Reviews"],["shift","Night Shift"]];
+const ROOMS=[["reception","Reception"],["surgery","Surgery"],["museum","Museum"],["reviews","Reviews"],["shift","Night Shift"],["attic","Attic"]];
 const done=new Set();
 const doorsEl=document.getElementById("doors"), candlesEl=document.getElementById("candles");
 ROOMS.forEach(([id,name],i)=>{
   const b=document.createElement("button");b.className="door";b.setAttribute("role","tab");b.id="door-"+id;
-  b.innerHTML=`<span class="num">${["I","II","III","IV","V"][i]}</span><span class="name">${name}</span>`;
+  b.innerHTML=`<span class="num">${["I","II","III","IV","V","VI"][i]}</span><span class="name">${name}</span>`;
   b.onclick=()=>openRoom(id);doorsEl.appendChild(b);
   const c=document.createElement("span");c.className="candle";c.id="candle-"+id;candlesEl.appendChild(c);
 });
@@ -535,6 +548,26 @@ const diceEl=document.getElementById("dice");
 function roll(){diceEl.innerHTML="";Object.entries(DICE).forEach(([k,v])=>{const d=document.createElement("div");d.className="die";
   d.innerHTML=`<span class="k">${k}</span><span class="v">${v[Math.floor(Math.random()*v.length)]}</span>`;diceEl.appendChild(d)})}
 roll();document.getElementById("roll").onclick=roll;
+(function(){const RF=[
+ ["The electric chair was invented by a dentist.",true,"Real. Alfred Southwick, a dentist from Buffalo, New York, came up with the idea in the 1880s. He was inspired by the dentist's chair."],
+ ["Cotton candy (candy floss) was co-invented by a dentist.",true,"Real. Dentist William Morrison and confectioner John Wharton made the machine in 1897. Good for business, probably."],
+ ["George Washington's false teeth were made of wood.",false,"Fake. It's a famous myth. His dentures were made of ivory, metal, and human and animal teeth."],
+ ["Bram Stoker, the author of Dracula, worked as a dentist.",false,"Fake. He worked as a civil servant and then as a theatre manager in London."],
+ ["In the 1800s, some coffins had bells, so that people buried alive could call for help.",true,"Real. People were so afraid of being buried alive that 'safety coffins' were patented, some with bells or air tubes."],
+ ["A court in New York once ruled that a house was legally haunted.",true,"Real. In 1991, a court decided that the owner had to tell buyers about the ghosts, because she had told everyone else."],
+ ["Vampire bats can drink so much blood that they struggle to fly afterwards.",true,"Real. A bat can drink about half its body weight in blood, so it has to get rid of water quickly before it can take off."],
+ ["The heaviest pumpkin ever grown weighed more than three tonnes.",false,"Fake. The record is about 1.2 tonnes. That's still as heavy as a small car."],
+ ["In ancient Rome, urine was used as a mouthwash to whiten teeth.",true,"Real. Romans used urine for whitening; it contains ammonia, which cleans. Please don't recommend it to patients."]
+];
+let ok=0,tried=0;const el=document.getElementById("rf");
+shuffle(RF).forEach(([s,ans,why],i)=>{const d=document.createElement("div");d.className="clue";
+  d.innerHTML=`<span class="n">Fact ${i+1}</span><p class="s">${s}</p><div class="opts"></div><p class="why" hidden></p>`;
+  const o=d.querySelector(".opts"),w=d.querySelector(".why");let answered=false;
+  [["Real",true],["Fake",false]].forEach(([l,v])=>{const b=document.createElement("button");b.className="opt";b.textContent=l;
+    b.onclick=()=>{if(answered)return;answered=true;tried++;
+      b.classList.add(v===ans?"ok":"no");if(v===ans)ok++;w.hidden=false;w.textContent=why;
+      document.getElementById("rfScore").textContent=`Correct guesses: ${ok} / ${tried}`};o.appendChild(b)});
+  el.appendChild(d)})})();
 toggles("checks",["2 passive forms","3 adverbs","a linking verb + adjective","past perfect continuous","5 dental words"]);
 </script>
 </body>
