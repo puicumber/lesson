@@ -221,6 +221,13 @@ nav.doors{grid-template-columns:repeat(5,1fr)}
 .patient .kw dd{margin:0;color:#4a3328}
 .patient .kw .ru{color:#8a5a40}
 .patient .kwl{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#8a5a40}
+.hh{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:760px){.hh{grid-template-columns:1fr}}
+.hh-card{background:var(--wall-2);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:8px}
+.hh-card strong{font-family:var(--display);font-size:24px;color:var(--ember);line-height:1.1}
+.hh-card p{font-size:16px}
+.hh-card b{color:var(--ember)}
+.hh-compare{display:flex;flex-direction:column;gap:6px;background:var(--ember-soft);border:1px dashed var(--ember);border-radius:12px;padding:14px 16px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -339,6 +346,21 @@ nav.doors{grid-template-columns:repeat(5,1fr)}
       <div><strong>watch out</strong><span>hard / hardly · late / lately · high / highly · near / nearly · good / well</span></div>
     </div>
     <div class="block">
+      <h3>Hard or hardly?</h3>
+      <p class="lede">They look like a pair, but they mean completely different things.</p>
+      <div class="hh">
+        <div class="hh-card"><span class="tag">hard · adjective</span><strong>difficult, or not soft</strong><p>a hard case · a hard exam · a hard chair<br>This tooth is very <b>hard</b> to reach.</p></div>
+        <div class="hh-card"><span class="tag">hard · adverb</span><strong>with a lot of effort or force</strong><p>work hard · try hard · study hard · bite hard · rain hard<br>I like to work <b>hard</b>. Don't bite <b>hard</b> for an hour.</p><p class="why">The adverb is "hard". "Hardly" is NOT its adverb form.</p></div>
+        <div class="hh-card"><span class="tag">hardly · adverb</span><strong>almost not, only just</strong><p>I can <b>hardly</b> open my mouth. (= almost can't)<br><b>hardly ever</b> = almost never · <b>hardly anyone</b> = almost nobody · <b>hardly anything</b> = almost nothing</p><p class="why">It goes before the main verb, after can / have / be.</p></div>
+      </div>
+      <div class="hh-compare">
+        <p><b>She worked hard</b> all night. <span class="why">= with a lot of effort</span></p>
+        <p><b>She hardly worked</b> all night. <span class="why">= she almost didn't work</span></p>
+      </div>
+      <div class="clues" id="hhq"></div>
+      <span class="score" id="hhScore"></span>
+    </div>
+    <div class="block">
       <h3>Online reviews</h3>
       <p class="lede">Choose the correct word. Then say why.</p>
       <div class="clues" id="adv"></div>
@@ -348,6 +370,11 @@ nav.doors{grid-template-columns:repeat(5,1fr)}
       <h3>Describe how…</h3>
       <p class="lede">Open a card. Describe it in detail, using at least two adverbs and one linking verb + adjective (looks, seems, sounds…).</p>
       <div class="cards" id="how"></div>
+    </div>
+    <div class="block">
+      <h3>Hard and hardly: about you</h3>
+      <p class="lede">Open a card and answer. Use <i>hard</i> or <i>hardly</i> in your answer.</p>
+      <div class="cards" id="hhTalk"></div>
     </div>
     <div class="room-foot"><span class="tip">Next: the Night Shift</span><button class="btn ghost" data-done="reviews">Light the candle</button></div>
   </section>
@@ -485,6 +512,17 @@ choose("adv",[
  ["★★★★★ The anaesthetic worked ___. I didn't feel a thing for three days.",["good","well"],"well","How did it work? Well is the adverb of good."],
  ["★☆☆☆☆ I ___ fainted when I saw the bill.",["near","nearly"],"nearly","Nearly = almost."]
 ],"aScore");
+choose("hhq",[
+ ["Dr Fang tried ___ to save the tooth, but it was too late.",["hard","hardly"],"hard","Try hard = with a lot of effort."],
+ ["After the extraction, I could ___ open my mouth.",["hard","hardly"],"hardly","Could hardly = almost couldn't."],
+ ["The night nurse ___ ever smiles. Nobody knows why.",["hard","hardly"],"hardly","Hardly ever = almost never."],
+ ["It was raining ___ when somebody knocked on the clinic door.",["hard","hardly"],"hard","Rain hard = rain a lot, heavily."],
+ ["There was ___ anyone in the waiting room at 3 a.m.",["hard","hardly"],"hardly","Hardly anyone = almost nobody."],
+ ["This is a really ___ case. I've never seen a tooth like this.",["hard","hardly"],"hard","Here 'hard' is an adjective: a difficult case."],
+ ["Bite down ___ on the gauze for thirty minutes.",["hard","hardly"],"hard","Bite hard = with force."],
+ ["I've ___ slept since I started working night shifts.",["hard","hardly"],"hardly","Have hardly slept = have almost not slept."]
+],"hhScore");
+flips("hhTalk",["What have you worked really hard for in your life?","What do you hardly ever do, but would like to do more often?","What was the hardest exam or operation you've ever had?","What can you hardly remember from your student years?","What do patients find hard to believe about your job?","Is there something you can hardly imagine your life without?"],"Open card");
 flips("how",["how a vampire dentist greets a new patient","how a very nervous patient behaves in your chair","how you work when you're running late","how your worst boss or teacher used to speak","how people dance at a party where nobody knows anyone","how a ghost moves through an old house"],"Open card");
 
 /* 5 night shift */
