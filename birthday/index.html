@@ -39,6 +39,7 @@ p{margin:0}
 @media (max-width:760px){.hero{grid-template-columns:1fr}}
 .hero .txt{display:flex;flex-direction:column;gap:12px;position:relative;z-index:1}
 .hero .ko{font-family:var(--display);font-size:22px;color:var(--green)}
+.hero img.bday{max-height:520px;width:auto;margin-inline:auto;object-fit:contain}
 .hero img{width:100%;max-width:100%;height:auto;display:block;filter:drop-shadow(0 12px 18px #e2407e33)}
 .age{display:inline-flex;align-items:center;justify-content:center;width:84px;height:84px;border-radius:50%;background:var(--green);color:#fff;font-family:var(--display);font-size:38px;transform:rotate(-8deg);box-shadow:4px 4px 0 var(--pink-mid)}
 .cake{display:flex;gap:8px;align-items:flex-end}
@@ -159,6 +160,12 @@ textarea:focus{outline:none}
 .finale h2{color:#fff;font-size:clamp(34px,6vw,58px)}
 .finale img{width:100%;height:auto;display:block}
 #confetti{position:fixed;inset:0;pointer-events:none;z-index:50}
+.expert-top{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,280px);gap:16px;align-items:end}
+.expert-top img{width:100%;height:auto;display:block}
+@media (max-width:700px){.expert-top{grid-template-columns:1fr}.expert-top img{max-width:280px}}
+.idcheck{display:grid;grid-template-columns:minmax(0,320px) minmax(0,1fr);gap:20px;align-items:center;background:var(--pink-soft);border-radius:20px;padding:18px}
+@media (max-width:700px){.idcheck{grid-template-columns:1fr}}
+.idcheck img{width:100%;height:auto;display:block;border-radius:12px;transform:rotate(-2deg);box-shadow:5px 5px 0 var(--mint-mid)}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -172,7 +179,7 @@ textarea:focus{outline:none}
       <div class="row"><span class="age">24</span><p class="lede">Today's lesson is a party. Six rooms, six candles on the cake. Light them all and make a wish!</p></div>
       <div><div class="cake" id="cake" aria-label="Rooms finished"></div><span class="cake-label" id="cakeLabel">0 of 6 candles lit</span></div>
     </div>
-    <img src="img/duo1.webp" alt="Lee Know and Han holding flowers" width="680" height="532">
+    <img class="bday" src="img/diana.webp" alt="Diana, the birthday girl" width="800" height="1021">
   </header>
 
   <nav class="tags" role="tablist" id="tags"></nav>
@@ -193,7 +200,10 @@ textarea:focus{outline:none}
 
   <!-- 2 EXPERT -->
   <section class="room" id="room-expert" role="tabpanel" hidden>
-    <div class="head"><span class="eyebrow">Room 2</span><h2>Ask the expert</h2><span class="goal">Speaking: Diana tells us everything about Stray Kids</span></div>
+    <div class="expert-top">
+      <div class="head"><span class="eyebrow">Room 2</span><h2>Ask the expert</h2><span class="goal">Speaking: Diana tells us everything about Stray Kids</span></div>
+      <img src="img/duo1.webp" alt="Lee Know and Han holding flowers" width="680" height="532">
+    </div>
     <div class="block">
       <h3>Fan words</h3>
       <p class="lede">K-pop fans have their own English. Match the words. Diana, you're the expert!</p>
@@ -229,7 +239,21 @@ textarea:focus{outline:none}
   <!-- 4 GIFTS -->
   <section class="room" id="room-gifts" role="tabpanel" hidden>
     <div class="head"><span class="eyebrow">Room 4</span><h2>Mystery gifts</h2><span class="goal">Modals of deduction: must / might / can't</span></div>
-    <p class="lede">There are six presents for Diana. Read the clues and guess what's inside: "It must be…", "It might be…", "It can't be… because…". Agree on one answer, then open the box!</p>
+    <div class="idcheck">
+      <img src="img/id.webp" alt="Two funny driver's licences side by side" width="900" height="1102">
+      <div class="block">
+        <h3>But first: ID check!</h3>
+        <p>The security guard at the party door doesn't believe this ID. Look carefully and help him:</p>
+        <ul class="clue">
+          <li>Is this ID real? "It can't be real, because…"</li>
+          <li>How old must the person on the card be, according to the date of birth?</li>
+          <li>Find at least five differences between the two cards.</li>
+          <li>What might the person's real name be?</li>
+        </ul>
+        <p class="tip">Use must / might / can't in every answer.</p>
+      </div>
+    </div>
+    <p class="lede">Now, there are six presents for Diana. Read the clues and guess what's inside: "It must be…", "It might be…", "It can't be… because…". Agree on one answer, then open the box!</p>
     <div class="gifts" id="gifts"></div>
     <div class="foot"><span class="tip">Next: What if…?</span><button class="btn green" data-done="gifts">Light a candle</button></div>
   </section>
