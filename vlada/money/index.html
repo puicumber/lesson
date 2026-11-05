@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Money Matters</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+[hidden]{display:none!important} body{margin:0}
+
+/* Layout: a banknote-style header, pill tabs for each exercise, one exercise panel at a time. */
+:root{
+  --bg:#eef2ec; --card:#fbfcf8; --ink:#1d2a22; --muted:#5d6b62; --line:#cfd9cf;
+  --green:#1f7a4d; --green-soft:#1f7a4d18; --gold:#c8921a; --gold-soft:#c8921a22;
+  --ok:#1f7a4d; --ok-soft:#1f7a4d1c; --bad:#c2453d; --bad-soft:#c2453d1c;
+  --display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;
+  --body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#141b17; --card:#1c2520; --ink:#e7eee8; --muted:#a2b1a7; --line:#33423a;
+  --green:#5cc18d; --green-soft:#5cc18d1f; --gold:#e3b54a; --gold-soft:#e3b54a24;
+  --ok:#5cc18d; --ok-soft:#5cc18d22; --bad:#ef7d74; --bad-soft:#ef7d7422; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141b17; --card:#1c2520; --ink:#e7eee8; --muted:#a2b1a7; --line:#33423a;
+  --green:#5cc18d; --green-soft:#5cc18d1f; --gold:#e3b54a; --gold-soft:#e3b54a24;
+  --ok:#5cc18d; --ok-soft:#5cc18d22; --bad:#ef7d74; --bad-soft:#ef7d7422; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 64px}
+.wrap{max-width:920px;margin:0 auto;display:flex;flex-direction:column;gap:24px}
+h1,h2,h3{font-family:var(--display);margin:0;line-height:1.05;text-wrap:balance}
+h1{font-size:clamp(40px,7vw,64px);font-weight:800;letter-spacing:-.02em}
+h2{font-size:clamp(28px,4vw,36px);font-weight:800}
+h3{font-size:22px;font-weight:600}
+p{margin:0}
+.eyebrow{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.lede{color:var(--muted);max-width:62ch}
+
+/* banknote header */
+.note{position:relative;border:2px solid var(--green);border-radius:18px;padding:26px clamp(20px,4vw,36px);background:
+  repeating-linear-gradient(135deg,transparent 0 10px,var(--green-soft) 10px 11px),var(--card);overflow:hidden;display:flex;flex-direction:column;gap:10px}
+.note::after{content:"";position:absolute;inset:8px;border:1px dashed var(--green);border-radius:12px;opacity:.5;pointer-events:none}
+.note h1{color:var(--green)}
+.denom{position:absolute;right:clamp(16px,4vw,32px);top:18px;font-family:var(--display);font-weight:800;font-size:clamp(44px,8vw,72px);color:var(--gold);opacity:.9;line-height:1}
+@media (max-width:520px){.denom{position:static;font-size:40px}}
+
+nav.tabs{display:flex;flex-wrap:wrap;gap:8px}
+.tab{appearance:none;cursor:pointer;font:inherit;font-weight:700;font-size:15px;border-radius:999px;padding:8px 16px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+.tab:hover{border-color:var(--green)}
+.tab[aria-selected="true"]{background:var(--green);border-color:var(--green);color:var(--card)}
+.tab:focus-visible,.btn:focus-visible,select:focus-visible,input:focus-visible,.chip:focus-visible,.opt:focus-visible,.flash:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+
+section.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:clamp(20px,4vw,34px);display:flex;flex-direction:column;gap:22px}
+.head{display:flex;flex-direction:column;gap:8px}
+.btn{appearance:none;cursor:pointer;font:inherit;font-weight:700;font-size:16px;border-radius:999px;padding:10px 20px;border:1px solid var(--green);background:var(--green);color:var(--card)}
+.btn.ghost{background:transparent;color:var(--green)}
+.btn.gold{background:var(--gold);border-color:var(--gold);color:#241a05}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.score{font-weight:700;color:var(--green);font-variant-numeric:tabular-nums}
+.tip{font-size:14px;color:var(--muted);font-style:italic}
+
+/* flashcards */
+.flash{appearance:none;cursor:pointer;font:inherit;color:var(--ink);width:100%;min-height:240px;border-radius:18px;border:2px solid var(--line);background:var(--bg);padding:28px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center}
+.flash .w{font-family:var(--display);font-size:clamp(34px,6vw,52px);font-weight:800;color:var(--green);line-height:1.05}
+.flash .t{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.flash .d{font-size:20px;max-width:46ch}
+.flash .e{font-style:italic;color:var(--muted);max-width:46ch}
+.flash.back{border-color:var(--gold)}
+.filters{display:flex;gap:6px;flex-wrap:wrap}
+.filter{appearance:none;cursor:pointer;font:inherit;font-size:14px;border-radius:8px;padding:5px 12px;border:1px solid var(--line);background:transparent;color:var(--muted)}
+.filter[aria-pressed="true"]{border-color:var(--gold);background:var(--gold-soft);color:var(--ink)}
+.bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden}
+.bar span{display:block;height:100%;background:var(--gold);transition:width .3s}
+
+/* match */
+.match{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.8fr);gap:12px 18px}
+@media (max-width:600px){.match{grid-template-columns:1fr}}
+.col{display:flex;flex-direction:column;gap:8px;min-width:0}
+.chip{appearance:none;cursor:pointer;font:inherit;text-align:left;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+.chip.word{font-weight:700}
+.chip:hover{border-color:var(--green)}
+.chip.sel{border-color:var(--gold);background:var(--gold-soft)}
+.chip.ok{border-color:var(--ok);background:var(--ok-soft);color:var(--ok);cursor:default}
+.chip.no{animation:shake .35s;border-color:var(--bad)}
+@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+
+/* choose */
+.qs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:700px){.qs{grid-template-columns:1fr}}
+.q{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.q .n{font-size:12px;color:var(--muted);letter-spacing:.1em}
+.q .s{font-weight:700}
+.opts{display:flex;gap:6px;flex-wrap:wrap}
+.opt{appearance:none;cursor:pointer;font:inherit;font-size:15px;border-radius:8px;padding:6px 12px;background:var(--card);color:var(--ink);border:1px solid var(--line)}
+.opt:hover{border-color:var(--green)}
+.opt.ok{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.opt.no{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.why{font-size:14px;color:var(--muted)}
+
+/* fill */
+.fill{display:flex;flex-direction:column;gap:8px;padding:0;margin:0}
+.fill li{list-style:none;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;padding:10px 14px;border-radius:10px;background:var(--bg);border:1px solid transparent}
+.fill li.ok{border-color:var(--ok)}.fill li.no{border-color:var(--bad)}
+select,input[type=text]{font:inherit;font-size:16px;color:var(--ink);background:var(--card);border:1px solid var(--green);border-radius:8px;padding:4px 8px;max-width:100%}
+.mark{font-size:14px;margin-left:auto}
+.mark.ok{color:var(--ok)}.mark.no{color:var(--bad)}
+
+/* spelling */
+.spell{display:flex;flex-direction:column;gap:10px}
+.spell li{list-style:none;display:grid;grid-template-columns:minmax(0,1fr) 200px auto;gap:10px;align-items:center;padding:10px 14px;border-radius:10px;background:var(--bg);border:1px solid transparent}
+@media (max-width:600px){.spell li{grid-template-columns:1fr}}
+.spell li.ok{border-color:var(--ok)}.spell li.no{border-color:var(--bad)}
+.spell ol{padding:0;margin:0;display:flex;flex-direction:column;gap:8px}
+.hint{font-family:var(--display);font-weight:600;color:var(--gold)}
+
+/* talk */
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:700px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.coin{appearance:none;cursor:pointer;font:inherit;color:var(--ink);background:var(--bg);border:2px dashed var(--gold);border-radius:14px;min-height:120px;padding:14px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:15px}
+.coin:not(.open){font-family:var(--display);font-size:34px;font-weight:800;color:var(--gold)}
+.coin.open{border-style:solid;border-color:var(--line)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="note">
+    <span class="denom">€€€</span>
+    <span class="eyebrow">Vocabulary practice for Vlada</span>
+    <h1>Money Matters</h1>
+    <p class="lede">Verbs, nouns, prepositions and phrasal verbs about money. Start with the flashcards, then try the exercises. Everything checks itself.</p>
+  </header>
+
+  <nav class="tabs" role="tablist" id="tabs"></nav>
+
+  <section class="panel" id="p-cards" role="tabpanel">
+    <div class="head"><span class="eyebrow">Step 1</span><h2>Flashcards</h2>
+      <p class="lede">Read the word and try to remember what it means. Click the card to check. "Got it" removes the card; "Again" keeps it in the pile.</p></div>
+    <div class="filters" id="filters"></div>
+    <div class="bar"><span id="bar" style="width:0"></span></div>
+    <button class="flash" id="flash"></button>
+    <div class="row"><button class="btn ghost" id="again">Again</button><button class="btn" id="gotit">Got it</button><span class="score" id="fCount"></span><button class="btn ghost" id="fReset" style="margin-left:auto">Start again</button></div>
+  </section>
+
+  <section class="panel" id="p-match" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Step 2</span><h2>Nouns: match the meaning</h2>
+      <p class="lede">Click a word, then click its definition.</p></div>
+    <div class="match"><div class="col" id="mW"></div><div class="col" id="mD"></div></div>
+    <div class="row"><span class="score" id="mScore"></span><button class="btn ghost" id="mReset">Shuffle again</button></div>
+  </section>
+
+  <section class="panel" id="p-verbs" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Step 3</span><h2>Verbs: which one?</h2>
+      <p class="lede">Watch out for the tricky pairs: borrow / lend, cost / charge, earn / win, save / waste.</p></div>
+    <div class="qs" id="verbs"></div>
+    <span class="score" id="vScore"></span>
+  </section>
+
+  <section class="panel" id="p-preps" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Step 4</span><h2>Prepositions</h2>
+      <p class="lede">Pay <b>by</b> card, pay <b>for</b> something, spend <b>on</b>, invest <b>in</b>, lend <b>to</b>, borrow <b>from</b>, get <b>into</b> / <b>out of</b> debt.</p></div>
+    <ol class="fill" id="preps"></ol>
+    <div class="row"><button class="btn" id="pCheck">Check answers</button><span class="score" id="pScore"></span></div>
+  </section>
+
+  <section class="panel" id="p-phrasal" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Step 5</span><h2>Phrasal verbs</h2>
+      <p class="lede"><b>take out</b> (from a cash machine) · <b>pay back</b> (return money) · <b>live on</b> (an amount of money) · <b>live off</b> (someone or something)</p></div>
+    <div class="qs" id="phrasal"></div>
+    <span class="score" id="phScore"></span>
+  </section>
+
+  <section class="panel" id="p-spell" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Step 6</span><h2>Spell it</h2>
+      <p class="lede">Read the definition and type the word. The first letter is a hint. Press Enter or "Check".</p></div>
+    <ol class="spell" id="spell"></ol>
+    <div class="row"><button class="btn" id="sCheck">Check all</button><span class="score" id="sScore"></span></div>
+  </section>
+
+  <section class="panel" id="p-talk" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Step 7</span><h2>Money talk</h2>
+      <p class="lede">Open a coin and answer. Use at least two words from this page in every answer.</p></div>
+    <div class="cards" id="talk"></div>
+  </section>
+</div>
+
+<script>
+const TABS=[["cards","Flashcards"],["match","Nouns"],["verbs","Verbs"],["preps","Prepositions"],["phrasal","Phrasal verbs"],["spell","Spelling"],["talk","Talk"]];
+const tabsEl=document.getElementById("tabs");
+TABS.forEach(([id,name])=>{const b=document.createElement("button");b.className="tab";b.setAttribute("role","tab");b.id="t-"+id;b.textContent=name;b.onclick=()=>show(id);tabsEl.appendChild(b)});
+function show(id){TABS.forEach(([t])=>{document.getElementById("p-"+t).hidden=t!==id;document.getElementById("t-"+t).setAttribute("aria-selected",t===id)});
+  try{if(location.hash!=="#"+id)history.replaceState(null,"","#"+id)}catch(e){}}
+const h=location.hash.slice(1);show(TABS.some(t=>t[0]===h)?h:"cards");
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+
+/* flashcards */
+const WORDS=[
+ ["be worth","verb","to have a particular value","This old ring is worth about €500."],
+ ["borrow (from)","verb","to take money from someone and give it back later","Can I borrow €10 from you?"],
+ ["lend (to) · lent · lent","verb","to give money to someone who will give it back later","I lent my brother €50 last month."],
+ ["can't afford","verb","to not have enough money for something","We can't afford a new car this year."],
+ ["charge (for)","verb","to ask someone to pay a price for a service","The hotel charged us €20 for parking."],
+ ["cost · cost · cost","verb","to have a price","How much did your new phone cost?"],
+ ["earn","verb","to get money for the work you do","She earns more than her husband."],
+ ["inherit","verb","to get money or property from someone after they die","He inherited his grandmother's flat."],
+ ["invest (in)","verb","to put money into something to make a profit","They invested in gold."],
+ ["owe","verb","to have to pay money back to someone","You still owe me €30!"],
+ ["raise","verb","to collect money for a good cause","The school raised €2,000 for the animal shelter."],
+ ["save (up)","verb","to keep money so you can use it later","I'm saving up for a trip to Japan."],
+ ["waste (on)","verb","to spend money badly, on things you don't need","Don't waste your money on that app."],
+ ["a bill","noun","a paper that shows how much you have to pay for something","The electricity bill was huge this month."],
+ ["a budget","noun","the money you have and a plan for how to spend it","Our budget for the holiday is €1,500."],
+ ["contactless payment","noun","paying by holding your card or phone near a reader","Contactless payment is so fast."],
+ ["insurance","noun","money you pay a company, so they pay you if something bad happens","Don't travel without travel insurance."],
+ ["a loan","noun","money that a bank or a person lends you","He took out a loan to buy a car."],
+ ["a mortgage","noun","a big loan from a bank to buy a house or a flat","They'll pay off their mortgage in 20 years."],
+ ["a salary","noun","the money you get for your job, usually every month","She got a higher salary at her new job."],
+ ["tax","noun","money you have to pay to the government","Prices include tax."],
+ ["a price tag","noun","a small label that shows how much something costs","I looked at the price tag and put the coat back."],
+ ["take out","phrasal verb","to get money from a cash machine or a bank account","I took out €100 at the airport."],
+ ["pay back","phrasal verb","to give back money that you borrowed","I'll pay you back on Friday."],
+ ["live on","phrasal verb","to have a certain amount of money to pay for everything","It's hard to live on €700 a month."],
+ ["live off","phrasal verb","to get the money you need from someone or something","He's 30 and still lives off his parents."],
+ ["get into debt","phrase","to start owing money","It's easy to get into debt with credit cards."],
+ ["get out of debt","phrase","to pay back all the money you owe","It took them five years to get out of debt."]
+];
+let filter="all",known=new Set(store.get("mm-known",[])),deck=[],cur=null,flipped=false;
+const filtersEl=document.getElementById("filters");
+[["all","All"],["verb","Verbs"],["noun","Nouns"],["phrasal verb","Phrasal verbs"]].forEach(([k,l])=>{const b=document.createElement("button");b.className="filter";b.textContent=l;b.setAttribute("aria-pressed",k===filter);
+  b.onclick=()=>{filter=k;filtersEl.querySelectorAll(".filter").forEach(x=>x.setAttribute("aria-pressed",x===b));buildDeck()};filtersEl.appendChild(b)});
+const pool=()=>WORDS.filter(w=>filter==="all"||w[1]===filter||(filter==="phrasal verb"&&w[1]==="phrase"));
+function buildDeck(){deck=shuffle(pool().filter(w=>!known.has(w[0])));next()}
+function next(){cur=deck.shift()||null;flipped=false;render()}
+function render(){const f=document.getElementById("flash"),p=pool(),k=p.filter(w=>known.has(w[0])).length;
+  document.getElementById("bar").style.width=(p.length?k/p.length*100:0)+"%";
+  document.getElementById("fCount").textContent=`${k} of ${p.length} learned`;
+  f.classList.toggle("back",flipped);
+  if(!cur){f.innerHTML=`<span class="w">All done!</span><span class="d">You know every word in this set. Try the exercises next.</span>`;return}
+  f.innerHTML=flipped?`<span class="t">${cur[1]}</span><span class="w">${cur[0]}</span><span class="d">${cur[2]}</span><span class="e">${cur[3]}</span>`
+    :`<span class="t">${cur[1]}</span><span class="w">${cur[0]}</span><span class="tip">Click to see the meaning</span>`}
+document.getElementById("flash").onclick=()=>{if(cur){flipped=!flipped;render()}};
+document.getElementById("gotit").onclick=()=>{if(!cur)return;known.add(cur[0]);store.set("mm-known",[...known]);next()};
+document.getElementById("again").onclick=()=>{if(!cur)return;deck.splice(Math.min(3,deck.length),0,cur);next()};
+document.getElementById("fReset").onclick=()=>{known=new Set();store.set("mm-known",[]);buildDeck()};
+buildDeck();
+
+/* match */
+const NOUNS=WORDS.filter(w=>w[1]==="noun").map(w=>[w[0].replace(/^an? /,""),w[2]]);
+function buildMatch(){let sel=null,ok=0;const W=document.getElementById("mW"),D=document.getElementById("mD"),sc=document.getElementById("mScore");W.innerHTML="";D.innerHTML="";sc.textContent=`0 / ${NOUNS.length}`;
+  shuffle(NOUNS).forEach(([w])=>{const b=document.createElement("button");b.className="chip word";b.textContent=w;b.dataset.k=w;
+    b.onclick=()=>{if(b.classList.contains("ok"))return;W.querySelectorAll(".sel").forEach(x=>x.classList.remove("sel"));b.classList.add("sel");sel=b};W.appendChild(b)});
+  shuffle(NOUNS).forEach(([w,d])=>{const b=document.createElement("button");b.className="chip";b.textContent=d;
+    b.onclick=()=>{if(!sel||b.classList.contains("ok"))return;
+      if(sel.dataset.k===w){sel.classList.remove("sel");sel.classList.add("ok");b.classList.add("ok");sel=null;ok++;sc.textContent=`${ok} / ${NOUNS.length}`+(ok===NOUNS.length?" — perfect!":"")}
+      else{b.classList.add("no");setTimeout(()=>b.classList.remove("no"),400)}};D.appendChild(b)})}
+buildMatch();document.getElementById("mReset").onclick=buildMatch;
+
+/* choose */
+function choose(elId,data,scoreId){let ok=0,tried=0;const el=document.getElementById(elId);
+  data.forEach(([s,opts,ans,why],i)=>{const d=document.createElement("div");d.className="q";
+    d.innerHTML=`<span class="n">${i+1}</span><p class="s">${s.replace("___","<u>&nbsp;?&nbsp;</u>")}</p><div class="opts"></div><p class="why" hidden></p>`;
+    const o=d.querySelector(".opts"),w=d.querySelector(".why");let answered=false;
+    shuffle(opts).forEach(t=>{const b=document.createElement("button");b.className="opt";b.textContent=t;
+      b.onclick=()=>{o.querySelectorAll(".opt").forEach(x=>x.classList.remove("no"));
+        if(t===ans){b.classList.add("ok");w.hidden=false;w.textContent=why;d.querySelector(".s u").innerHTML=`&nbsp;${ans}&nbsp;`;if(!answered){answered=true;tried++;ok++}}
+        else{b.classList.add("no");if(!answered){answered=true;tried++}}
+        document.getElementById(scoreId).textContent=`First-try answers: ${ok} / ${tried}`};o.appendChild(b)});
+    el.appendChild(d)})}
+choose("verbs",[
+ ["Could you ___ me €20 until Friday?",["lend","borrow"],"lend","Lend = give. You lend something TO someone."],
+ ["I had to ___ money from the bank to start my business.",["borrow","lend"],"borrow","Borrow = take. You borrow something FROM someone."],
+ ["How much does a taxi to the airport ___?",["cost","charge"],"cost","Things cost money."],
+ ["The plumber ___ me €80 for one hour of work!",["charged","cost"],"charged","People charge you money for a service."],
+ ["She ___ €2,000 a month as a nurse.",["earns","wins"],"earns","You earn money by working. You win money in a game or a lottery."],
+ ["My grandfather left me his car. I ___ it when he died.",["inherited","earned"],"inherited","Inherit = get something from a person who has died."],
+ ["Stop ___ your money on clothes you never wear!",["wasting","saving"],"wasting","Waste money ON useless things."],
+ ["I'm ___ up for a new laptop.",["saving","investing"],"saving","Save up FOR something you want to buy."],
+ ["This painting is ___ a fortune.",["worth","cost"],"worth","Be worth = have this value."],
+ ["I ___ Anna €15 because she paid for my lunch.",["owe","lend"],"owe","Owe = you have to give money back."],
+ ["We can't ___ a holiday abroad this year.",["afford","cost"],"afford","Can't afford = don't have enough money."],
+ ["The charity ___ €10,000 for the children's hospital.",["raised","earned"],"raised","Raise money = collect it for a good cause."],
+ ["He ___ all his savings in a friend's start-up.",["invested","spent"],"invested","Invest IN something to make a profit. (Spend ON.)"]
+],"vScore");
+choose("phrasal",[
+ ["I need to ___ some cash. Is there a cash machine near here?",["take out","pay back","live on"],"take out","Take out money from a cash machine."],
+ ["Don't worry, I'll ___ the money next week.",["pay back","take out","live off"],"pay back","Pay back = return money you borrowed."],
+ ["It's really hard to ___ €600 a month in a big city.",["live on","live off","take out"],"live on","Live on an amount of money."],
+ ["She's 28 and she still ___ her parents.",["lives off","lives on","pays back"],"lives off","Live off someone: they give you the money you need."],
+ ["He ___ €200 last night and spent it all.",["took out","paid back","lived on"],"took out","Past tense: took out."],
+ ["Have you ___ the money you borrowed from Max yet?",["paid back","taken out","lived off"],"paid back","Present perfect: have paid back."],
+ ["Many students ___ cheap pasta at the end of the month.",["live on","live off","take out"],"live on","Live on a kind of food: it's the main thing you eat."],
+ ["It took them five years to get ___ debt.",["out of","into","off"],"out of","Get out of debt = pay back everything you owe."]
+],"phScore");
+
+/* prepositions */
+const P=["by","for","on","in","to","from","into","out of"];
+const PREPS=[
+ ["Can I pay","card, or only in cash?","by"],
+ ["Who paid","the taxi last night?","for"],
+ ["I spend far too much money","coffee.","on"],
+ ["She invested her savings","a small café.","in"],
+ ["I never lend money","my brother. He never gives it back.","to"],
+ ["I borrowed €500","my parents to buy a bike.","from"],
+ ["The restaurant charged us €5","bread!","for"],
+ ["Be careful with credit cards. It's very easy to get","debt.","into"],
+ ["After three years, they finally got","debt.","out of"],
+ ["How much did you pay","your new phone?","for"]
+];
+const pEl=document.getElementById("preps");
+PREPS.forEach(([a,b],i)=>{const li=document.createElement("li");
+  li.innerHTML=`<span>${a}</span><select id="prep-${i}" aria-label="Gap ${i+1}"><option value="">…</option>${P.map(x=>`<option>${x}</option>`).join("")}</select><span>${b}</span><span class="mark"></span>`;pEl.appendChild(li)});
+document.getElementById("pCheck").onclick=()=>{let n=0;PREPS.forEach(([, ,ans],i)=>{const li=pEl.children[i],v=li.querySelector("select").value,m=li.querySelector(".mark"),good=v===ans;
+  li.className=v?(good?"ok":"no"):"";m.className="mark "+(good?"ok":"no");m.textContent=!v?"":good?"✓":"try again";if(good)n++});
+  document.getElementById("pScore").textContent=`${n} / ${PREPS.length}`};
+
+/* spelling */
+const SPELL=[["money that you have to pay to the government","tax"],["a big loan from a bank to buy a flat","mortgage"],["the money you get for your job every month","salary"],["to get money for the work you do","earn"],["to get money from someone after they die","inherit"],["to have to pay money back to someone","owe"],["a paper that shows how much you must pay","bill"],["a plan for how to spend your money","budget"],["to spend money badly","waste"],["to collect money for a good cause","raise"]];
+const sEl=document.getElementById("spell");
+function checkOne(i){const li=sEl.children[i],v=li.querySelector("input").value.trim().toLowerCase(),m=li.querySelector(".mark"),ans=SPELL[i][1],good=v===ans;
+  li.className=v?(good?"ok":"no"):"";m.className="mark "+(good?"ok":"no");m.textContent=!v?"":good?"✓":"try again";return good}
+SPELL.forEach(([d,w],i)=>{const li=document.createElement("li");
+  li.innerHTML=`<span>${d} <span class="hint">${w[0]}…</span></span><input type="text" id="sp-${i}" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="${d}"><span class="mark"></span>`;
+  li.querySelector("input").addEventListener("keydown",e=>{if(e.key==="Enter"){checkOne(i);const n=document.getElementById("sp-"+(i+1));if(n)n.focus()}});sEl.appendChild(li)});
+document.getElementById("sCheck").onclick=()=>{let n=0;SPELL.forEach((_,i)=>{if(checkOne(i))n++});document.getElementById("sScore").textContent=`${n} / ${SPELL.length}`};
+
+/* talk */
+const TALK=["Are you a saver or a spender? Give an example.","Have you ever lent money to a friend? Did you get it back?","What's the last thing you wasted money on?","What can't you afford right now that you'd love to buy?","High salary in a boring job, or low salary in your dream job?","Do you usually pay by card or in cash? Why?","Is it OK to live off your parents at 25? Why or why not?","Do you plan a budget for the month? Do you stick to it?","Would you ever take out a mortgage? What would you buy?","What would you invest in, if you had €10,000?","What's something expensive that is really worth the money?","Should children get pocket money? How much?"];
+const tEl=document.getElementById("talk");
+TALK.forEach((t,i)=>{const b=document.createElement("button");b.className="coin";b.textContent="€";b.setAttribute("aria-label","Open question "+(i+1));b.onclick=()=>{b.classList.add("open");b.textContent=t};tEl.appendChild(b)});
+</script>
+</body>
+</html>
