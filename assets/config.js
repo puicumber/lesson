@@ -1,7 +1,7 @@
 // Supabase connection (public anon key only)
 window.PORTAL_CONFIG = {
-  url: "",
-  key: ""
+  url: "https://chfrhrkzeckmalwiitlt.supabase.co",
+  key: "sb_publishable_Mg8bi1MLyK-dMorOcf4KBA_5iuP8AoY"
 };
 // Exercises inside each material, used to show progress
 window.PORTAL_ACTIVITIES = {
