@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Review: Prepositions & Idioms</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+[hidden]{display:none!important} body{margin:0}
+
+/* Review page: case-file header, flashcards first, then self-checking exercises. Data lives in REVIEW below. */
+:root{
+  --bg:#f1ece2; --card:#fbf8f2; --paper:#f6efe0; --ink:#1f2433; --muted:#5f6475; --line:#d8cfbd;
+  --navy:#2b3a67; --navy-soft:#2b3a6714; --stamp:#b8402f; --stamp-soft:#b8402f1a;
+  --ok:#2f7a52; --ok-soft:#2f7a521c; --bad:#b8402f; --bad-soft:#b8402f1c;
+  --display:"Fraunces",Georgia,serif;
+  --body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#15171f; --card:#1d2029; --paper:#232631; --ink:#e9e6df; --muted:#a6a9b6; --line:#353948;
+  --navy:#9fb2ec; --navy-soft:#9fb2ec1c; --stamp:#f08a78; --stamp-soft:#f08a7822;
+  --ok:#6cc596; --ok-soft:#6cc59622; --bad:#f08a78; --bad-soft:#f08a7822; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#15171f; --card:#1d2029; --paper:#232631; --ink:#e9e6df; --muted:#a6a9b6; --line:#353948;
+  --navy:#9fb2ec; --navy-soft:#9fb2ec1c; --stamp:#f08a78; --stamp-soft:#f08a7822;
+  --ok:#6cc596; --ok-soft:#6cc59622; --bad:#f08a78; --bad-soft:#f08a7822; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 64px}
+.wrap{max-width:920px;margin:0 auto;display:flex;flex-direction:column;gap:24px}
+h1,h2{font-family:var(--display);margin:0;line-height:1.05;text-wrap:balance}
+h1{font-size:clamp(36px,7vw,58px);font-weight:800;letter-spacing:-.01em}
+h2{font-size:clamp(26px,4vw,34px);font-weight:800}
+p{margin:0}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.lede{color:var(--muted);max-width:64ch}
+.tip{font-size:14px;color:var(--muted);font-style:italic}
+
+.file{position:relative;border:1px solid var(--line);border-radius:6px 18px 18px 18px;padding:30px clamp(20px,4vw,38px) 26px;background:var(--paper);display:flex;flex-direction:column;gap:10px;margin-top:22px}
+.file::before{content:"REVIEW FILE";position:absolute;top:-22px;left:-1px;font-family:var(--mono);font-size:12px;letter-spacing:.12em;padding:4px 16px;background:var(--paper);border:1px solid var(--line);border-bottom:0;border-radius:10px 10px 0 0;color:var(--muted)}
+.file h1{color:var(--navy)}
+.stamp{position:absolute;right:clamp(14px,4vw,34px);top:20px;font-family:var(--mono);font-weight:600;font-size:13px;letter-spacing:.16em;color:var(--stamp);border:2px solid var(--stamp);border-radius:6px;padding:6px 10px;transform:rotate(-6deg);opacity:.85}
+@media (max-width:560px){.stamp{position:static;align-self:flex-start;transform:none}}
+
+nav.tabs{display:flex;flex-wrap:wrap;gap:8px}
+.tab{appearance:none;cursor:pointer;font:inherit;font-weight:700;font-size:15px;border-radius:999px;padding:8px 16px;border:1px solid var(--line);background:var(--card);color:var(--ink);display:inline-flex;gap:8px;align-items:center}
+.tab:hover{border-color:var(--navy)}
+.tab[aria-selected="true"]{background:var(--navy);border-color:var(--navy);color:var(--card)}
+.tab .best{font-family:var(--mono);font-size:12px;font-weight:500;opacity:.8}
+.tab:focus-visible,.btn:focus-visible,input:focus-visible,.opt:focus-visible,.flash:focus-visible,.filter:focus-visible,.coin:focus-visible{outline:2px solid var(--stamp);outline-offset:2px}
+
+section.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:clamp(20px,4vw,34px);display:flex;flex-direction:column;gap:22px}
+.head{display:flex;flex-direction:column;gap:8px}
+.btn{appearance:none;cursor:pointer;font:inherit;font-weight:700;font-size:16px;border-radius:999px;padding:10px 20px;border:1px solid var(--navy);background:var(--navy);color:var(--card)}
+.btn.ghost{background:transparent;color:var(--navy)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.score{font-family:var(--mono);font-weight:600;color:var(--navy);font-variant-numeric:tabular-nums}
+
+/* flashcards */
+.flash{appearance:none;cursor:pointer;font:inherit;color:var(--ink);width:100%;min-height:240px;border-radius:18px;border:2px solid var(--line);background:var(--paper);padding:28px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center}
+.flash .w{font-family:var(--display);font-size:clamp(30px,6vw,46px);font-weight:800;color:var(--navy);line-height:1.1}
+.flash .t{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.flash .d{font-size:20px;max-width:46ch}
+.flash .e{font-style:italic;color:var(--muted);max-width:50ch}
+.flash.back{border-color:var(--stamp)}
+.filters{display:flex;gap:6px;flex-wrap:wrap}
+.filter{appearance:none;cursor:pointer;font:inherit;font-size:14px;border-radius:8px;padding:5px 12px;border:1px solid var(--line);background:transparent;color:var(--muted)}
+.filter[aria-pressed="true"]{border-color:var(--stamp);background:var(--stamp-soft);color:var(--ink)}
+.bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden}
+.bar span{display:block;height:100%;background:var(--stamp);transition:width .3s}
+
+/* multiple choice */
+.qs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:700px){.qs{grid-template-columns:1fr}}
+.q{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.q .n{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.1em}
+.q .s{font-weight:700}
+.q .s u{text-decoration:none;border-bottom:2px solid var(--navy);color:var(--navy)}
+.opts{display:flex;gap:6px;flex-wrap:wrap}
+.opt{appearance:none;cursor:pointer;font:inherit;font-size:15px;border-radius:8px;padding:6px 12px;background:var(--card);color:var(--ink);border:1px solid var(--line)}
+.opt:hover{border-color:var(--navy)}
+.opt.ok{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.opt.no{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.why{font-size:14px;color:var(--muted)}
+
+/* typed */
+.items{display:flex;flex-direction:column;gap:12px;padding:0;margin:0}
+.items li{list-style:none;background:var(--bg);border:1px solid transparent;border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.items li.ok{border-color:var(--ok)}.items li.no{border-color:var(--bad)}
+.items .n{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.1em}
+.key{font-family:var(--mono);font-weight:600;letter-spacing:.08em;color:var(--stamp);background:var(--stamp-soft);border-radius:6px;padding:1px 8px}
+.line{display:flex;flex-wrap:wrap;gap:6px;align-items:baseline}
+input[type=text]{font:inherit;font-size:16px;color:var(--ink);background:var(--card);border:1px solid var(--navy);border-radius:8px;padding:4px 8px;flex:1 1 200px;min-width:0;max-width:100%}
+.fb{font-size:14px}
+.fb.ok{color:var(--ok)}.fb.no{color:var(--bad)}
+.fb .ans{font-weight:700}
+
+/* speaking prompts */
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:700px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:420px){.cards{grid-template-columns:1fr}}
+.coin{appearance:none;cursor:pointer;font:inherit;color:var(--ink);background:var(--paper);border:2px dashed var(--stamp);border-radius:14px;min-height:120px;padding:14px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:15px}
+.coin:not(.open){font-family:var(--mono);font-size:22px;font-weight:600;color:var(--stamp);letter-spacing:.1em}
+.coin.open{border-style:solid;border-color:var(--line)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.js"></script>
+<script src="../../assets/config.js?v=3"></script>
+<script src="../../assets/portal.js?v=2"></script>
+</head>
+<body>
+<div class="wrap">
+  <header class="file">
+    <span class="stamp" id="stamp"></span>
+    <span class="eyebrow" id="eyebrow"></span>
+    <h1 id="title"></h1>
+    <p class="lede" id="lede"></p>
+    <p class="tip" id="saveState"></p>
+  </header>
+  <nav class="tabs" role="tablist" id="tabs"></nav>
+  <div id="panels"></div>
+</div>
+
+<script>
+/* ===== REVIEW DATA (change this block for each new session) ===== */
+const REVIEW={
+ set:"g28",
+ stamp:"GRIVAS P.28–29",
+ eyebrow:"CPE review · Language development",
+ title:"Prepositions, idioms & at-phrases",
+ lede:"Everything from pages 28–29 in one place, with original sentences. Start with the flashcards, then do the exercises. Aim for 80% or more in each.",
+ cards:[
+  ["absorbed in","preposition","so interested that you notice nothing else","She was so absorbed in the case notes that she missed lunch."],
+  ["abstain from","preposition","choose not to do or have something","Patients are asked to abstain from alcohol during treatment."],
+  ["access to","preposition","the right or chance to use or see something","Students have access to the library 24/7."],
+  ["according to","preposition","as said or reported by","According to the latest study, sleep affects memory."],
+  ["accustomed to","preposition","used to (+ noun or -ing)","I'm not accustomed to being interrupted."],
+  ["acquainted with","preposition","knowing something or someone a little","Are you acquainted with the new guidelines?"],
+  ["acquitted of","preposition","officially found not guilty of a crime","He was acquitted of all charges."],
+  ["addicted to","preposition","unable to stop doing or using something","Many teenagers are addicted to their phones."],
+  ["adhere to","preposition","follow a rule or belief exactly","Staff must adhere to the safety protocol."],
+  ["advantage over","preposition","something that puts you in a better position than others","Her French gave her an advantage over the other candidates."],
+  ["adjust to","preposition","get used to a new situation","It took me weeks to adjust to night shifts."],
+  ["advise against","preposition","tell someone it's a bad idea","The GP advised him against stopping the tablets."],
+  ["aim at","preposition","point at a target; intend something for someone","The campaign is aimed at young adults."],
+  ["alienated from","preposition","feeling separate or not belonging","He felt alienated from his classmates."],
+  ["allergic to","preposition","having a bad physical reaction to","She's allergic to penicillin."],
+  ["alternative to","preposition","another possible option instead of","Is there an alternative to surgery?"],
+  ["appeal to","preposition","make a serious request to; attract","The police appealed to the public for help."],
+  ["approve of","preposition","think that something is good or acceptable","Her parents never approved of her career choice."],
+  ["aptitude for","preposition","a natural ability","He has a real aptitude for languages."],
+  ["arise from","preposition","happen as a result of","Most complaints arise from long waiting times."],
+  ["be above one's head","idiom","be too difficult to understand","The statistics lecture was way above my head."],
+  ["get above oneself","idiom","become too proud or arrogant","After one good review he started to get above himself."],
+  ["above board","idiom","honest and legal","The hiring process was completely above board."],
+  ["over and above","idiom","in addition to; more than","She did a lot over and above what her contract required."],
+  ["get one's act together","idiom","get organised and start working properly","If I want to pass CPE, I need to get my act together."],
+  ["act the fool","idiom","behave in a silly way on purpose","Stop acting the fool and listen!"],
+  ["actions speak louder than words","idiom","what you do matters more than what you say","He says he cares, but actions speak louder than words."],
+  ["not know someone from Adam","idiom","not know someone at all","A woman hugged me, but I didn't know her from Adam."],
+  ["add insult to injury","idiom","make a bad situation even worse","I missed the bus and, to add insult to injury, it started to pour."],
+  ["time and again","idiom","repeatedly, many times","I've told him time and again to lock the door."],
+  ["be up against something","idiom","face a difficulty or opponent","New therapists are up against huge caseloads."],
+  ["come of age","idiom","reach adulthood; become fully developed","Online therapy has finally come of age."],
+  ["out of thin air","idiom","from nowhere, unexpectedly","Good ideas don't come out of thin air."],
+  ["vanish into thin air","idiom","disappear completely","My keys seem to have vanished into thin air."],
+  ["full of hot air","idiom","talking a lot without meaning it; boasting","Ignore his promises, he's full of hot air."],
+  ["up in the air","idiom","not decided yet","Our summer plans are still up in the air."],
+  ["alive and kicking","idiom","still alive and very active","At ninety, my grandad is alive and kicking."],
+  ["all at sea","idiom","confused, not knowing what to do","On my first day on the ward I was all at sea."],
+  ["once and for all","idiom","finally and permanently","Let's settle this once and for all."],
+  ["Be an angel and…","idiom","a polite, friendly request","Be an angel and pass me that file."],
+  ["the apple of one's eye","idiom","the person you love most","Her granddaughter is the apple of her eye."],
+  ["with open arms","idiom","very warmly (welcome people)","The staff welcomed us with open arms."],
+  ["yours for the asking","idiom","you can have it just by asking","The spare desk is yours for the asking."],
+  ["have an axe to grind","idiom","have a personal, often selfish reason or grudge","Don't trust his review; he has an axe to grind."],
+  ["at a discount","at-phrase","for a lower price","Students can buy tickets at a discount."],
+  ["at a glance","at-phrase","by looking quickly","At a glance, the report looked fine."],
+  ["at a guess","at-phrase","estimating roughly","At a guess, there were about fifty people."],
+  ["at a moment's notice","at-phrase","with almost no warning","Doctors on call must come in at a moment's notice."],
+  ["at an advantage","at-phrase","in a better position (opposite: at a disadvantage)","Bilingual applicants are at an advantage."],
+  ["at a speed of","at-phrase","moving that fast","The train travels at a speed of 300 km/h."],
+  ["at first sight","at-phrase","when you first see someone or something","It was love at first sight."],
+  ["at fault","at-phrase","to blame for something","The driver was clearly at fault."],
+  ["at heart","at-phrase","deep down, in your true nature","He seems tough, but he's kind at heart."],
+  ["at hand","at-phrase","close by; being dealt with now","Help is at hand. Let's focus on the task at hand."],
+  ["at large","at-phrase","not caught (criminal); in general","The escaped prisoner is still at large."]
+ ],
+ filters:[["all","All"],["preposition","Prepositions"],["idiom","Idioms"],["at-phrase","At-phrases"]],
+ parts:[
+  {id:"preps",tab:"Prepositions",title:"Which preposition?",lede:"Choose the preposition. Only your first try counts.",type:"choose",items:[
+   ["She was so absorbed ___ the case notes that she missed lunch.",["in","with","at"],"in","absorbed IN something."],
+   ["Patients are asked to abstain ___ alcohol during treatment.",["from","of","to"],"from","abstain FROM."],
+   ["It took me weeks to adjust ___ night shifts.",["to","with","at"],"to","adjust TO a new situation."],
+   ["The GP advised him ___ stopping the tablets suddenly.",["against","from","of"],"against","advise someone AGAINST doing something."],
+   ["Many teenagers feel alienated ___ their families.",["from","of","with"],"from","alienated FROM."],
+   ["Is there an alternative ___ medication for mild anxiety?",["to","for","of"],"to","an alternative TO something."],
+   ["Her parents never approved ___ her career choice.",["of","with","to"],"of","approve OF."],
+   ["He has a real aptitude ___ languages.",["for","in","at"],"for","an aptitude FOR."],
+   ["Most complaints arose ___ long waiting times.",["from","of","with"],"from","arise FROM a cause."],
+   ["The defendant was acquitted ___ all charges.",["of","from","for"],"of","acquitted OF a crime."],
+   ["I'm not accustomed ___ being spoken to like that.",["to","with","of"],"to","accustomed TO + -ing (like 'used to')."],
+   ["Speaking French gave her an advantage ___ the other candidates.",["over","of","against"],"over","an advantage OVER people. (But: take advantage OF something.)"]
+  ]},
+  {id:"idioms",tab:"Idioms",title:"Pick the idiom",lede:"Choose the idiom that fits the context.",type:"choose",items:[
+   ["Don't believe his promises; he's ___.",["full of hot air","above board","alive and kicking"],"full of hot air","Full of hot air = talks a lot but means nothing."],
+   ["The funding for the project is still ___.",["up in the air","out of thin air","at large"],"up in the air","Up in the air = not decided yet."],
+   ["I'd never met him before; I didn't know him ___.",["from Adam","at heart","once and for all"],"from Adam","Not know someone from Adam = not know them at all."],
+   ["She did a lot ___ what her contract required.",["over and above","above board","above her head"],"over and above","Over and above = in addition to. (The verb idiom is 'go above and beyond'.)"],
+   ["I lost my wallet and, to ___, my phone died.",["add insult to injury","get my act together","act the fool"],"add insult to injury","Add insult to injury = make a bad situation worse."],
+   ["Honestly, the neuroscience module is completely ___.",["above my head","above board","up in the air"],"above my head","Above your head = too difficult to understand."],
+   ["Don't trust his opinion of the new manager; he has ___.",["an axe to grind","the apple of his eye","open arms"],"an axe to grind","An axe to grind = a personal reason or grudge."],
+   ["The new interns were welcomed ___.",["with open arms","out of thin air","time and again"],"with open arms","With open arms = warmly. Only about welcoming people."],
+   ["I've reminded her ___, but she still forgets.",["time and again","once and for all","at a glance"],"time and again","Time and again = repeatedly."],
+   ["Since his promotion he's ___; he won't even talk to us.",["got above himself","got his act together","come of age"],"got above himself","Get above yourself = become arrogant."],
+   ["Let's sort out this argument ___.",["once and for all","time and again","with open arms"],"once and for all","Once and for all = finally, permanently."],
+   ["After three weeks of chaos, I finally ___.",["got my act together","got above myself","came of age"],"got my act together","Get your act together = get organised."]
+  ]},
+  {id:"at",tab:"At-phrases",title:"At-phrases",lede:"These phrases always take AT, never IN. Choose the one that fits.",type:"choose",items:[
+   ["The escaped prisoner is still ___.",["at large","at heart","at hand"],"at large","At large = not yet caught."],
+   ["The driver who caused the crash was clearly ___.",["at fault","at heart","at large"],"at fault","At fault = to blame."],
+   ["He seems strict, but he's a softie ___.",["at heart","at fault","at hand"],"at heart","At heart = deep down."],
+   ["Don't panic: help is ___.",["at hand","at large","at a guess"],"at hand","At hand = close by, available."],
+   ["___, I'd say there were about fifty people.",["At a guess","At a glance","At first sight"],"At a guess","At a guess = estimating a number."],
+   ["Not speaking the language puts you ___.",["at a disadvantage","at a discount","at fault"],"at a disadvantage","At a disadvantage = in a worse position."],
+   ["On-call doctors must be ready to come in ___.",["at a moment's notice","at first sight","at a speed of"],"at a moment's notice","At a moment's notice = with almost no warning."],
+   ["___, the report looked fine, but then I found the errors.",["At first glance","At a guess","At large"],"At first glance","At (first) glance = by looking quickly; first impression."]
+  ]}
+ ],
+ talk:["Describe a time you were all at sea in a new place.","Who is the apple of your eye? Why?","Do actions always speak louder than words?","Tell me about a time something vanished into thin air.","What are you up against in your CPE preparation?","When did you last have to get your act together?","Which of your plans are still up in the air?","Is it ever OK to act the fool at work?","Describe someone who is full of hot air."]
+};
+/* ===== END OF DATA ===== */
+
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const norm=s=>s.toLowerCase().replace(/[’‘`]/g,"'").replace(/\s+/g," ").replace(/[.!?]+$/,"").trim();
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const R=REVIEW;
+$("stamp").textContent=R.stamp;$("eyebrow").textContent=R.eyebrow;$("title").textContent=R.title;$("lede").textContent=R.lede;
+
+/* portal saving */
+const PT=window.Portal;const canSave=!!(PT&&PT.ready&&PT.code());
+const save=(a,sc,t,d)=>{if(canSave)PT.log(R.set+"/"+a,sc,t,d)};
+$("saveState").textContent=canSave?"Your progress is saved to your portal.":"Tip: open this page from your personal portal link to save your progress.";
+
+/* tabs and panels */
+const TABS=[["cards","Flashcards"],...R.parts.map(p=>[p.id,p.tab]),...(R.talk&&R.talk.length?[["talk","Speaking"]]:[])];
+TABS.forEach(([id,name])=>{const b=document.createElement("button");b.className="tab";b.setAttribute("role","tab");b.id="t-"+id;b.innerHTML=`${esc(name)}<span class="best" id="best-${id}"></span>`;b.onclick=()=>show(id);$("tabs").appendChild(b);
+  const s=document.createElement("section");s.className="panel";s.id="p-"+id;s.setAttribute("role","tabpanel");s.hidden=true;$("panels").appendChild(s)});
+function show(id){TABS.forEach(([t])=>{$("p-"+t).hidden=t!==id;$("t-"+t).setAttribute("aria-selected",t===id)});try{if(location.hash!=="#"+id)history.replaceState(null,"","#"+id)}catch(e){}}
+
+/* flashcards */
+$("p-cards").innerHTML=`<div class="head"><span class="eyebrow">Step 1</span><h2>Flashcards</h2><p class="lede">Say the meaning out loud, then tap the card to check. "Got it" removes the card; "Again" keeps it in the pile.</p></div>
+ <div class="filters" id="filters"></div><div class="bar"><span id="bar" style="width:0"></span></div><button class="flash" id="flash"></button>
+ <div class="row"><button class="btn ghost" id="again">Again</button><button class="btn" id="gotit">Got it</button><span class="score" id="fCount"></span><button class="btn ghost" id="fReset" style="margin-left:auto">Start again</button></div>`;
+const KEY="rev-"+R.set+"-known";let filter="all",known=new Set(store.get(KEY,[])),deck=[],cur=null,flipped=false,cardTimer=null;
+const saveCards=()=>{clearTimeout(cardTimer);cardTimer=setTimeout(()=>save("cards",known.size,R.cards.length,{known:[...known]}),2500)};
+(R.filters||[["all","All"]]).forEach(([k,l])=>{const b=document.createElement("button");b.className="filter";b.textContent=l;b.setAttribute("aria-pressed",k===filter);
+  b.onclick=()=>{filter=k;$("filters").querySelectorAll(".filter").forEach(x=>x.setAttribute("aria-pressed",x===b));buildDeck()};$("filters").appendChild(b)});
+const pool=()=>R.cards.filter(w=>filter==="all"||w[1]===filter);
+function buildDeck(){deck=shuffle(pool().filter(w=>!known.has(w[0])));next()}
+function next(){cur=deck.shift()||null;flipped=false;renderCard()}
+function renderCard(){const f=$("flash"),p=pool(),k=p.filter(w=>known.has(w[0])).length;
+  $("bar").style.width=(p.length?k/p.length*100:0)+"%";$("fCount").textContent=`${k} of ${p.length} learned`;f.classList.toggle("back",flipped);
+  if(!cur){f.innerHTML=`<span class="w">All done!</span><span class="d">You know every card in this set. Try the exercises next.</span>`;return}
+  f.innerHTML=flipped?`<span class="t">${esc(cur[1])}</span><span class="w">${esc(cur[0])}</span><span class="d">${esc(cur[2])}</span><span class="e">${esc(cur[3])}</span>`
+    :`<span class="t">${esc(cur[1])}</span><span class="w">${esc(cur[0])}</span><span class="tip">Tap to see the meaning</span>`}
+$("flash").onclick=()=>{if(cur){flipped=!flipped;renderCard()}};
+$("gotit").onclick=()=>{if(!cur)return;known.add(cur[0]);store.set(KEY,[...known]);saveCards();next()};
+$("again").onclick=()=>{if(!cur)return;deck.splice(Math.min(3,deck.length),0,cur);next()};
+$("fReset").onclick=()=>{known=new Set();store.set(KEY,[]);saveCards();buildDeck()};
+buildDeck();
+
+/* exercises */
+R.parts.forEach((p,pi)=>{const el=$("p-"+p.id);
+  el.innerHTML=`<div class="head"><span class="eyebrow">Step ${pi+2}</span><h2>${esc(p.title)}</h2><p class="lede">${esc(p.lede)}</p></div>`;
+  if(p.type==="choose")buildChoose(el,p);else buildTyped(el,p)});
+
+function buildChoose(el,p){const box=document.createElement("div");el.appendChild(box);
+  const row=document.createElement("div");row.className="row";row.innerHTML=`<span class="score"></span><button class="btn ghost">Start again</button>`;el.appendChild(row);
+  const sc=row.querySelector(".score");row.querySelector("button").onclick=draw;
+  function draw(){box.className="qs";box.innerHTML="";sc.textContent="";let ok=0,tried=0,saved=false;const wrong=[];
+    shuffle(p.items).forEach(([s,opts,ans,why],i)=>{const d=document.createElement("div");d.className="q";
+      d.innerHTML=`<span class="n">${i+1}</span><p class="s">${esc(s).replace("___","<u>&nbsp;?&nbsp;</u>")}</p><div class="opts"></div><p class="why" hidden></p>`;
+      const o=d.querySelector(".opts"),w=d.querySelector(".why");let answered=false;
+      shuffle(opts).forEach(t=>{const b=document.createElement("button");b.className="opt";b.textContent=t;
+        b.onclick=()=>{if(o.querySelector(".ok"))return;o.querySelectorAll(".opt").forEach(x=>x.classList.remove("no"));
+          if(t===ans){b.classList.add("ok");w.hidden=false;w.textContent=why;d.querySelector(".s u").innerHTML=`&nbsp;${esc(ans)}&nbsp;`;if(!answered){answered=true;tried++;ok++}}
+          else{b.classList.add("no");if(!answered){answered=true;tried++;wrong.push(s.replace("___",ans))}}
+          if(tried===p.items.length&&!saved){saved=true;save(p.id,ok,p.items.length,{wrong})}
+          sc.textContent=saved?`Score: ${ok} / ${p.items.length}`+(ok/p.items.length>=.8?" ✓ passed":" · aim for 80%"):`First-try answers: ${ok} / ${tried}`};o.appendChild(b)});
+      box.appendChild(d)})}
+  draw()}
+
+function buildTyped(el,p){const ol=document.createElement("ol");ol.className="items";el.appendChild(ol);
+  p.items.forEach((it,k)=>{const li=document.createElement("li");
+    li.innerHTML=`<span class="n">${k+1}</span><div class="line"><span>${esc(it.a)}</span><input type="text" aria-label="Answer ${k+1}" autocomplete="off" autocapitalize="off" spellcheck="false"><span>${esc(it.b)}</span><span class="key">${esc(it.stem)}</span></div><p class="fb" hidden></p>`;
+    li.querySelector("input").addEventListener("keydown",e=>{if(e.key==="Enter"){const nx=ol.children[k+1];if(nx)nx.querySelector("input").focus()}});ol.appendChild(li)});
+  const row=document.createElement("div");row.className="row";row.innerHTML=`<button class="btn">Check answers</button><button class="btn ghost">Clear</button><span class="score"></span>`;el.appendChild(row);
+  const [chk,clr]=row.querySelectorAll("button"),sc=row.querySelector(".score");
+  chk.onclick=()=>{let n=0;const wrong=[];p.items.forEach((it,k)=>{const li=ol.children[k],v=norm(li.querySelector("input").value),good=it.acc.map(norm).includes(v),fb=li.querySelector(".fb");
+    li.className=good?"ok":"no";fb.hidden=false;fb.className="fb "+(good?"ok":"no");fb.innerHTML=(good?"✓ ":`✗ Answer: <span class="ans">${esc(it.acc[0])}</span>. `)+esc(it.why);if(good)n++;else wrong.push(`${it.stem} → ${it.acc[0]}`)});
+    sc.textContent=`${n} / ${p.items.length}`+(n/p.items.length>=.8?" ✓ passed":"");save(p.id,n,p.items.length,{wrong})};
+  clr.onclick=()=>{[...ol.children].forEach(li=>{li.className="";li.querySelector("input").value="";li.querySelector(".fb").hidden=true});sc.textContent=""}}
+
+/* speaking */
+if(R.talk&&R.talk.length){$("p-talk").innerHTML=`<div class="head"><span class="eyebrow">Last step</span><h2>Speaking</h2><p class="lede">Open a card and answer out loud for about a minute. Use at least two expressions from this page.</p></div><div class="cards" id="talk"></div>`;
+  R.talk.forEach((t,i)=>{const b=document.createElement("button");b.className="coin";b.textContent="Q"+(i+1);b.setAttribute("aria-label","Open question "+(i+1));b.onclick=()=>{b.classList.add("open");b.textContent=t};$("talk").appendChild(b)})}
+
+/* restore portal state */
+if(canSave)PT.getPortal(PT.code()).then(d=>{if(!d)return;const st=d.state&&d.state[R.set+"/cards"];if(st&&st.known){st.known.forEach(k=>known.add(k));store.set(KEY,[...known]);buildDeck()}
+  const r=d.results||{};TABS.forEach(([id])=>{const x=r[R.set+"/"+id];if(x&&x.total)$("best-"+id).textContent=`${Math.round(x.best/x.total*100)}%`})}).catch(()=>{});
+
+const h=location.hash.slice(1);show(TABS.some(t=>t[0]===h)?h:"cards");
+</script>
+</body>
+</html>
