@@ -8,165 +8,211 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
 <style>
-[hidden]{display:none!important} body{margin:0}
+body{margin:0}
 
-/* Layout: a pink-and-green party page. Six rooms behind gift-tag tabs, a cake whose candles light up as rooms are finished. Single light theme by choice. */
+/* Layout: a loud pink-and-green party. Gift-tag tabs, rooms alternating pink and green, games in every room, a cake with 24 candles to blow out at the end. Single light theme by choice. */
 :root{
-  --bg:#fff4f8; --paper:#ffffff; --ink:#2b1f26; --muted:#7a6470; --line:#f2cddd;
-  --pink:#e2407e; --pink-soft:#fde0ec; --pink-mid:#f7b6cf;
-  --green:#2f8a5f; --mint:#cdeedc; --mint-mid:#9ad8b8;
-  --bad:#c2453d; --bad-soft:#fbe1df;
+  --pink:#ff2e88; --pink-d:#d61a6c; --pink-m:#ff8fc0; --pink-l:#ffd3e7; --pink-xl:#fff0f7;
+  --green:#14b86a; --green-d:#0b7a45; --green-m:#7fe3b0; --green-l:#cdf7e1; --green-xl:#effdf5;
+  --ink:#2a1622; --muted:#6e4b5e; --white:#ffffff; --bad:#c92a2a;
   --display:"Bagel Fat One","Arial Rounded MT Bold","Trebuchet MS",sans-serif;
   --body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
   color-scheme:light;
 }
 *{box-sizing:border-box}
-body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55;
-  background-image:radial-gradient(var(--pink-mid) 1.5px,transparent 1.6px),radial-gradient(var(--mint-mid) 1.5px,transparent 1.6px);
-  background-size:38px 38px,38px 38px;background-position:0 0,19px 19px;
+[hidden]{display:none!important}
+body{background:var(--pink-l);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55;
+  background-image:radial-gradient(var(--green-m) 3px,transparent 3.5px),radial-gradient(var(--pink-m) 3px,transparent 3.5px);
+  background-size:44px 44px,44px 44px;background-position:0 0,22px 22px;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px 64px}
-.wrap{max-width:1000px;margin:0 auto;display:flex;flex-direction:column;gap:24px}
+.wrap{max-width:1020px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
 h1,h2,h3{font-family:var(--display);font-weight:400;margin:0;line-height:1.05;text-wrap:balance}
-h1{font-size:clamp(46px,9vw,92px);color:var(--pink);letter-spacing:.5px}
-h2{font-size:clamp(30px,5vw,44px);color:var(--green)}
-h3{font-size:24px;color:var(--pink)}
+h1{font-size:clamp(46px,9vw,94px);color:var(--white);text-shadow:4px 4px 0 var(--green-d)}
+h2{font-size:clamp(32px,5vw,48px)}
+h3{font-size:24px}
 p{margin:0}
-.eyebrow{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700}
-.lede{color:var(--muted);max-width:62ch}
+.eyebrow{font-size:13px;letter-spacing:.14em;text-transform:uppercase;font-weight:700}
+.lede{max-width:64ch}
+.tip{font-size:14px;font-style:italic;opacity:.8}
 
 /* hero */
-.hero{position:relative;background:var(--paper);border:3px solid var(--pink);border-radius:28px;padding:clamp(20px,4vw,40px);display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:20px;align-items:center;overflow:hidden;box-shadow:8px 8px 0 var(--mint-mid)}
+.hero{background:linear-gradient(135deg,var(--pink) 0%,var(--pink-m) 48%,var(--green-m) 52%,var(--green) 100%);border:4px solid var(--ink);border-radius:30px;padding:clamp(20px,4vw,40px);display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:20px;align-items:center;box-shadow:8px 8px 0 var(--ink);overflow:hidden}
 @media (max-width:760px){.hero{grid-template-columns:1fr}}
-.hero .txt{display:flex;flex-direction:column;gap:12px;position:relative;z-index:1}
-.hero .ko{font-family:var(--display);font-size:22px;color:var(--green)}
-.hero img.bday{max-height:520px;width:auto;margin-inline:auto;object-fit:contain}
-.hero img{width:100%;max-width:100%;height:auto;display:block;filter:drop-shadow(0 12px 18px #e2407e33)}
-.age{display:inline-flex;align-items:center;justify-content:center;width:84px;height:84px;border-radius:50%;background:var(--green);color:#fff;font-family:var(--display);font-size:38px;transform:rotate(-8deg);box-shadow:4px 4px 0 var(--pink-mid)}
-.cake{display:flex;gap:8px;align-items:flex-end}
-.candle{width:12px;height:34px;border-radius:3px;background:repeating-linear-gradient(180deg,var(--pink-mid) 0 6px,#fff 6px 12px);position:relative;border:1px solid var(--pink)}
-.candle::before{content:"";position:absolute;left:50%;top:-14px;width:9px;height:13px;transform:translateX(-50%);border-radius:50% 50% 50% 50%/60% 60% 40% 40%}
-.candle.lit::before{background:#ffb02e;box-shadow:0 0 12px 3px #ffb02e99;animation:flick 2s infinite ease-in-out}
-@keyframes flick{50%{transform:translateX(-50%) scale(1.1,.9)}}
-.cake-label{font-size:14px;color:var(--muted)}
+.hero .txt{display:flex;flex-direction:column;gap:14px}
+.ko{font-family:var(--display);font-size:24px;color:var(--white);background:var(--green-d);padding:4px 14px;border-radius:999px;width:fit-content}
+.hero .lede{color:var(--white);font-size:19px;font-weight:700;text-shadow:1px 1px 0 var(--pink-d)}
+.age{display:inline-flex;align-items:center;justify-content:center;width:96px;height:96px;flex:none;border-radius:50%;background:var(--green);color:var(--white);font-family:var(--display);font-size:44px;transform:rotate(-8deg);border:4px solid var(--white);box-shadow:4px 4px 0 var(--ink)}
+.hero img{max-height:520px;width:auto;max-width:100%;height:auto;margin-inline:auto;display:block}
+.hearts{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.heart{font-size:26px;color:var(--white);opacity:.55;transition:transform .3s,opacity .3s}
+.heart.on{opacity:1;color:var(--pink-d);transform:scale(1.2)}
+.hearts span.lbl{color:var(--white);font-weight:700;margin-left:6px}
 
 /* tabs */
-nav.tags{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px}
-@media (max-width:760px){nav.tags{grid-template-columns:repeat(3,minmax(0,1fr))}}
-.tag{appearance:none;cursor:pointer;font:inherit;font-weight:700;font-size:15px;color:var(--ink);background:var(--paper);border:2px solid var(--line);border-radius:14px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center;position:relative}
-.tag .n{font-family:var(--display);font-size:22px;color:var(--pink-mid);line-height:1}
-.tag:hover{border-color:var(--pink)}
-.tag[aria-selected="true"]{background:var(--pink);border-color:var(--pink);color:#fff}
-.tag[aria-selected="true"] .n{color:#fff}
-.tag.done::after{content:"✓";position:absolute;top:6px;right:8px;color:var(--green);font-size:14px}
-.tag[aria-selected="true"].done::after{color:#fff}
-.tag:focus-visible,.btn:focus-visible,.chip:focus-visible,.opt:focus-visible,select:focus-visible,textarea:focus-visible,.card:focus-visible,.box:focus-visible{outline:3px solid var(--green);outline-offset:2px}
+nav.tags{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px}
+@media (max-width:820px){nav.tags{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.tag{appearance:none;cursor:pointer;font:inherit;font-weight:700;font-size:14px;color:var(--white);background:var(--pink);border:3px solid var(--ink);border-radius:16px;padding:10px 6px;display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center;position:relative;box-shadow:3px 3px 0 var(--ink);transition:transform .1s}
+.tag:nth-child(even){background:var(--green)}
+.tag .n{font-family:var(--display);font-size:24px;line-height:1}
+.tag:hover{transform:translate(-1px,-1px)}
+.tag[aria-selected="true"]{background:var(--white);color:var(--ink);transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+.tag.done::after{content:"♥";position:absolute;top:2px;right:6px;font-size:14px}
+.tag:focus-visible,.btn:focus-visible,button:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
 
 /* rooms */
-section.room{background:var(--paper);border:2px solid var(--line);border-radius:24px;padding:clamp(20px,4vw,36px);display:flex;flex-direction:column;gap:24px}
+section.room{border:4px solid var(--ink);border-radius:28px;padding:clamp(20px,4vw,36px);display:flex;flex-direction:column;gap:24px;box-shadow:8px 8px 0 var(--ink)}
+section.room.p{background:var(--pink-xl)} section.room.g{background:var(--green-xl)}
+section.room.p h2{color:var(--pink)} section.room.g h2{color:var(--green-d)}
+section.room.p h3{color:var(--green-d)} section.room.g h3{color:var(--pink-d)}
 .head{display:flex;flex-direction:column;gap:8px}
-.goal{display:inline-flex;font-size:14px;font-weight:700;color:var(--green);background:var(--mint);border-radius:999px;padding:4px 12px;width:fit-content}
+.goal{display:inline-flex;font-size:14px;font-weight:700;color:var(--white);background:var(--ink);border-radius:999px;padding:4px 14px;width:fit-content}
 .block{display:flex;flex-direction:column;gap:12px}
-.btn{appearance:none;cursor:pointer;font:inherit;font-weight:700;font-size:16px;border-radius:999px;padding:10px 20px;border:2px solid var(--pink);background:var(--pink);color:#fff}
-.btn.ghost{background:transparent;color:var(--pink)}
-.btn.green{background:var(--green);border-color:var(--green)}
+.btn{appearance:none;cursor:pointer;font:inherit;font-weight:700;font-size:16px;border-radius:999px;padding:10px 22px;border:3px solid var(--ink);background:var(--pink);color:var(--white);box-shadow:3px 3px 0 var(--ink)}
+.btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+.btn.green{background:var(--green)}
+.btn.white{background:var(--white);color:var(--ink)}
 .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-.foot{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;border-top:2px dashed var(--line);padding-top:18px}
-.tip{font-size:14px;color:var(--muted);font-style:italic}
-.score{font-weight:700;color:var(--green)}
+.foot{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;border-top:3px dashed var(--pink-m);padding-top:18px;align-items:center}
+.score{font-weight:700;font-size:18px}
+
+/* memory game */
+.board{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.player{font-weight:700;border:3px solid var(--ink);border-radius:999px;padding:6px 16px;background:var(--white)}
+.player.turn.v{background:var(--pink);color:var(--white)} .player.turn.d{background:var(--green);color:var(--white)}
+.mem{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+@media (max-width:560px){.mem{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.mc{appearance:none;cursor:pointer;font:inherit;border:3px solid var(--ink);border-radius:16px;min-height:104px;padding:8px;display:flex;align-items:center;justify-content:center;text-align:center;font-weight:700;font-size:15px;line-height:1.25;color:var(--ink);background:var(--white);transition:transform .25s}
+.mc.down{background:var(--pink);color:transparent;background-image:radial-gradient(var(--pink-m) 2px,transparent 2.5px);background-size:14px 14px}
+.mc.down:nth-child(even){background-color:var(--green);background-image:radial-gradient(var(--green-m) 2px,transparent 2.5px)}
+.mc.down::before{content:"?";color:var(--white);font-family:var(--display);font-size:34px}
+.mc.down:hover{transform:rotate(-3deg)}
+.mc.phrase:not(.down){background:var(--pink-l)} .mc.mean:not(.down){background:var(--green-l);font-weight:400}
+.mc.got{border-style:dashed;opacity:.75;cursor:default}
+.mc.got.v{box-shadow:inset 0 0 0 4px var(--pink)} .mc.got.d{box-shadow:inset 0 0 0 4px var(--green)}
+
+/* balloons */
+.balloons{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:14px 10px;align-items:end}
+@media (max-width:760px){.balloons{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.bal{appearance:none;border:none;background:none;cursor:pointer;padding:0;display:flex;flex-direction:column;align-items:center;min-height:150px;justify-content:flex-end;font:inherit}
+.bal .shape{width:78px;height:94px;border-radius:50% 50% 48% 48%/55% 55% 45% 45%;background:radial-gradient(circle at 32% 28%,#ffffffaa 0 10%,transparent 24%),var(--c);border:3px solid var(--ink);position:relative;animation:float 3s ease-in-out infinite}
+.bal:nth-child(odd) .shape{animation-delay:-1.5s}
+.bal .shape::after{content:"";position:absolute;left:50%;bottom:-9px;transform:translateX(-50%);border:7px solid transparent;border-top-color:var(--ink)}
+.bal .str{width:2px;height:40px;background:var(--ink)}
+@keyframes float{50%{transform:translateY(-8px) rotate(2deg)}}
+.bal.popped{cursor:default}
+.bal.popped .shape,.bal.popped .str{display:none}
+.popq{background:var(--white);border:3px solid var(--ink);border-radius:14px;padding:10px;font-weight:700;font-size:14px;line-height:1.3;text-align:center;animation:pop .35s ease-out;box-shadow:3px 3px 0 var(--c)}
+@keyframes pop{0%{transform:scale(.3)}70%{transform:scale(1.1)}100%{transform:scale(1)}}
+.popq .t{display:block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
 
 /* match */
 .match{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr);gap:10px 16px}
 @media (max-width:620px){.match{grid-template-columns:1fr}}
 .col{display:flex;flex-direction:column;gap:8px;min-width:0}
-.chip{appearance:none;cursor:pointer;font:inherit;text-align:left;color:var(--ink);background:var(--bg);border:2px solid var(--line);border-radius:12px;padding:9px 14px}
-.chip.word{font-weight:700}
-.chip:hover{border-color:var(--pink)}
-.chip.sel{border-color:var(--pink);background:var(--pink-soft)}
-.chip.ok{border-color:var(--green);background:var(--mint);color:var(--green);cursor:default}
+.chip{appearance:none;cursor:pointer;font:inherit;text-align:left;color:var(--ink);background:var(--white);border:3px solid var(--ink);border-radius:12px;padding:8px 14px}
+.chip.word{font-weight:700;background:var(--pink-l)}
+.chip.sel{background:var(--pink);color:var(--white)}
+.chip.ok{background:var(--green);color:var(--white);cursor:default;border-style:dashed}
 .chip.no{animation:shake .35s;border-color:var(--bad)}
 @keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
 
-/* cards */
-.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
-@media (max-width:700px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
-.card{appearance:none;cursor:pointer;font:inherit;color:var(--ink);background:var(--mint);border:2px solid var(--mint-mid);border-radius:18px;min-height:120px;padding:14px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:16px}
-.card:nth-child(even){background:var(--pink-soft);border-color:var(--pink-mid)}
-.card:not(.open){font-family:var(--display);font-size:34px;color:var(--green)}
-.card:nth-child(even):not(.open){color:var(--pink)}
-.card.open{background:var(--paper)}
-.for{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--pink)}
+/* wheel */
+.wheel-wrap{display:grid;grid-template-columns:auto minmax(0,1fr);gap:24px;align-items:center}
+@media (max-width:700px){.wheel-wrap{grid-template-columns:1fr;justify-items:center}}
+.wheel{position:relative;width:min(320px,82vw);aspect-ratio:1;max-width:100%}
+.wheel canvas{width:100%;height:100%;display:block;border-radius:50%;border:5px solid var(--ink);box-shadow:6px 6px 0 var(--ink);transition:transform 4s cubic-bezier(.17,.67,.12,1)}
+.wheel .pin{position:absolute;top:-14px;left:50%;transform:translateX(-50%);border:14px solid transparent;border-top:26px solid var(--ink);z-index:2}
+.wq{background:var(--white);border:4px solid var(--ink);border-radius:20px;padding:20px;min-height:150px;display:flex;flex-direction:column;gap:8px;justify-content:center;box-shadow:5px 5px 0 var(--pink)}
+.wq .q{font-size:clamp(20px,2.6vw,26px);font-weight:700;line-height:1.3}
 
-/* rules / qs */
-.rule{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
-.rule div{background:var(--bg);border:2px solid var(--line);border-radius:14px;padding:12px 14px}
-.rule strong{font-family:var(--display);font-weight:400;font-size:22px;color:var(--pink);display:block}
-.rule span{font-size:14px;color:var(--muted)}
-.qs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-@media (max-width:700px){.qs{grid-template-columns:1fr}}
-.q{background:var(--bg);border:2px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
-.q .n{font-size:12px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
-.q .s{font-weight:700}
-.opts{display:flex;gap:6px;flex-wrap:wrap}
-.opt{appearance:none;cursor:pointer;font:inherit;font-size:15px;border-radius:10px;padding:6px 12px;background:var(--paper);color:var(--ink);border:2px solid var(--line)}
-.opt:hover{border-color:var(--pink)}
-.opt.ok{background:var(--mint);border-color:var(--green);color:var(--green)}
-.opt.no{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
-.why{font-size:14px;color:var(--muted)}
+/* would you rather */
+.wyr{display:flex;flex-direction:column;gap:14px}
+.wyr-card{background:var(--white);border:4px solid var(--ink);border-radius:22px;padding:20px;display:flex;flex-direction:column;gap:14px;box-shadow:6px 6px 0 var(--green)}
+.ab{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:12px;align-items:stretch}
+@media (max-width:640px){.ab{grid-template-columns:1fr}}
+.or{font-family:var(--display);font-size:28px;align-self:center;text-align:center;color:var(--pink)}
+.side{border:3px solid var(--ink);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:10px;justify-content:space-between}
+.side.a{background:var(--pink-l)} .side.b{background:var(--green-l)}
+.side .txt{font-size:20px;font-weight:700;line-height:1.3}
+.votes{display:flex;gap:6px;flex-wrap:wrap}
+.vote{appearance:none;cursor:pointer;font:inherit;font-size:14px;font-weight:700;border:2px solid var(--ink);border-radius:999px;padding:4px 12px;background:var(--white);color:var(--ink)}
+.vote.v[aria-pressed="true"]{background:var(--pink);color:var(--white)} .vote.d[aria-pressed="true"]{background:var(--green);color:var(--white)}
+.verdict{font-family:var(--display);font-size:22px;min-height:1.2em}
+.verdict.agree{color:var(--green-d)} .verdict.fight{color:var(--pink)}
+.counter{font-weight:700}
 
 /* gifts */
+.idcheck{display:grid;grid-template-columns:minmax(0,320px) minmax(0,1fr);gap:20px;align-items:center;background:var(--white);border:3px solid var(--ink);border-radius:20px;padding:18px}
+@media (max-width:700px){.idcheck{grid-template-columns:1fr}}
+.idcheck img{width:100%;height:auto;display:block;border-radius:12px;transform:rotate(-2deg);box-shadow:5px 5px 0 var(--green)}
 .gifts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
 @media (max-width:760px){.gifts{grid-template-columns:1fr}}
-.gift{background:var(--bg);border:2px solid var(--line);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:10px}
-.box{width:86px;height:76px;margin:4px auto 0;position:relative;border:none;background:none;cursor:pointer;padding:0}
-.box .b{position:absolute;left:6px;right:6px;bottom:0;height:52px;border-radius:6px;background:var(--pink-mid)}
-.box .l{position:absolute;left:0;right:0;top:12px;height:16px;border-radius:5px;background:var(--pink);transition:transform .4s}
-.box .r1{position:absolute;left:50%;top:12px;bottom:0;width:12px;transform:translateX(-50%);background:var(--green)}
-.box .bow{position:absolute;left:50%;top:0;width:34px;height:16px;transform:translateX(-50%);border:5px solid var(--green);border-radius:50% 50% 8px 8px}
-.gift.open .l,.gift.open .bow{transform:translateY(-14px) rotate(-12deg)}
-.gift:nth-child(even) .b{background:var(--mint-mid)} .gift:nth-child(even) .l{background:var(--green)} .gift:nth-child(even) .r1,.gift:nth-child(even) .bow{background:none;border-color:var(--pink)} .gift:nth-child(even) .r1{background:var(--pink)}
-.clue{font-size:15px}
-.clue li{margin-left:-6px}
-.reveal{font-family:var(--display);font-size:22px;color:var(--green);text-align:center}
+.gift{background:var(--white);border:3px solid var(--ink);border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.box{width:96px;height:86px;margin:4px auto 0;position:relative;border:none;background:none;cursor:pointer;padding:0;animation:wiggle 2.4s ease-in-out infinite}
+.gift:nth-child(2n) .box{animation-delay:-1.2s}
+@keyframes wiggle{0%,80%,100%{transform:rotate(0)}85%{transform:rotate(-6deg)}90%{transform:rotate(6deg)}95%{transform:rotate(-3deg)}}
+.box .b{position:absolute;left:6px;right:6px;bottom:0;height:58px;border-radius:6px;background:var(--pink);border:3px solid var(--ink)}
+.box .l{position:absolute;left:0;right:0;top:14px;height:18px;border-radius:5px;background:var(--pink-d);border:3px solid var(--ink);transition:transform .4s}
+.box .r1{position:absolute;left:50%;top:16px;bottom:3px;width:14px;transform:translateX(-50%);background:var(--green)}
+.box .bow{position:absolute;left:50%;top:0;width:38px;height:18px;transform:translateX(-50%);border:6px solid var(--green);border-radius:50% 50% 8px 8px;transition:transform .4s}
+.gift:nth-child(even) .b{background:var(--green)} .gift:nth-child(even) .l{background:var(--green-d)} .gift:nth-child(even) .r1{background:var(--pink)} .gift:nth-child(even) .bow{border-color:var(--pink)}
+.gift.open .l,.gift.open .bow{transform:translateY(-16px) rotate(-14deg)}
+.gift.open .box{animation:none}
+.clue{margin:0;padding-left:18px;font-size:15px}
+.reveal{font-family:var(--display);font-size:22px;color:var(--pink);text-align:center}
 
-/* fill */
-.fill{display:flex;flex-direction:column;gap:8px;padding:0;margin:0}
-.fill li{list-style:none;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;padding:10px 14px;border-radius:12px;background:var(--bg);border:2px solid transparent}
-.fill li.ok{border-color:var(--green)}.fill li.no{border-color:var(--bad)}
-select{font:inherit;font-size:16px;color:var(--ink);background:var(--paper);border:2px solid var(--pink-mid);border-radius:8px;padding:3px 8px;max-width:100%}
-.mark{font-size:14px;margin-left:auto}.mark.ok{color:var(--green)}.mark.no{color:var(--bad)}
-
-/* decks */
-.decks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
-@media (max-width:700px){.decks{grid-template-columns:1fr}}
-.deck{background:var(--bg);border:2px solid var(--line);border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:12px}
-.deck .q2{font-size:20px;font-weight:700;min-height:3em;line-height:1.35}
-.dtag{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--pink);font-weight:700}
+/* conditionals */
+.rule{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.rule div{background:var(--white);border:3px solid var(--ink);border-radius:16px;padding:12px 14px}
+.rule strong{font-family:var(--display);font-weight:400;font-size:22px;color:var(--pink);display:block}
+.rule div:nth-child(2) strong{color:var(--green-d)}
+.rule span{font-size:15px}
+.qs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:700px){.qs{grid-template-columns:1fr}}
+.q{background:var(--white);border:3px solid var(--ink);border-radius:16px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.q .n{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.q .s{font-weight:700}
+.opts{display:flex;gap:6px;flex-wrap:wrap}
+.opt{appearance:none;cursor:pointer;font:inherit;font-size:15px;font-weight:700;border-radius:10px;padding:6px 12px;background:var(--pink-xl);color:var(--ink);border:2px solid var(--ink)}
+.opt.ok{background:var(--green);color:var(--white)}
+.opt.no{background:var(--bad);color:var(--white);animation:shake .35s}
+.why{font-size:14px;color:var(--muted)}
 
 /* letter */
 .book{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
 @media (max-width:700px){.book{grid-template-columns:1fr}}
-.note{background:var(--paper);border:2px solid var(--line);border-radius:6px 18px 6px 18px;padding:18px 20px;box-shadow:5px 5px 0 var(--pink-soft)}
-.letter{background:repeating-linear-gradient(180deg,var(--paper) 0 31px,var(--pink-soft) 31px 32px);border:2px solid var(--pink-mid);border-radius:8px;padding:16px 20px 8px}
+.note{background:var(--white);border:3px solid var(--ink);border-radius:8px 22px 8px 22px;padding:18px 20px;box-shadow:6px 6px 0 var(--pink-m);display:flex;flex-direction:column;gap:10px}
+.still{width:100%;height:auto;display:block;border-radius:12px;border:3px solid var(--ink)}
+.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.card{appearance:none;cursor:pointer;font:inherit;color:var(--ink);background:var(--pink);border:3px solid var(--ink);border-radius:18px;min-height:96px;padding:12px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:15px;font-weight:700}
+.card:nth-child(4n+2),.card:nth-child(4n+3){background:var(--green)}
+.card:not(.open){font-family:var(--display);font-size:32px;color:var(--white);font-weight:400}
+.card.open{background:var(--white)}
+.letter{background:repeating-linear-gradient(180deg,var(--white) 0 31px,var(--pink-l) 31px 32px);border:3px solid var(--ink);border-radius:10px;padding:14px 20px 8px;box-shadow:6px 6px 0 var(--green)}
 textarea{width:100%;min-height:220px;font:inherit;font-size:18px;line-height:32px;color:var(--ink);background:transparent;border:none;resize:vertical;padding:0}
 textarea:focus{outline:none}
-.checks{display:flex;flex-wrap:wrap;gap:8px}
-.check{appearance:none;cursor:pointer;font:inherit;font-size:15px;border-radius:999px;padding:7px 14px;border:2px solid var(--line);background:var(--paper);color:var(--ink)}
-.check[aria-pressed="true"]{background:var(--mint);border-color:var(--green);color:var(--green)}
-.check[aria-pressed="true"]::before{content:"✓ "}
 
-/* finale */
-.finale{background:var(--pink);color:#fff;border-radius:28px;padding:clamp(20px,4vw,36px);display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:center}
-@media (max-width:760px){.finale{grid-template-columns:1fr}}
-.finale h2{color:#fff;font-size:clamp(34px,6vw,58px)}
+/* cake */
+.cake-room{align-items:center;text-align:center}
+.cake{position:relative;width:min(560px,100%);margin:0 auto}
+.flames{display:grid;grid-template-columns:repeat(12,1fr);gap:4px 6px;padding:0 24px}
+.cd{appearance:none;border:none;background:none;cursor:pointer;padding:0;display:flex;flex-direction:column;align-items:center;height:62px;justify-content:flex-end}
+.cd .f{width:12px;height:18px;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;background:#ffb02e;box-shadow:0 0 12px 4px #ffb02e99;animation:flick 1.6s infinite ease-in-out;margin-bottom:2px}
+.cd .w{width:10px;height:32px;border-radius:3px;border:2px solid var(--ink);background:repeating-linear-gradient(180deg,var(--pink) 0 5px,var(--white) 5px 10px)}
+.cd:nth-child(even) .w{background:repeating-linear-gradient(180deg,var(--green) 0 5px,var(--white) 5px 10px)}
+.cd.out .f{background:transparent;box-shadow:none;animation:smoke 1s ease-out forwards}
+@keyframes flick{50%{transform:scale(1.15,.88)}}
+@keyframes smoke{0%{background:#999;opacity:.6;transform:translateY(0)}100%{background:#999;opacity:0;transform:translateY(-20px) scale(2)}}
+.tier{border:4px solid var(--ink);border-radius:18px}
+.tier.t1{height:70px;margin:0 16px;background:var(--pink);background-image:radial-gradient(var(--white) 3px,transparent 3.5px);background-size:22px 22px}
+.tier.t2{height:90px;margin-top:-4px;background:var(--green);background-image:repeating-linear-gradient(90deg,transparent 0 30px,var(--green-m) 30px 40px)}
+.plate{height:16px;margin:-4px -18px 0;border:4px solid var(--ink);border-radius:999px;background:var(--white)}
+.cake-msg{font-family:var(--display);font-size:clamp(28px,5vw,44px);color:var(--pink)}
+.finale{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:center;text-align:left;background:var(--pink);border:4px solid var(--ink);border-radius:24px;padding:20px;color:var(--white)}
+@media (max-width:700px){.finale{grid-template-columns:1fr}}
+.finale h2{color:var(--white)!important}
 .finale img{width:100%;height:auto;display:block}
 #confetti{position:fixed;inset:0;pointer-events:none;z-index:50}
-.expert-top{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,280px);gap:16px;align-items:end}
-.expert-top img{width:100%;height:auto;display:block}
-@media (max-width:700px){.expert-top{grid-template-columns:1fr}.expert-top img{max-width:280px}}
-.idcheck{display:grid;grid-template-columns:minmax(0,320px) minmax(0,1fr);gap:20px;align-items:center;background:var(--pink-soft);border-radius:20px;padding:18px}
-@media (max-width:700px){.idcheck{grid-template-columns:1fr}}
-.idcheck img{width:100%;height:auto;display:block;border-radius:12px;transform:rotate(-2deg);box-shadow:5px 5px 0 var(--mint-mid)}
-.still{width:100%;height:auto;display:block;border-radius:12px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -177,69 +223,59 @@ textarea:focus{outline:none}
     <div class="txt">
       <span class="ko">생일 축하해, 디아나!</span>
       <h1>Happy Birthday, Diana!</h1>
-      <div class="row"><span class="age">24</span><p class="lede">Today's lesson is a party. Six rooms, six candles on the cake. Light them all and make a wish!</p></div>
-      <div><div class="cake" id="cake" aria-label="Rooms finished"></div><span class="cake-label" id="cakeLabel">0 of 6 candles lit</span></div>
+      <div class="row" style="flex-wrap:nowrap"><span class="age">24</span><p class="lede">Today's lesson is a party! Play every game, collect the hearts and then blow out the candles.</p></div>
+      <div class="hearts" id="hearts" aria-label="Rooms finished"></div>
     </div>
-    <img class="bday" src="img/diana.webp" alt="Diana, the birthday girl" width="800" height="1021">
+    <img src="img/diana.webp" alt="Diana, the birthday girl" width="800" height="1021">
   </header>
 
   <nav class="tags" role="tablist" id="tags"></nav>
 
-  <!-- 1 PARTY -->
-  <section class="room" id="room-party" role="tabpanel">
-    <div class="head"><span class="eyebrow">Room 1</span><h2>Let's party</h2><span class="goal">Birthday vocabulary</span></div>
-    <p class="lede">Click a phrase, then click its meaning.</p>
-    <div class="match"><div class="col" id="bW"></div><div class="col" id="bD"></div></div>
-    <div class="row"><span class="score" id="bScore"></span><button class="btn ghost" id="bReset">Shuffle again</button></div>
-    <div class="block">
-      <h3>Birthday talk</h3>
-      <p class="lede">Open a card and answer. Then ask your partner the same question.</p>
-      <div class="cards" id="bdTalk"></div>
-    </div>
-    <div class="foot"><span class="tip">Next: Ask the Expert</span><button class="btn green" data-done="party">Light a candle</button></div>
+  <!-- 1 MEMORY -->
+  <section class="room p" id="room-party" role="tabpanel">
+    <div class="head"><span class="eyebrow">Game 1</span><h2>Birthday memory</h2><span class="goal">Birthday vocabulary</span></div>
+    <p class="lede">Find the pairs: a birthday phrase and its meaning. Take turns! If you find a pair, you get a point and you go again. Say each phrase out loud when you find it.</p>
+    <div class="board"><span class="player v" id="pv">Victoria · 0</span><span class="player d" id="pd">Diana · 0</span><button class="btn white" id="memReset">New game</button></div>
+    <div class="mem" id="mem"></div>
+    <p class="score" id="memMsg"></p>
+    <div class="foot"><span class="tip">Next: Spin the wheel</span><button class="btn green" data-done="party">Collect a heart ♥</button></div>
   </section>
 
   <!-- 2 EXPERT -->
-  <section class="room" id="room-expert" role="tabpanel" hidden>
-    <div class="expert-top">
-      <div class="head"><span class="eyebrow">Room 2</span><h2>Ask the expert</h2><span class="goal">Speaking: Diana tells us everything about Stray Kids</span></div>
-      <img src="img/duo1.webp" alt="Lee Know and Han holding flowers" width="680" height="532">
-    </div>
+  <section class="room g" id="room-expert" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Game 2</span><h2>Spin the wheel</h2><span class="goal">Speaking: Diana is the Stray Kids expert</span></div>
     <div class="block">
-      <h3>Fan words</h3>
-      <p class="lede">K-pop fans have their own English. Match the words. Diana, you're the expert!</p>
+      <h3>Fan words first</h3>
+      <p class="lede">Click a word, then its meaning.</p>
       <div class="match"><div class="col" id="kW"></div><div class="col" id="kD"></div></div>
       <span class="score" id="kScore"></span>
     </div>
     <div class="block">
       <h3>The interview</h3>
-      <p class="lede"><b>Victoria</b> is the journalist and <b>Diana</b> is the expert. Victoria opens a card and asks; Diana answers in as much detail as she can. Victoria, ask at least one follow-up question each time: <i>Why? Really? What happened next?</i></p>
-      <div class="cards" id="interview"></div>
+      <p class="lede"><b>Victoria</b> spins the wheel and asks the question. <b>Diana</b> answers in as much detail as she can. Victoria, always ask one more question: <i>Why? Really? Tell me more!</i></p>
+      <div class="wheel-wrap">
+        <div class="wheel"><span class="pin"></span><canvas id="wheel" width="640" height="640"></canvas></div>
+        <div class="block">
+          <div class="wq"><span class="eyebrow" id="wqn">Ready?</span><p class="q" id="wq">Spin the wheel to get a question.</p></div>
+          <div class="row"><button class="btn" id="spin">Spin!</button><span class="tip" id="wleft"></span></div>
+        </div>
+      </div>
     </div>
-    <div class="foot"><span class="tip">Next: Concert Rules</span><button class="btn green" data-done="expert">Light a candle</button></div>
+    <div class="foot"><span class="tip">Next: Would you rather</span><button class="btn" data-done="expert">Collect a heart ♥</button></div>
   </section>
 
-  <!-- 3 CONCERT -->
-  <section class="room" id="room-concert" role="tabpanel" hidden>
-    <div class="head"><span class="eyebrow">Room 3</span><h2>Concert rules</h2><span class="goal">must / have to / mustn't / don't have to</span></div>
-    <div class="rule">
-      <div><strong>must / have to</strong><span>It's necessary.</span></div>
-      <div><strong>mustn't</strong><span>It's forbidden. Don't do it!</span></div>
-      <div><strong>don't have to</strong><span>It isn't necessary. It's your choice.</span></div>
-    </div>
-    <p class="lede">Diana has a ticket to a big concert. Here's the information on the website. Complete it.</p>
-    <ol class="fill" id="rules"></ol>
-    <div class="row"><button class="btn" id="rCheck">Check answers</button><span class="score" id="rScore"></span></div>
-    <div class="block">
-      <h3>Diana's birthday party rules</h3>
-      <p>Together, write five rules for Diana's perfect birthday party: two with <i>must / have to</i>, two with <i>mustn't</i>, one with <i>don't have to</i>. Diana decides if the rules are accepted!</p>
-    </div>
-    <div class="foot"><span class="tip">Next: Mystery Gifts</span><button class="btn green" data-done="concert">Light a candle</button></div>
+  <!-- 3 WOULD YOU RATHER -->
+  <section class="room p" id="room-wyr" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Game 3</span><h2>Would you rather…?</h2><span class="goal">Speaking: agree, disagree, explain</span></div>
+    <p class="lede">Both of you vote. If you agree, high five! If you disagree, each of you has 30 seconds to change the other's mind. Start with "I'd rather… because…"</p>
+    <div class="wyr" id="wyr"></div>
+    <div class="row"><button class="btn white" id="wPrev">← Back</button><span class="counter" id="wCount"></span><button class="btn" id="wNext">Next →</button></div>
+    <div class="foot"><span class="tip">Next: Mystery gifts</span><button class="btn green" data-done="wyr">Collect a heart ♥</button></div>
   </section>
 
   <!-- 4 GIFTS -->
-  <section class="room" id="room-gifts" role="tabpanel" hidden>
-    <div class="head"><span class="eyebrow">Room 4</span><h2>Mystery gifts</h2><span class="goal">Modals of deduction: must / might / can't</span></div>
+  <section class="room g" id="room-gifts" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Game 4</span><h2>Mystery gifts</h2><span class="goal">Guessing game</span></div>
     <div class="idcheck">
       <img src="img/id.webp" alt="Two funny driver's licences side by side" width="900" height="1102">
       <div class="block">
@@ -254,102 +290,131 @@ textarea:focus{outline:none}
         <p class="tip">Use must / might / can't in every answer.</p>
       </div>
     </div>
-    <p class="lede">Now, there are six presents for Diana. Read the clues and guess what's inside: "It must be…", "It might be…", "It can't be… because…". Agree on one answer, then open the box!</p>
+    <p class="lede">Six presents for Diana are shaking under the table! Read the clues and guess what's inside: "It must be…", "It might be…", "It can't be…". Then open the box.</p>
     <div class="gifts" id="gifts"></div>
-    <div class="foot"><span class="tip">Next: What if…?</span><button class="btn green" data-done="gifts">Light a candle</button></div>
+    <div class="foot"><span class="tip">Next: What if…?</span><button class="btn" data-done="gifts">Collect a heart ♥</button></div>
   </section>
 
   <!-- 5 WHAT IF -->
-  <section class="room" id="room-whatif" role="tabpanel" hidden>
-    <div class="head"><span class="eyebrow">Room 5</span><h2>What if…?</h2><span class="goal">First and second conditional</span></div>
+  <section class="room p" id="room-whatif" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Game 5</span><h2>What if…?</h2><span class="goal">First and second conditional</span></div>
     <div class="rule">
       <div><strong>If + present, will</strong><span>Real and possible: If it snows tomorrow, I'll stay at home.</span></div>
       <div><strong>If + past, would</strong><span>Imaginary: If I met my favourite idol, I'd probably cry.</span></div>
     </div>
     <div class="qs" id="conds"></div>
     <span class="score" id="cScore"></span>
-    <div class="decks">
-      <div class="deck"><span class="dtag">Real · first conditional</span><p class="q2" id="d1">Draw a card.</p><button class="btn" id="draw1">Draw a card</button></div>
-      <div class="deck"><span class="dtag">Imagine · second conditional</span><p class="q2" id="d2">Draw a card.</p><button class="btn green" id="draw2">Draw a card</button></div>
+    <div class="block">
+      <h3>Pop the balloons</h3>
+      <p class="lede">Take turns popping a balloon and answering the question. Pink balloons are imaginary (would), green balloons are real (will).</p>
+      <div class="balloons" id="balloons"></div>
     </div>
-    <p class="tip">Take turns. Answer with a full sentence and add one more detail.</p>
-    <div class="foot"><span class="tip">Next: Dear Friend</span><button class="btn green" data-done="whatif">Light a candle</button></div>
+    <div class="foot"><span class="tip">Next: Dear friend</span><button class="btn green" data-done="whatif">Collect a heart ♥</button></div>
   </section>
 
   <!-- 6 DEAR FRIEND -->
-  <section class="room" id="room-letter" role="tabpanel" hidden>
-    <div class="head"><span class="eyebrow">Room 6</span><h2>Dear friend</h2><span class="goal">The Perks of Being a Wallflower · writing a letter</span></div>
+  <section class="room g" id="room-letter" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Game 6</span><h2>Dear friend</h2><span class="goal">The Perks of Being a Wallflower</span></div>
     <div class="book">
-      <div class="note block">
+      <div class="note">
         <img class="still" src="img/charlie.webp" alt="Charlie blowing out the candles on a birthday cake" width="736" height="414">
         <h3>About the book</h3>
         <p>Diana's favourite book is told through letters. Charlie, a shy and sensitive teenager, writes to an unknown "friend" about his first year of high school. Everything changes when he meets Patrick and his stepsister Sam, who take him into their world of music, parties and real friendship.</p>
       </div>
       <div class="block">
         <h3>Talk about it</h3>
-        <div class="cards" id="bookTalk" style="grid-template-columns:repeat(2,minmax(0,1fr))"></div>
+        <div class="cards" id="bookTalk"></div>
       </div>
     </div>
     <div class="block">
       <h3>A birthday letter</h3>
-      <p><b>Victoria</b> writes a birthday letter to Diana, like Charlie: it starts with "Dear friend". <b>Diana</b> writes a letter to herself on her 30th birthday: "Dear Diana, …". Use the grammar from today and tick what you use. Then read your letters out loud.</p>
-      <div class="letter"><label for="letterBox" class="eyebrow">Your letter</label><textarea id="letterBox">Dear friend,
+      <p><b>Victoria</b> writes a birthday letter to Diana that starts like Charlie's: "Dear friend". Use at least one "If…" sentence. Then read it out loud!</p>
+      <div class="letter"><label for="letterBox" class="eyebrow">Victoria's letter</label><textarea id="letterBox">Dear friend,
 </textarea></div>
-      <div class="checks" id="checks"></div>
     </div>
-    <div class="foot"><span class="tip">Last room</span><button class="btn green" data-done="letter">Light a candle</button></div>
+    <div class="foot"><span class="tip">Last: make a wish!</span><button class="btn" data-done="letter">Collect a heart ♥</button></div>
   </section>
 
-  <section class="finale" id="finale" hidden>
-    <div class="block"><span class="ko" style="color:#fff">생일 축하해!</span><h2>All 24… well, all 6 candles are lit!</h2><p>Make a wish, Diana. Happy birthday from Polina and Victoria!</p><div class="row"><button class="btn green" id="again">More confetti</button></div></div>
-    <img src="img/duo2.webp" alt="Han whispering to Lee Know" width="736" height="645">
+  <!-- 7 CAKE -->
+  <section class="room p cake-room" id="room-cake" role="tabpanel" hidden>
+    <div class="head" style="align-items:center"><span class="eyebrow">The end</span><h2>Make a wish, Diana!</h2></div>
+    <p class="lede">Close your eyes, make a wish, and blow out all 24 candles. Click them one by one, or all at once!</p>
+    <div class="cake">
+      <div class="flames" id="flames"></div>
+      <div class="tier t1"></div><div class="tier t2"></div><div class="plate"></div>
+    </div>
+    <div class="row" style="justify-content:center"><button class="btn green" id="blowAll">Blow them all out!</button><span class="score" id="cakeCount"></span></div>
+    <div class="finale" id="finale" hidden>
+      <div class="block"><span class="ko">생일 축하해!</span><h2>Happy 24th birthday, Diana!</h2><p>Your wish will come true. Love from Polina and Victoria ♥</p><div class="row"><button class="btn green" id="again">More confetti!</button></div></div>
+      <img src="img/duo2.webp" alt="Han whispering to Lee Know" width="736" height="645">
+    </div>
   </section>
 </div>
 
 <script>
-const ROOMS=[["party","Let's party"],["expert","Ask the expert"],["concert","Concert rules"],["gifts","Mystery gifts"],["whatif","What if…?"],["letter","Dear friend"]];
-const done=new Set();const tags=document.getElementById("tags"),cake=document.getElementById("cake");
+const ROOMS=[["party","Memory"],["expert","Wheel"],["wyr","Would you rather"],["gifts","Gifts"],["whatif","What if…?"],["letter","Dear friend"],["cake","Make a wish"]];
+const GAMES=6;const done=new Set();const tags=document.getElementById("tags"),hearts=document.getElementById("hearts");
 ROOMS.forEach(([id,name],i)=>{const b=document.createElement("button");b.className="tag";b.setAttribute("role","tab");b.id="tag-"+id;
-  b.innerHTML=`<span class="n">${i+1}</span>${name}`;b.onclick=()=>open(id);tags.appendChild(b);
-  const c=document.createElement("span");c.className="candle";c.id="candle-"+id;cake.appendChild(c)});
+  b.innerHTML=`<span class="n">${i<GAMES?i+1:"♥"}</span>${name}`;b.onclick=()=>open(id);tags.appendChild(b);
+  if(i<GAMES){const h=document.createElement("span");h.className="heart";h.id="heart-"+id;h.textContent="♥";hearts.appendChild(h)}});
+hearts.insertAdjacentHTML("beforeend",'<span class="lbl" id="heartLbl">0 / 6</span>');
 function open(id){ROOMS.forEach(([r])=>{document.getElementById("room-"+r).hidden=r!==id;document.getElementById("tag-"+r).setAttribute("aria-selected",r===id)});
   try{if(location.hash!=="#"+id)history.replaceState(null,"","#"+id)}catch(e){}}
 document.querySelectorAll("[data-done]").forEach(b=>b.onclick=()=>{const id=b.dataset.done;done.add(id);
-  document.getElementById("candle-"+id).classList.add("lit");document.getElementById("tag-"+id).classList.add("done");
-  document.getElementById("cakeLabel").textContent=`${done.size} of ${ROOMS.length} candles lit`;b.textContent="Candle lit";
-  if(done.size===ROOMS.length){document.getElementById("finale").hidden=false;burst(260);setTimeout(()=>document.getElementById("finale").scrollIntoView({behavior:"smooth"}),300);return}
-  const i=ROOMS.findIndex(r=>r[0]===id);if(i<ROOMS.length-1)setTimeout(()=>{open(ROOMS[i+1][0]);window.scrollTo({top:0,behavior:"smooth"})},500)});
-const h=location.hash.slice(1);open(ROOMS.some(r=>r[0]===h)?h:"party");
+  document.getElementById("heart-"+id).classList.add("on");document.getElementById("tag-"+id).classList.add("done");
+  document.getElementById("heartLbl").textContent=`${done.size} / ${GAMES}`;b.textContent="Heart collected ♥";burst(60);
+  const i=ROOMS.findIndex(r=>r[0]===id);setTimeout(()=>{open(ROOMS[i+1][0]);window.scrollTo({top:0,behavior:"smooth"})},600)});
+const h0=location.hash.slice(1);open(ROOMS.some(r=>r[0]===h0)?h0:"party");
 const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
-function match(data,wId,dId,sId){let sel=null,ok=0;const W=document.getElementById(wId),D=document.getElementById(dId),S=document.getElementById(sId);W.innerHTML="";D.innerHTML="";S.textContent=`0 / ${data.length}`;
-  shuffle(data).forEach(([w])=>{const b=document.createElement("button");b.className="chip word";b.textContent=w;b.dataset.k=w;
-    b.onclick=()=>{if(b.classList.contains("ok"))return;W.querySelectorAll(".sel").forEach(x=>x.classList.remove("sel"));b.classList.add("sel");sel=b};W.appendChild(b)});
-  shuffle(data).forEach(([w,d])=>{const b=document.createElement("button");b.className="chip";b.textContent=d;
-    b.onclick=()=>{if(!sel||b.classList.contains("ok"))return;
-      if(sel.dataset.k===w){sel.classList.remove("sel");sel.classList.add("ok");b.classList.add("ok");sel=null;ok++;S.textContent=`${ok} / ${data.length}`+(ok===data.length?" — perfect!":"");if(ok===data.length)burst(80)}
-      else{b.classList.add("no");setTimeout(()=>b.classList.remove("no"),400)}};D.appendChild(b)})}
-function flips(elId,list,label){const el=document.getElementById(elId);list.forEach((t,i)=>{const b=document.createElement("button");b.className="card";b.textContent="♡";
-  b.setAttribute("aria-label",label+" "+(i+1));b.onclick=()=>{b.classList.add("open");b.innerHTML=t};el.appendChild(b)})}
 
-/* 1 */
-const BD=[["make a wish","to secretly hope for something before you blow out the candles"],["blow out the candles","to put out the small fires on a birthday cake with your breath"],["throw a party","to organise a party for other people"],["turn 24","to become 24 years old"],["unwrap a present","to take the paper off a gift"],["Many happy returns!","a traditional way to say 'happy birthday'"],["the birthday girl","the person whose birthday it is today"],["a surprise party","a party that the guest of honour doesn't know about"],["make a toast","to say something nice and then drink together"],["celebrate","to do something special because it's an important day"]];
-match(BD,"bW","bD","bScore");document.getElementById("bReset").onclick=()=>match(BD,"bW","bD","bScore");
-flips("bdTalk",["What's the best birthday you've ever had?","Do you prefer a big party or a quiet evening with close friends?","What's the best present you've ever got?","Would you like a surprise party? Why or why not?","What do people in Russia usually do on their birthday?","What was your dream birthday when you were a child?"],"Open birthday question");
+/* 1 memory */
+const PAIRS=[["make a wish","secretly hope for something"],["blow out the candles","put out the little fires on a cake"],["throw a party","organise a party for others"],["turn 24","become 24 years old"],["unwrap a present","take the paper off a gift"],["make a toast","say nice words, then everyone drinks"],["the birthday girl","it's her special day!"],["a surprise party","she doesn't know about it!"]];
+let flipped=[],lock=false,turn="v",pts={v:0,d:0},found=0;
+function setTurn(t){turn=t;document.getElementById("pv").classList.toggle("turn",t==="v");document.getElementById("pd").classList.toggle("turn",t==="d")}
+function pts2(){document.getElementById("pv").textContent=`Victoria · ${pts.v}`;document.getElementById("pd").textContent=`Diana · ${pts.d}`}
+function memory(){const el=document.getElementById("mem");el.innerHTML="";flipped=[];lock=false;pts={v:0,d:0};found=0;pts2();setTurn("v");document.getElementById("memMsg").textContent="Victoria starts!";
+  shuffle(PAIRS.flatMap(([p,m],i)=>[[p,i,"phrase"],[m,i,"mean"]])).forEach(([t,k,c])=>{const b=document.createElement("button");b.className="mc down "+c;b.dataset.k=k;b.dataset.t=t;b.setAttribute("aria-label","Hidden card");
+    b.onclick=()=>{if(lock||!b.classList.contains("down"))return;b.classList.remove("down");b.textContent=t;b.setAttribute("aria-label",t);flipped.push(b);
+      if(flipped.length===2){lock=true;const [a,c2]=flipped;
+        if(a.dataset.k===c2.dataset.k&&a!==c2){a.classList.add("got",turn);c2.classList.add("got",turn);pts[turn]++;found++;pts2();flipped=[];lock=false;
+          document.getElementById("memMsg").textContent=found===PAIRS.length?(pts.v===pts.d?"It's a draw! Happy birthday anyway!":`${pts.v>pts.d?"Victoria":"Diana"} wins!`):`A pair! ${turn==="v"?"Victoria":"Diana"} goes again.`;
+          if(found===PAIRS.length)burst(150)}
+        else setTimeout(()=>{[a,c2].forEach(x=>{x.classList.add("down");x.textContent="";x.setAttribute("aria-label","Hidden card")});flipped=[];lock=false;setTurn(turn==="v"?"d":"v");
+          document.getElementById("memMsg").textContent=`${turn==="v"?"Victoria":"Diana"}'s turn.`},1100)}};el.appendChild(b)})}
+memory();document.getElementById("memReset").onclick=memory;
 
-/* 2 */
-match([["a bias","your favourite member of a group"],["a comeback","when a group releases new music after a break"],["a fandom","all the fans of a group together"],["a lightstick","a special glowing light that fans hold at concerts"],["a fan chant","words that fans shout together during a song"],["to stan","to be a very big, very loyal fan of someone"],["choreography","the dance moves for a song"],["to debut","to start your career for the first time"]],"kW","kD","kScore");
-flips("interview",['<span><span class="for">Victoria asks</span><br>How did you first discover Stray Kids?</span>','<span><span class="for">Victoria asks</span><br>Who is your bias, and why?</span>','<span><span class="for">Victoria asks</span><br>Who are Minsung? Why do fans love them so much?</span>','<span><span class="for">Victoria asks</span><br>Describe Lee Know and Han in three adjectives each.</span>','<span><span class="for">Victoria asks</span><br>What\'s your favourite song? What is it about?</span>','<span><span class="for">Victoria asks</span><br>Have you ever been to a K-pop concert? Would you like to go?</span>','<span><span class="for">Victoria asks</span><br>What do people get wrong about K-pop fans?</span>','<span><span class="for">Victoria asks</span><br>Which song should Victoria listen to first?</span>','<span><span class="for">Victoria asks</span><br>If you could ask Lee Know and Han one question, what would it be?</span>'],"Open interview card");
+/* 2 fan words + wheel */
+(function(){const data=[["a bias","your favourite member of a group"],["a comeback","new music after a break"],["a fandom","all the fans of a group together"],["a lightstick","a glowing light fans hold at concerts"],["a fan chant","words fans shout together during a song"],["to stan","to be a very big, very loyal fan"]];
+  let sel=null,ok=0;const W=document.getElementById("kW"),D=document.getElementById("kD"),S=document.getElementById("kScore");S.textContent=`0 / ${data.length}`;
+  shuffle(data).forEach(([w])=>{const b=document.createElement("button");b.className="chip word";b.textContent=w;b.dataset.k=w;b.onclick=()=>{if(b.classList.contains("ok"))return;W.querySelectorAll(".sel").forEach(x=>x.classList.remove("sel"));b.classList.add("sel");sel=b};W.appendChild(b)});
+  shuffle(data).forEach(([w,d])=>{const b=document.createElement("button");b.className="chip";b.textContent=d;b.onclick=()=>{if(!sel||b.classList.contains("ok"))return;
+    if(sel.dataset.k===w){sel.classList.remove("sel");sel.classList.add("ok");b.classList.add("ok");sel=null;ok++;S.textContent=`${ok} / ${data.length}`;if(ok===data.length)burst(80)}else{b.classList.add("no");setTimeout(()=>b.classList.remove("no"),400)}};D.appendChild(b)})})();
+const WQ=["How did you first discover Stray Kids?","Who is your bias, and why?","Who are Minsung? Why do fans love them so much?","Describe Lee Know and Han in three words each.","What's your favourite song? What is it about?","Have you been to a K-pop concert? Would you like to go?","What do people get wrong about K-pop fans?","Which song should Victoria listen to first, and why?","If you could ask Lee Know and Han one question, what would it be?","Wild card: sing one line of your favourite song!"];
+const wc=document.getElementById("wheel"),wx=wc.getContext("2d"),N=WQ.length;let rot=0,used=new Set(),spinning=false;
+(function draw(){const r=320,seg=2*Math.PI/N;for(let i=0;i<N;i++){wx.beginPath();wx.moveTo(r,r);wx.arc(r,r,r,i*seg-Math.PI/2,(i+1)*seg-Math.PI/2);wx.closePath();
+  wx.fillStyle=i%2?"#14b86a":"#ff2e88";wx.fill();wx.lineWidth=6;wx.strokeStyle="#2a1622";wx.stroke();
+  wx.save();wx.translate(r,r);wx.rotate((i+.5)*seg-Math.PI/2);wx.fillStyle="#fff";wx.font="64px 'Bagel Fat One', sans-serif";wx.textAlign="right";wx.textBaseline="middle";wx.fillText(i===N-1?"★":String(i+1),r-36,0);wx.restore()}
+  wx.beginPath();wx.arc(r,r,46,0,2*Math.PI);wx.fillStyle="#fff";wx.fill();wx.lineWidth=8;wx.stroke()})();
+document.fonts&&document.fonts.ready.then(()=>{wx.clearRect(0,0,640,640);(function(){const r=320,seg=2*Math.PI/N;for(let i=0;i<N;i++){wx.beginPath();wx.moveTo(r,r);wx.arc(r,r,r,i*seg-Math.PI/2,(i+1)*seg-Math.PI/2);wx.closePath();wx.fillStyle=i%2?"#14b86a":"#ff2e88";wx.fill();wx.lineWidth=6;wx.strokeStyle="#2a1622";wx.stroke();wx.save();wx.translate(r,r);wx.rotate((i+.5)*seg-Math.PI/2);wx.fillStyle="#fff";wx.font="64px 'Bagel Fat One', sans-serif";wx.textAlign="right";wx.textBaseline="middle";wx.fillText(i===N-1?"★":String(i+1),r-36,0);wx.restore()}wx.beginPath();wx.arc(r,r,46,0,2*Math.PI);wx.fillStyle="#fff";wx.fill();wx.lineWidth=8;wx.stroke()})()});
+document.getElementById("spin").onclick=()=>{if(spinning)return;let left=[...Array(N).keys()].filter(i=>!used.has(i));if(!left.length){used.clear();left=[...Array(N).keys()]}
+  const pick=left[Math.floor(Math.random()*left.length)];used.add(pick);spinning=true;
+  const seg=360/N,target=360-(pick+.5)*seg;rot+=360*5+((target-rot%360)+360)%360;wc.style.transform=`rotate(${rot}deg)`;
+  document.getElementById("wq").textContent="…";document.getElementById("wqn").textContent="Spinning";
+  setTimeout(()=>{spinning=false;document.getElementById("wqn").textContent=pick===N-1?"Wild card":`Question ${pick+1}`;document.getElementById("wq").textContent=WQ[pick];
+    document.getElementById("wleft").textContent=`${N-used.size} questions left`;burst(30)},matchMedia("(prefers-reduced-motion: reduce)").matches?50:4100)};
 
-/* 3 */
-const RO=["must","have to","mustn't","don't have to"];
-const RULES=[["You","show your ticket at the entrance.",["must","have to"]],["You","bring a lightstick, but it's more fun if you do!",["don't have to"]],["You","bring food or drinks into the hall.",["mustn't"]],["Fans","throw anything onto the stage.",["mustn't"]],["You","arrive early, but the queue is very long, so it's a good idea.",["don't have to"]],["Children under 14","come with an adult.",["must","have to"]],["You","film the whole concert. Enjoy the moment!",["mustn't"]],["You","wear the official T-shirt. Your own outfit is fine.",["don't have to"]]];
-const rEl=document.getElementById("rules");
-RULES.forEach(([a,b],i)=>{const li=document.createElement("li");li.innerHTML=`<span>${a}</span><select id="rule-${i}" aria-label="Rule ${i+1}"><option value="">…</option>${RO.map(o=>`<option>${o}</option>`).join("")}</select><span>${b}</span><span class="mark"></span>`;rEl.appendChild(li)});
-document.getElementById("rCheck").onclick=()=>{let ok=0;RULES.forEach(([, ,ans],i)=>{const li=rEl.children[i],v=li.querySelector("select").value,m=li.querySelector(".mark"),g=ans.includes(v);
-  li.className=v?(g?"ok":"no"):"";m.className="mark "+(g?"ok":"no");m.textContent=!v?"":g?(ans.length>1?"✓ must / have to":"✓"):"try again";if(g)ok++});
-  document.getElementById("rScore").textContent=`${ok} / ${RULES.length}`;if(ok===RULES.length)burst(80)};
+/* 3 would you rather */
+const WYR=[["have a huge party with 100 people","have a quiet dinner with three best friends"],["go to a Stray Kids concert in Seoul","have a 5-minute video call with Lee Know and Han"],["read only one book for the rest of your life","never read the same book twice"],["have a birthday every month but no presents","have a birthday every 10 years with amazing presents"],["be a famous K-pop idol","be a famous writer"],["live inside your favourite book","live inside your favourite music video"],["always know what people think about you","never know what people think about you"],["get a cake you hate","get no cake at all"],["be 24 forever","be 16 again for one year"]];
+let wi=0;const wyrEl=document.getElementById("wyr");const votes=WYR.map(()=>({v:null,d:null}));
+function drawW(){const [a,b]=WYR[wi],vt=votes[wi];
+  const side=(k,t)=>`<div class="side ${k}"><span class="txt">${t}</span><div class="votes"><button class="vote v" data-p="v" data-k="${k}" aria-pressed="${vt.v===k}">Victoria</button><button class="vote d" data-p="d" data-k="${k}" aria-pressed="${vt.d===k}">Diana</button></div></div>`;
+  let verdict="";if(vt.v&&vt.d)verdict=vt.v===vt.d?'<p class="verdict agree">You agree! High five! ✋</p>':'<p class="verdict fight">You disagree! Convince each other!</p>';
+  wyrEl.innerHTML=`<div class="wyr-card"><span class="eyebrow">Would you rather…</span><div class="ab">${side("a",a)}<span class="or">or</span>${side("b",b)}</div>${verdict||'<p class="verdict"></p>'}</div>`;
+  wyrEl.querySelectorAll(".vote").forEach(x=>x.onclick=()=>{vt[x.dataset.p]=x.dataset.k;drawW();if(vt.v&&vt.d)burst(vt.v===vt.d?60:20)});
+  document.getElementById("wCount").textContent=`${wi+1} / ${WYR.length}`}
+document.getElementById("wNext").onclick=()=>{wi=(wi+1)%WYR.length;drawW()};document.getElementById("wPrev").onclick=()=>{wi=(wi-1+WYR.length)%WYR.length;drawW()};drawW();
 
-/* 4 */
+/* 4 gifts */
 const GIFTS=[
  [["It's long and thin, and it lights up.","You can only really use it at a concert.","It isn't a candle."],"A lightstick!"],
  [["It's small and made of paper.","It has a date, a time and a seat number on it.","It's for a concert in Seoul."],"A concert ticket!"],
@@ -363,7 +428,7 @@ GIFTS.forEach(([clues,ans],i)=>{const d=document.createElement("div");d.classNam
   d.innerHTML=`<button class="box" aria-label="Open present ${i+1}"><span class="b"></span><span class="r1"></span><span class="l"></span><span class="bow"></span></button><span class="eyebrow" style="text-align:center">Present ${i+1}</span><ul class="clue">${clues.map(c=>`<li>${c}</li>`).join("")}</ul><p class="reveal" hidden>${ans}</p>`;
   d.querySelector(".box").onclick=()=>{d.classList.add("open");d.querySelector(".reveal").hidden=false;burst(50)};gEl.appendChild(d)});
 
-/* 5 */
+/* 5 conditionals */
 let ok=0,tried=0;const cEl=document.getElementById("conds");
 [["If it ___ on your birthday, what will you do?",["rains","rained","will rain"],"rains","First conditional: if + present simple."],
  ["If I ___ Lee Know, I'd ask him about his cats.",["meet","met","will meet"],"met","Second conditional: if + past simple. It's imaginary."],
@@ -376,30 +441,39 @@ let ok=0,tried=0;const cEl=document.getElementById("conds");
   const o=d.querySelector(".opts"),w=d.querySelector(".why");let answered=false;
   opts.forEach(t=>{const b=document.createElement("button");b.className="opt";b.textContent=t;
     b.onclick=()=>{o.querySelectorAll(".opt").forEach(x=>x.classList.remove("no"));
-      if(t===ans){b.classList.add("ok");w.hidden=false;w.textContent=why;d.querySelector(".s u").innerHTML=`&nbsp;${ans}&nbsp;`;if(!answered){answered=true;tried++;ok++}}
+      if(t===ans){b.classList.add("ok");w.hidden=false;w.textContent=why;d.querySelector(".s u").innerHTML=`&nbsp;${ans}&nbsp;`;if(!answered){answered=true;tried++;ok++}if(ok===6)burst(80)}
       else{b.classList.add("no");if(!answered){answered=true;tried++}}
       document.getElementById("cScore").textContent=`First-try answers: ${ok} / ${tried}`};o.appendChild(b)});
   cEl.appendChild(d)});
-function deck(list,el,btn){let d=shuffle(list),i=0;document.getElementById(btn).onclick=()=>{if(i>=d.length){d=shuffle(list);i=0}document.getElementById(el).textContent=d[i++]}}
-deck(["If you get money for your birthday, what will you buy?","If the weather is nice this weekend, what will you do?","If Stray Kids announce a new tour, will you try to go?","If you have free time tonight, how will you celebrate?","If your friends throw you a surprise party, how will you react?","If you start a new book this month, what will it be?"],"d1","draw1");
-deck(["If you met Lee Know and Han, what would you say first?","If you could be a member of Stray Kids for one day, what would you do?","If you could live inside any book, which one would you choose?","If you could have any superpower for your birthday, what would it be?","If Charlie from the book wrote you a letter, what would you write back?","If you could celebrate your birthday anywhere in the world, where would you go?","If you could meet your 14-year-old self, what would you tell her?"],"d2","draw2");
+const BAL=[["would","If you met Lee Know and Han, what would you say first?"],["will","If you get money for your birthday, what will you buy?"],["would","If you could be in Stray Kids for one day, what would you do?"],["will","If the weather is nice this weekend, what will you do?"],["would","If you could celebrate your birthday anywhere in the world, where would you go?"],["will","If Stray Kids announce a new tour, will you try to go?"],["would","If Charlie wrote you a letter, what would you write back?"],["will","If your friends throw you a surprise party, how will you react?"],["would","If you could have any superpower for one day, what would it be?"],["will","If you start a new book this month, what will it be?"],["would","If you could meet your 14-year-old self, what would you tell her?"],["will","If you have free time tonight, how will you celebrate?"]];
+const bEl=document.getElementById("balloons");
+shuffle(BAL).forEach(([k,q],i)=>{const b=document.createElement("button");b.className="bal";const c=k==="would"?"var(--pink)":"var(--green)";b.style.setProperty("--c",c);
+  b.setAttribute("aria-label",`Pop balloon ${i+1}`);b.innerHTML='<span class="shape"></span><span class="str"></span>';
+  b.onclick=()=>{if(b.classList.contains("popped"))return;b.classList.add("popped");b.insertAdjacentHTML("beforeend",`<span class="popq" style="--c:${c}"><span class="t">${k}</span>${q}</span>`);burst(25)};bEl.appendChild(b)});
 
-/* 6 */
-flips("bookTalk",["Why do you love Patrick and Charlie so much?","What is a 'wallflower'? Are you one?","Which character are you most like: Charlie, Patrick or Sam?","What makes someone a real friend?","Have you seen the film? Is it better or worse than the book?","Who would you recommend this book to, and why?"],"Open book question");
-["must / have to","mustn't / don't have to","must / might / can't","If + present, will","If + past, would","3 birthday words"].forEach(t=>{const b=document.createElement("button");b.className="check";b.textContent=t;b.setAttribute("aria-pressed","false");
-  b.onclick=()=>b.setAttribute("aria-pressed",b.getAttribute("aria-pressed")!=="true");document.getElementById("checks").appendChild(b)});
+/* 6 book */
+(function(){const el=document.getElementById("bookTalk");["Why do you love Patrick and Charlie so much?","What is a 'wallflower'? Are you one?","Which character are you most like: Charlie, Patrick or Sam?","What makes someone a real friend?","Have you seen the film? Is it as good as the book?","Who would you give this book to as a present, and why?"].forEach((t,i)=>{const b=document.createElement("button");b.className="card";b.textContent="♥";b.setAttribute("aria-label","Open book question "+(i+1));b.onclick=()=>{b.classList.add("open");b.textContent=t};el.appendChild(b)})})();
+
+/* 7 cake */
+const fl=document.getElementById("flames");let out=0;
+function cnt(){document.getElementById("cakeCount").textContent=`${24-out} candles left`;if(out===24){document.getElementById("finale").hidden=false;burst(300);setTimeout(()=>burst(200),900)}}
+for(let i=0;i<24;i++){const c=document.createElement("button");c.className="cd";c.setAttribute("aria-label","Candle "+(i+1));c.innerHTML='<span class="f"></span><span class="w"></span>';
+  c.onclick=()=>{if(c.classList.contains("out"))return;c.classList.add("out");out++;cnt()};fl.appendChild(c)}
+cnt();
+document.getElementById("blowAll").onclick=()=>{[...fl.children].forEach((c,i)=>setTimeout(()=>{if(!c.classList.contains("out")){c.classList.add("out");out++;cnt()}},i*60))};
 
 /* confetti */
 const cv=document.getElementById("confetti"),cx=cv.getContext("2d");let parts=[],raf=null;
 const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
 function size(){cv.width=innerWidth;cv.height=innerHeight}size();addEventListener("resize",size);
-function burst(n){if(reduce)return;const cols=["#e2407e","#f7b6cf","#2f8a5f","#9ad8b8","#ffb02e"];
-  for(let i=0;i<n;i++)parts.push({x:Math.random()*cv.width,y:-20-Math.random()*cv.height*.3,vx:(Math.random()-.5)*2,vy:2+Math.random()*3,r:Math.random()*6.28,vr:(Math.random()-.5)*.2,w:6+Math.random()*6,h:8+Math.random()*8,c:cols[i%cols.length]});
+function burst(n){if(reduce)return;const cols=["#ff2e88","#ff8fc0","#14b86a","#7fe3b0","#ffffff"];
+  for(let i=0;i<n;i++)parts.push({x:Math.random()*cv.width,y:-20-Math.random()*cv.height*.3,vx:(Math.random()-.5)*2,vy:2+Math.random()*3,r:Math.random()*6.28,vr:(Math.random()-.5)*.2,w:6+Math.random()*7,h:8+Math.random()*9,c:cols[i%cols.length],heart:Math.random()<.2});
   if(!raf)tick()}
-function tick(){cx.clearRect(0,0,cv.width,cv.height);parts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;cx.save();cx.translate(p.x,p.y);cx.rotate(p.r);cx.fillStyle=p.c;cx.fillRect(-p.w/2,-p.h/2,p.w,p.h);cx.restore()});
+function tick(){cx.clearRect(0,0,cv.width,cv.height);parts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;cx.save();cx.translate(p.x,p.y);cx.rotate(p.r);cx.fillStyle=p.c;
+  if(p.heart){cx.font="18px sans-serif";cx.fillText("♥",0,0)}else cx.fillRect(-p.w/2,-p.h/2,p.w,p.h);cx.restore()});
   parts=parts.filter(p=>p.y<cv.height+20);raf=parts.length?requestAnimationFrame(tick):(cx.clearRect(0,0,cv.width,cv.height),null)}
-document.getElementById("again").onclick=()=>burst(200);
-setTimeout(()=>burst(160),400);
+document.getElementById("again").onclick=()=>burst(220);
+setTimeout(()=>burst(180),400);
 </script>
 </body>
 </html>
