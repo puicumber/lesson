@@ -7,7 +7,7 @@
 <meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
-<link rel="stylesheet" href="../assets/portal.css">
+<link rel="stylesheet" href="../assets/portal.css?v=2">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.js"></script>
 <script src="../assets/config.js?v=3"></script>
 <script src="../assets/portal.js?v=2"></script>
@@ -41,7 +41,9 @@
     <section class="panel" id="detail" hidden>
       <div class="row" style="justify-content:space-between"><h2 id="dName"></h2><button class="btn ghost small" id="dClose">Close</button></div>
       <div><span class="eyebrow">Personal link</span><p class="copy" id="dLink"></p></div>
-      <h3>Materials</h3>
+      <h3>Given materials</h3>
+      <div class="table-wrap"><table><thead><tr><th>Title</th><th>Type</th><th>Set</th><th>Due</th><th>Added</th><th></th></tr></thead><tbody id="dMat"></tbody></table></div>
+      <h3>Progress</h3>
       <div class="table-wrap"><table><thead><tr><th>Material</th><th>Exercise</th><th>Best</th><th>Tries</th><th>Last</th></tr></thead><tbody id="dRes"></tbody></table></div>
       <h3>Most missed</h3>
       <div class="weak" id="dWeak"></div>
@@ -109,6 +111,17 @@ function draw(){
 }
 function detail(x){
   $("detail").hidden=false;$("dName").textContent=`${x.name} · ${x.level||""}`;$("dLink").textContent=link(x.code);
+  const mt=$("dMat");mt.innerHTML="";const mats=M.filter(m=>m.student_code===x.code);
+  if(!mats.length)mt.innerHTML='<tr><td colspan="6" class="muted">No materials yet.</td></tr>';
+  mats.forEach(m=>{const tr=document.createElement("tr");
+    tr.innerHTML=`<td><a href="${m.url}" target="_blank" rel="noopener">${m.title}</a></td><td>${m.kind||""}</td><td>${m.activity||"–"}</td><td>${m.due?new Date(m.due).toLocaleDateString("en-GB",{day:"numeric",month:"short"}):"–"}</td><td>${when(m.created_at)}</td><td></td>`;
+    const b=document.createElement("button");b.className="btn ghost small del";b.textContent="Delete";let armed=null;
+    b.onclick=async()=>{if(!armed){b.textContent="Sure? Click again";b.classList.add("armed");armed=setTimeout(()=>{armed=null;b.textContent="Delete";b.classList.remove("armed")},3000);return}
+      clearTimeout(armed);b.disabled=true;b.textContent="Deleting…";
+      const {error}=await db.from("materials").delete().eq("id",m.id);
+      if(error){b.disabled=false;b.textContent="Error, try again";return}
+      M=M.filter(z=>z.id!==m.id);draw();detail(x)};
+    tr.lastElementChild.appendChild(b);mt.appendChild(tr)});
   const mine=R.filter(r=>r.student_code===x.code);const tb=$("dRes");tb.innerHTML="";
   M.filter(m=>m.student_code===x.code).forEach(m=>{
     const subs=m.activity&&ACT[m.activity]?Object.keys(ACT[m.activity]):[];
