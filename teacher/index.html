@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Teacher Desk</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<link rel="stylesheet" href="../assets/portal.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="../assets/config.js"></script>
+<script src="../assets/portal.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">English with Polina</span>
+    <h1>Teacher <span>Desk</span></h1>
+  </header>
+
+  <p class="notice" id="msg" hidden></p>
+
+  <section class="panel" id="login" hidden>
+    <h2>Sign in</h2>
+    <form class="form" id="loginForm">
+      <label>Email<input type="email" id="email" required autocomplete="username"></label>
+      <label>Password<input type="password" id="pass" required autocomplete="current-password"></label>
+      <button class="btn" type="submit">Sign in</button>
+    </form>
+    <p class="error" id="loginErr"></p>
+  </section>
+
+  <div id="app" hidden style="display:flex;flex-direction:column;gap:24px">
+    <div class="row"><span class="muted" id="who"></span><button class="btn ghost small" id="logout">Sign out</button></div>
+
+    <section class="panel">
+      <h2>Students</h2>
+      <div class="grid" id="students"></div>
+    </section>
+
+    <section class="panel" id="detail" hidden>
+      <div class="row" style="justify-content:space-between"><h2 id="dName"></h2><button class="btn ghost small" id="dClose">Close</button></div>
+      <div><span class="eyebrow">Personal link</span><p class="copy" id="dLink"></p></div>
+      <h3>Materials</h3>
+      <div class="table-wrap"><table><thead><tr><th>Material</th><th>Exercise</th><th>Best</th><th>Tries</th><th>Last</th></tr></thead><tbody id="dRes"></tbody></table></div>
+      <h3>Most missed</h3>
+      <div class="weak" id="dWeak"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Recent activity</h2>
+      <div class="table-wrap"><table><thead><tr><th>When</th><th>Student</th><th>Exercise</th><th>Score</th></tr></thead><tbody id="recent"></tbody></table></div>
+    </section>
+
+    <section class="panel">
+      <h2>Give a material</h2>
+      <form class="form" id="matForm">
+        <label>Student<select id="mStudent" required></select></label>
+        <label>Title<input id="mTitle" required></label>
+        <label>Link<input id="mUrl" type="url" required placeholder="https://"></label>
+        <label>Type<select id="mKind"><option value="homework">Homework</option><option value="vocabulary">Vocabulary</option><option value="lesson">Lesson</option><option value="grammar">Grammar</option><option value="practice">Practice</option></select></label>
+        <label>Exercise set (optional)<input id="mAct" placeholder="money"></label>
+        <label>Due (optional)<input id="mDue" type="date"></label>
+        <label style="grid-column:1/-1">Note (optional)<input id="mNote"></label>
+        <button class="btn" type="submit">Add</button>
+      </form>
+      <p class="muted" id="matMsg"></p>
+    </section>
+
+    <section class="panel">
+      <h2>New student</h2>
+      <form class="form" id="stForm">
+        <label>Name<input id="sName" required></label>
+        <label>Level<input id="sLevel" placeholder="B1"></label>
+        <button class="btn" type="submit">Create</button>
+      </form>
+      <p class="muted" id="stMsg"></p>
+    </section>
+  </div>
+</div>
+<script>
+const ACT=window.PORTAL_ACTIVITIES||{};
+const db=Portal.client;
+const PORTAL_URL=new URL("../my/",location.href).href;
+let S=[],M=[],R=[];
+const $=id=>document.getElementById(id);
+const when=d=>new Date(d).toLocaleString("en-GB",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});
+const actName=a=>{const [m,s]=a.split("/");return ACT[m]&&ACT[m][s]?`${m} · ${ACT[m][s]}`:a};
+const link=c=>PORTAL_URL+"?c="+encodeURIComponent(c);
+function slug(n){return n.toLowerCase().normalize("NFD").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")||"student"}
+function rand(){const a="abcdefghjkmnpqrstuvwxyz23456789";let s="";for(let i=0;i<4;i++)s+=a[Math.floor(Math.random()*a.length)];return s}
+
+async function load(){
+  const [s,m,r]=await Promise.all([db.from("students").select("*").order("name"),db.from("materials").select("*").order("created_at",{ascending:false}),db.from("results").select("*").order("created_at",{ascending:false}).limit(1000)]);
+  if(s.error||m.error||r.error){$("msg").hidden=false;$("msg").textContent="Couldn't load data: "+(s.error||m.error||r.error).message;return}
+  S=s.data;M=m.data;R=r.data;draw();
+}
+function draw(){
+  const st=$("students");st.innerHTML="";
+  S.forEach(x=>{const mine=R.filter(r=>r.student_code===x.code);const last=mine[0];
+    const b=document.createElement("button");b.className="item";b.style.cssText="text-align:left;cursor:pointer;font:inherit";
+    b.innerHTML=`<div class="top"><span class="kind">${x.level||""}</span>${last?`<span class="pill go">${when(last.created_at)}</span>`:'<span class="pill new">No activity yet</span>'}</div><h3>${x.name}</h3><p class="muted">${M.filter(m=>m.student_code===x.code).length} materials · ${mine.length} results</p>`;
+    b.onclick=()=>detail(x);st.appendChild(b)});
+  const rc=$("recent");rc.innerHTML="";
+  R.slice(0,25).forEach(r=>{const n=(S.find(x=>x.code===r.student_code)||{}).name||r.student_code;
+    rc.insertAdjacentHTML("beforeend",`<tr><td>${when(r.created_at)}</td><td>${n}</td><td>${actName(r.activity)}</td><td>${r.total?`${r.score} / ${r.total}`:"–"}</td></tr>`)});
+  if(!R.length)rc.innerHTML='<tr><td colspan="4" class="muted">No results yet. They will appear here when students do the exercises.</td></tr>';
+  $("mStudent").innerHTML=S.map(x=>`<option value="${x.code}">${x.name}</option>`).join("");
+}
+function detail(x){
+  $("detail").hidden=false;$("dName").textContent=`${x.name} · ${x.level||""}`;$("dLink").textContent=link(x.code);
+  const mine=R.filter(r=>r.student_code===x.code);const tb=$("dRes");tb.innerHTML="";
+  M.filter(m=>m.student_code===x.code).forEach(m=>{
+    const subs=m.activity&&ACT[m.activity]?Object.keys(ACT[m.activity]):[];
+    if(!subs.length){tb.insertAdjacentHTML("beforeend",`<tr><td>${m.title}</td><td class="muted">no exercises</td><td></td><td></td><td></td></tr>`);return}
+    subs.forEach((s,i)=>{const rs=mine.filter(r=>r.activity===m.activity+"/"+s);
+      const best=rs.reduce((a,r)=>r.total&&(!a||r.score/r.total>a.score/a.total)?r:a,null);
+      tb.insertAdjacentHTML("beforeend",`<tr><td>${i?"":m.title}</td><td>${ACT[m.activity][s]}</td><td>${best?`${best.score} / ${best.total}`:"–"}</td><td>${rs.length||"–"}</td><td>${rs[0]?when(rs[0].created_at):"–"}</td></tr>`)})});
+  const cnt={};mine.forEach(r=>(r.details&&r.details.wrong||[]).forEach(w=>cnt[w]=(cnt[w]||0)+1));
+  const top=Object.entries(cnt).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  $("dWeak").innerHTML=top.length?`<ul>${top.map(([w,n])=>`<li>${w} <span class="muted">· missed ${n}×</span></li>`).join("")}</ul>`:'<p class="muted">Nothing yet.</p>';
+  $("detail").scrollIntoView({behavior:"smooth"});
+}
+$("dClose").onclick=()=>$("detail").hidden=true;
+$("matForm").onsubmit=async e=>{e.preventDefault();
+  const row={student_code:$("mStudent").value,title:$("mTitle").value.trim(),url:$("mUrl").value.trim(),kind:$("mKind").value,activity:$("mAct").value.trim()||null,due:$("mDue").value||null,note:$("mNote").value.trim()||null};
+  const {error}=await db.from("materials").insert(row);$("matMsg").textContent=error?"Error: "+error.message:`Added "${row.title}".`;
+  if(!error){e.target.reset();await load()}};
+$("stForm").onsubmit=async e=>{e.preventDefault();const name=$("sName").value.trim();const code=slug(name)+"-"+rand();
+  const {error}=await db.from("students").insert({code,name,level:$("sLevel").value.trim()||null});
+  $("stMsg").innerHTML=error?"Error: "+error.message:`Created. ${name}'s personal link: <span class="copy">${link(code)}</span>`;
+  if(!error){e.target.reset();await load()}};
+$("loginForm").onsubmit=async e=>{e.preventDefault();$("loginErr").textContent="";
+  const {error}=await db.auth.signInWithPassword({email:$("email").value,password:$("pass").value});
+  if(error)$("loginErr").textContent="Wrong email or password.";else start()};
+$("logout").onclick=async()=>{await db.auth.signOut();location.reload()};
+async function start(){const {data}=await db.auth.getSession();
+  if(!data.session){$("login").hidden=false;$("app").hidden=true;return}
+  $("login").hidden=true;$("app").hidden=false;$("who").textContent="Signed in as "+data.session.user.email;load()}
+if(!Portal.ready){$("msg").hidden=false;$("msg").textContent="Supabase isn't connected yet. Add the project URL and key to assets/config.js."}else start();
+</script>
+</body>
+</html>

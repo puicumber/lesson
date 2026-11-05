@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>My English</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<link rel="stylesheet" href="../assets/portal.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="../assets/config.js"></script>
+<script src="../assets/portal.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow" id="level">English with Polina</span>
+    <h1 id="hello">Hello!</h1>
+    <p class="muted" id="sub">Loading your materials…</p>
+  </header>
+
+  <section class="panel" id="todoPanel" hidden>
+    <h2>To do</h2>
+    <div class="grid" id="todo"></div>
+  </section>
+
+  <section class="panel" id="libPanel" hidden>
+    <h2>All materials</h2>
+    <div class="tabs" id="filters"></div>
+    <div class="grid" id="lib"></div>
+  </section>
+
+  <p class="notice" id="msg" hidden></p>
+</div>
+<script>
+const ACT=window.PORTAL_ACTIVITIES||{};
+const KIND={vocabulary:"Vocabulary",lesson:"Lesson",grammar:"Grammar",homework:"Homework",practice:"Practice"};
+function fmtDate(d){return new Date(d).toLocaleDateString("en-GB",{day:"numeric",month:"short"})}
+function status(m,results){
+  const subs=ACT[m.activity]?Object.keys(ACT[m.activity]):[];
+  const mine=results.filter(r=>m.activity&&(r.activity===m.activity||r.activity.startsWith(m.activity+"/")));
+  const doneSubs=subs.filter(s=>mine.some(r=>r.activity===m.activity+"/"+s&&r.total&&r.best/r.total>=0.8));
+  const started=mine.length>0;
+  const complete=subs.length?doneSubs.length===subs.length:false;
+  return {subs,doneSubs,started,complete,mine};
+}
+function card(m,results){
+  const s=status(m,results);const late=m.due&&!s.complete&&new Date(m.due)<new Date(new Date().toDateString());
+  const pill=s.complete?'<span class="pill done">Done ✓</span>':late?'<span class="pill late">Overdue</span>':s.started?'<span class="pill go">In progress</span>':m.activity?'<span class="pill new">New</span>':"";
+  const a=document.createElement("a");a.className="item";a.href=Portal.withCode(m.url);a.target="_blank";a.rel="noopener";
+  let html=`<div class="top"><span class="kind">${KIND[m.kind]||m.kind||""}</span>${pill}</div><h3>${m.title}</h3>`;
+  if(m.note)html+=`<p class="muted">${m.note}</p>`;
+  if(m.due)html+=`<p class="muted">Due ${fmtDate(m.due)}</p>`;
+  if(s.subs.length){const pct=Math.round(s.doneSubs.length/s.subs.length*100);
+    html+=`<div class="bar"><span style="width:${pct}%"></span></div><div class="subs">${s.subs.map(k=>`<span class="sub ${s.doneSubs.includes(k)?"ok":""}">${ACT[m.activity][k]}</span>`).join("")}</div>`}
+  a.innerHTML=html;return a;
+}
+(async()=>{
+  const msg=document.getElementById("msg");const code=Portal.code();
+  if(!Portal.ready){msg.hidden=false;msg.textContent="The portal isn't connected yet. Please check back soon.";document.getElementById("sub").textContent="";return}
+  if(!code){msg.hidden=false;msg.textContent="Please open this page from the personal link Polina sent you.";document.getElementById("sub").textContent="";return}
+  try{
+    const d=await Portal.getPortal(code);
+    if(!d||!d.student){msg.hidden=false;msg.textContent="This link doesn't work. Please ask Polina for your personal link.";document.getElementById("sub").textContent="";return}
+    document.title=`${d.student.name}'s English`;
+    document.getElementById("hello").innerHTML=`Hello, <span>${d.student.name}</span>!`;
+    document.getElementById("level").textContent=`English with Polina · ${d.student.level||""}`;
+    const res=d.results||[],mats=d.materials||[];
+    const todo=mats.filter(m=>m.activity&&!status(m,res).complete);
+    document.getElementById("sub").textContent=todo.length?`You have ${todo.length} thing${todo.length>1?"s":""} to do. Your progress saves automatically.`:"Everything is done. Great job!";
+    if(todo.length){document.getElementById("todoPanel").hidden=false;todo.forEach(m=>document.getElementById("todo").appendChild(card(m,res)))}
+    document.getElementById("libPanel").hidden=false;
+    const kinds=["all",...new Set(mats.map(m=>m.kind))];const lib=document.getElementById("lib"),fl=document.getElementById("filters");
+    function draw(k){lib.innerHTML="";mats.filter(m=>k==="all"||m.kind===k).forEach(m=>lib.appendChild(card(m,res)));
+      fl.querySelectorAll(".tab").forEach(b=>b.setAttribute("aria-selected",b.dataset.k===k))}
+    kinds.forEach(k=>{const b=document.createElement("button");b.className="tab";b.dataset.k=k;b.textContent=k==="all"?"All":(KIND[k]||k);b.onclick=()=>draw(k);fl.appendChild(b)});
+    draw("all");
+  }catch(e){msg.hidden=false;msg.textContent="Something went wrong while loading. Please refresh the page.";console.error(e)}
+})();
+</script>
+</body>
+</html>
