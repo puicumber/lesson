@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Review: Phrasal Verbs & Derivatives</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+[hidden]{display:none!important} body{margin:0}
+
+/* Review page: case-file header, flashcards first, then self-checking exercises. Data lives in REVIEW below. */
+:root{
+  --bg:#f1ece2; --card:#fbf8f2; --paper:#f6efe0; --ink:#1f2433; --muted:#5f6475; --line:#d8cfbd;
+  --navy:#2b3a67; --navy-soft:#2b3a6714; --stamp:#b8402f; --stamp-soft:#b8402f1a;
+  --ok:#2f7a52; --ok-soft:#2f7a521c; --bad:#b8402f; --bad-soft:#b8402f1c;
+  --display:"Fraunces",Georgia,serif;
+  --body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#15171f; --card:#1d2029; --paper:#232631; --ink:#e9e6df; --muted:#a6a9b6; --line:#353948;
+  --navy:#9fb2ec; --navy-soft:#9fb2ec1c; --stamp:#f08a78; --stamp-soft:#f08a7822;
+  --ok:#6cc596; --ok-soft:#6cc59622; --bad:#f08a78; --bad-soft:#f08a7822; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#15171f; --card:#1d2029; --paper:#232631; --ink:#e9e6df; --muted:#a6a9b6; --line:#353948;
+  --navy:#9fb2ec; --navy-soft:#9fb2ec1c; --stamp:#f08a78; --stamp-soft:#f08a7822;
+  --ok:#6cc596; --ok-soft:#6cc59622; --bad:#f08a78; --bad-soft:#f08a7822; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 64px}
+.wrap{max-width:920px;margin:0 auto;display:flex;flex-direction:column;gap:24px}
+h1,h2{font-family:var(--display);margin:0;line-height:1.05;text-wrap:balance}
+h1{font-size:clamp(36px,7vw,58px);font-weight:800;letter-spacing:-.01em}
+h2{font-size:clamp(26px,4vw,34px);font-weight:800}
+p{margin:0}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.lede{color:var(--muted);max-width:64ch}
+.tip{font-size:14px;color:var(--muted);font-style:italic}
+
+.file{position:relative;border:1px solid var(--line);border-radius:6px 18px 18px 18px;padding:30px clamp(20px,4vw,38px) 26px;background:var(--paper);display:flex;flex-direction:column;gap:10px;margin-top:22px}
+.file::before{content:"REVIEW FILE";position:absolute;top:-22px;left:-1px;font-family:var(--mono);font-size:12px;letter-spacing:.12em;padding:4px 16px;background:var(--paper);border:1px solid var(--line);border-bottom:0;border-radius:10px 10px 0 0;color:var(--muted)}
+.file h1{color:var(--navy)}
+.stamp{position:absolute;right:clamp(14px,4vw,34px);top:20px;font-family:var(--mono);font-weight:600;font-size:13px;letter-spacing:.16em;color:var(--stamp);border:2px solid var(--stamp);border-radius:6px;padding:6px 10px;transform:rotate(-6deg);opacity:.85}
+@media (max-width:560px){.stamp{position:static;align-self:flex-start;transform:none}}
+
+nav.tabs{display:flex;flex-wrap:wrap;gap:8px}
+.tab{appearance:none;cursor:pointer;font:inherit;font-weight:700;font-size:15px;border-radius:999px;padding:8px 16px;border:1px solid var(--line);background:var(--card);color:var(--ink);display:inline-flex;gap:8px;align-items:center}
+.tab:hover{border-color:var(--navy)}
+.tab[aria-selected="true"]{background:var(--navy);border-color:var(--navy);color:var(--card)}
+.tab .best{font-family:var(--mono);font-size:12px;font-weight:500;opacity:.8}
+.tab:focus-visible,.btn:focus-visible,input:focus-visible,.opt:focus-visible,.flash:focus-visible,.filter:focus-visible,.coin:focus-visible{outline:2px solid var(--stamp);outline-offset:2px}
+
+section.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:clamp(20px,4vw,34px);display:flex;flex-direction:column;gap:22px}
+.head{display:flex;flex-direction:column;gap:8px}
+.btn{appearance:none;cursor:pointer;font:inherit;font-weight:700;font-size:16px;border-radius:999px;padding:10px 20px;border:1px solid var(--navy);background:var(--navy);color:var(--card)}
+.btn.ghost{background:transparent;color:var(--navy)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.score{font-family:var(--mono);font-weight:600;color:var(--navy);font-variant-numeric:tabular-nums}
+
+/* flashcards */
+.flash{appearance:none;cursor:pointer;font:inherit;color:var(--ink);width:100%;min-height:240px;border-radius:18px;border:2px solid var(--line);background:var(--paper);padding:28px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center}
+.flash .w{font-family:var(--display);font-size:clamp(30px,6vw,46px);font-weight:800;color:var(--navy);line-height:1.1}
+.flash .t{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.flash .d{font-size:20px;max-width:46ch}
+.flash .e{font-style:italic;color:var(--muted);max-width:50ch}
+.flash.back{border-color:var(--stamp)}
+.filters{display:flex;gap:6px;flex-wrap:wrap}
+.filter{appearance:none;cursor:pointer;font:inherit;font-size:14px;border-radius:8px;padding:5px 12px;border:1px solid var(--line);background:transparent;color:var(--muted)}
+.filter[aria-pressed="true"]{border-color:var(--stamp);background:var(--stamp-soft);color:var(--ink)}
+.bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden}
+.bar span{display:block;height:100%;background:var(--stamp);transition:width .3s}
+
+/* multiple choice */
+.qs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:700px){.qs{grid-template-columns:1fr}}
+.q{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.q .n{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.1em}
+.q .s{font-weight:700}
+.q .s u{text-decoration:none;border-bottom:2px solid var(--navy);color:var(--navy)}
+.opts{display:flex;gap:6px;flex-wrap:wrap}
+.opt{appearance:none;cursor:pointer;font:inherit;font-size:15px;border-radius:8px;padding:6px 12px;background:var(--card);color:var(--ink);border:1px solid var(--line)}
+.opt:hover{border-color:var(--navy)}
+.opt.ok{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.opt.no{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.why{font-size:14px;color:var(--muted)}
+
+/* typed */
+.items{display:flex;flex-direction:column;gap:12px;padding:0;margin:0}
+.items li{list-style:none;background:var(--bg);border:1px solid transparent;border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.items li.ok{border-color:var(--ok)}.items li.no{border-color:var(--bad)}
+.items .n{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.1em}
+.key{font-family:var(--mono);font-weight:600;letter-spacing:.08em;color:var(--stamp);background:var(--stamp-soft);border-radius:6px;padding:1px 8px}
+.line{display:flex;flex-wrap:wrap;gap:6px;align-items:baseline}
+input[type=text]{font:inherit;font-size:16px;color:var(--ink);background:var(--card);border:1px solid var(--navy);border-radius:8px;padding:4px 8px;flex:1 1 200px;min-width:0;max-width:100%}
+.fb{font-size:14px}
+.fb.ok{color:var(--ok)}.fb.no{color:var(--bad)}
+.fb .ans{font-weight:700}
+
+/* speaking prompts */
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:700px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:420px){.cards{grid-template-columns:1fr}}
+.coin{appearance:none;cursor:pointer;font:inherit;color:var(--ink);background:var(--paper);border:2px dashed var(--stamp);border-radius:14px;min-height:120px;padding:14px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:15px}
+.coin:not(.open){font-family:var(--mono);font-size:22px;font-weight:600;color:var(--stamp);letter-spacing:.1em}
+.coin.open{border-style:solid;border-color:var(--line)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.js"></script>
+<script src="../../assets/config.js?v=3"></script>
+<script src="../../assets/portal.js?v=2"></script>
+</head>
+<body>
+<div class="wrap">
+  <header class="file">
+    <span class="stamp" id="stamp"></span>
+    <span class="eyebrow" id="eyebrow"></span>
+    <h1 id="title"></h1>
+    <p class="lede" id="lede"></p>
+    <p class="tip" id="saveState"></p>
+  </header>
+  <nav class="tabs" role="tablist" id="tabs"></nav>
+  <div id="panels"></div>
+</div>
+
+<script>
+/* ===== REVIEW DATA (change this block for each new session) ===== */
+const REVIEW={
+ set:"g30",
+ stamp:"GRIVAS P.30–32",
+ eyebrow:"CPE review · Language development",
+ title:"Phrasal verbs, tricky pairs & derivatives",
+ lede:"Pages 30–32 in one place, with original sentences and extra practice on the mistakes you made. Start with the flashcards, then aim for 80% or more in each exercise.",
+ cards:[
+  ["account for","phrasal verb","explain the reason for; make up a part of","How do you account for the sudden drop in attendance?"],
+  ["act up","phrasal verb","behave badly; (of a machine) not work properly","My laptop always acts up before a deadline."],
+  ["not add up","phrasal verb","not make sense; seem suspicious","His alibi just doesn't add up."],
+  ["not agree with (food)","phrasal verb","make you feel ill","Spicy food doesn't agree with me."],
+  ["amount to","phrasal verb","be the same as; reach a total of","His silence amounted to an admission of guilt."],
+  ["answer for","phrasal verb","take the blame or responsibility for","Someone will have to answer for this mess."],
+  ["answer to","phrasal verb","match a description","A man answering to that description was seen near the station."],
+  ["back down","phrasal verb","give up your position in an argument","She refused to back down, even when her boss shouted."],
+  ["back out (of)","phrasal verb","withdraw from a deal or promise","The sponsor backed out of the agreement at the last minute."],
+  ["back up","phrasal verb","support (a claim, a product with a service)","The printer is backed up by a two-year warranty."],
+  ["back sb up","phrasal verb","support a person; say they are right","My colleagues backed me up in the meeting."],
+  ["be after","phrasal verb","be looking for; chase","The police are after the driver who fled."],
+  ["be off","phrasal verb","be absent (off work / off school); have gone bad","He's been off work with flu all week."],
+  ["refuse","refuse/deny","say NO to something offered or asked for; refuse TO do","She refused the job offer. He refused to sign."],
+  ["deny","refuse/deny","say something is NOT TRUE; deny DOING / deny THAT","He denied taking the money."],
+  ["deny sb sth","refuse/deny","NOT ALLOW someone to have something","Prisoners were denied access to a lawyer."],
+  ["major / essential","confused","major = big in scale; essential = absolutely necessary","Stress is a major factor. Sleep is essential for memory."],
+  ["suppress / oppress","confused","suppress = hold back inside; oppress = treat a group cruelly","She suppressed a laugh. The regime oppressed minorities."],
+  ["state / condition","confused","condition = physical health; state = situation, state of mind","He's in a stable condition. She's in a terrible state of mind."],
+  ["effective / operative","confused","effective = gets results; operative = in force, working","An effective therapy. The new rule is operative from May."],
+  ["fully / perfectly","confused","fully = completely; perfectly = ideally (perfectly normal / fine)","I'm fully aware of the risks. That's perfectly normal."],
+  ["uncertain / unsure","confused","unsure = people only; uncertain = people or situations","I'm unsure what to do. We live in uncertain times."],
+  ["suffer / undergo","confused","suffer = experience something bad; undergo = go through a process","She suffered severe pain. He underwent surgery."],
+  ["scratch / scrape","confused","scratch = thin marks with something sharp; scrape = rub roughly, graze skin","The cat scratched me. I scraped my knee on the pavement."],
+  ["lucky / fortunate","confused","mostly the same; fixed phrases: a lucky escape, in the fortunate position of","We had a lucky escape. I'm in the fortunate position of working from home."],
+  ["make ends meet","confused","have just enough money to live (MEET, not join)","Many students work two jobs to make ends meet."]
+ ],
+ filters:[["all","All"],["phrasal verb","Phrasal verbs"],["refuse/deny","Refuse/deny"],["confused","Tricky pairs"]],
+ parts:[
+  {id:"refuse",tab:"Refuse or deny",title:"Refuse or deny?",lede:"Offered or asked → refuse. Claimed true, or not allowed → deny.",type:"choose",items:[
+   ["The minister ___ all the accusations against him.",["denied","refused"],"denied","An accusation is a claim that something is true → deny."],
+   ["She ___ the invitation politely.",["refused","denied"],"refused","An invitation is offered → refuse."],
+   ["The hospital ___ the journalists access to the ward.",["denied","refused"],"denied","Deny sb access = not allow."],
+   ["He ___ to answer any more questions.",["refused","denied"],"refused","Refuse TO do something."],
+   ["The suspect ___ having been at the scene.",["denied","refused"],"denied","Deny DOING something."],
+   ["They ___ him permission to leave early.",["denied","refused"],"denied","Deny sb permission. (Refuse permission is also possible, but deny sb permission is the pattern you missed.)"],
+   ["The company ___ the rumours of a takeover.",["denied","refused"],"denied","A rumour = a claim → deny."],
+   ["I can't ___ that the idea is tempting.",["deny","refuse"],"deny","I can't deny that… = I have to admit that…"],
+   ["She ___ his offer of help.",["refused","denied"],"refused","An offer → refuse."]
+  ]},
+  {id:"phrasal",tab:"Phrasal verbs",title:"Pick the phrasal verb",lede:"First the meaning, then the form. Watch the ones you missed: back out of, are after, answering to, amounted to.",type:"choose",items:[
+   ["You signed the contract, so you can't ___ the deal now.",["back out of","back down from","back up"],"back out of","Withdraw from an agreement → back out OF."],
+   ["Even when everyone disagreed, she wouldn't ___.",["back down","back out","back up"],"back down","Give up your position in an argument → back down."],
+   ["The police ___ a man who robbed a pharmacy.",["are after","is after","are off"],"are after","Police is always plural → ARE. Be after = chase."],
+   ["Nobody ___ the police description was found.",["answering to","answered for","answers to"],"answering to","The sentence already has a main verb (was found), so we need -ing."],
+   ["Her reply ___ a flat refusal.",["amounted to","was amount to","accounted for"],"amounted to","Amount to = be the same as. Never 'was amount'."],
+   ["Women ___ 70% of the staff in psychiatry.",["account for","amount to","answer for"],"account for","Account for = make up a part of a total."],
+   ["Whoever broke the window will ___ it!",["answer for","answer to","account to"],"answer for","Answer for = take the blame."],
+   ["Her story just doesn't ___. Something is missing.",["add up","agree with","act up"],"add up","Not add up = not make sense."],
+   ["Seafood doesn't ___ me; I feel sick every time.",["agree with","add up to","back up"],"agree with","Food doesn't agree with you = makes you ill."],
+   ["The kids always ___ when they're tired.",["act up","back up","be after"],"act up","Act up = behave badly."],
+   ["If they doubt you, I'll ___.",["back you up","back up you","back you down"],"back you up","Pronoun goes in the MIDDLE of a separable phrasal verb."],
+   ["Sasha has been ___ school for three days with a cold.",["off","after","out"],"off","Be off school / off work = absent."]
+  ]},
+  {id:"confused",tab:"Tricky pairs",title:"Words easily confused",lede:"In CPE, collocation beats dictionary meaning. Which word goes with the noun?",type:"choose",items:[
+   ["Lack of sleep is a ___ factor in depression.",["major","essential"],"major","A major factor = important in scale."],
+   ["Water is ___ for survival.",["essential","major"],"essential","Essential = absolutely necessary."],
+   ["I had to ___ a yawn during the lecture.",["suppress","oppress"],"suppress","Suppress = hold back something inside you."],
+   ["For centuries the regime ___ religious minorities.",["oppressed","suppressed"],"oppressed","Oppress = treat a group cruelly and unfairly."],
+   ["The patient is in a stable ___ after surgery.",["condition","state"],"condition","Medical health → condition."],
+   ["Her ___ of mind worried her friends.",["state","condition"],"state","State of mind (also: state of affairs)."],
+   ["CBT is an ___ treatment for anxiety.",["effective","operative"],"effective","Effective = gives the result you want."],
+   ["The new law becomes ___ on 1 May.",["operative","effective"],"operative","Operative = in force. (Effective from a date is also used, but 'operative' is the textbook collocation here.)"],
+   ["Feeling nervous before an exam is ___ normal.",["perfectly","fully"],"perfectly","Perfectly normal / fine / healthy."],
+   ["I'm ___ aware of the risks.",["fully","perfectly"],"fully","Fully aware / booked / qualified = completely."],
+   ["The company faces an ___ future.",["uncertain","unsure"],"uncertain","Unsure is only for people. Situations are uncertain."],
+   ["He had to ___ three operations on his knee.",["undergo","suffer"],"undergo","Undergo surgery / treatment = go through a process."],
+   ["Jenny fell off her bike and ___ her elbow.",["scraped","scratched"],"scraped","Rub skin against a rough surface → scrape (graze)."],
+   ["The driver had a ___ escape when the tree fell.",["lucky","fortunate"],"lucky","Fixed phrase: a lucky escape."],
+   ["We're in the ___ position of not needing a loan.",["fortunate","lucky"],"fortunate","Fixed phrase: in the fortunate position of."],
+   ["With prices rising, many families struggle to make ends ___.",["meet","join"],"meet","Make ends meet = have just enough money."]
+  ]},
+  {id:"derivatives",tab:"Word formation",title:"Derivatives",lede:"Type the right form of the word in capitals. Often you need two changes: prefix + suffix, or suffix + plural.",type:"typed",items:[
+   {a:"The",b:"factories by the river have been empty for years.",stem:"ABANDON",acc:["abandoned"],why:"-ed = someone left them. There's no 'unabandoned'."},
+   {a:"Shouting at patients is completely",b:".",stem:"ACCEPT",acc:["unacceptable"],why:"Negative meaning → un- + -able."},
+   {a:"The village is",b:"by car in winter because of the snow.",stem:"ACCESS",acc:["inaccessible"],why:"-ible words take in-: inaccessible (not un-)."},
+   {a:"Processed food often contains too many",b:".",stem:"ADD",acc:["additives"],why:"Too many → plural. Substances in food = additives (not additions)."},
+   {a:"She looked at the painting with open",b:".",stem:"ADMIRE",acc:["admiration"],why:"Noun after 'with open'."},
+   {a:"The judge ruled that the recording was",b:"as evidence.",stem:"ADMIT",acc:["inadmissible"],why:"admit → admissible; not allowed → in-admissible."},
+   {a:"What an",b:"puppy!",stem:"ADORE",acc:["adorable"],why:"Drop the -e and add -able."},
+   {a:"Doctors say it is",b:"to stop antidepressants suddenly.",stem:"ADVISE",acc:["inadvisable","unadvisable"],why:"Not a good idea → inadvisable."},
+   {a:"Rents in the city are no longer",b:"for students.",stem:"AFFORD",acc:["affordable"],why:"Adjective after 'are no longer'."},
+   {a:"Children from",b:"areas often have fewer chances.",stem:"ADVANTAGE",acc:["disadvantaged"],why:"-ed for people/places that lack opportunities (not disadvantageous)."},
+   {a:"The deadline is tight, but I think it's",b:".",stem:"ACHIEVE",acc:["achievable"],why:"Can be achieved → -able."},
+   {a:"Much to everyone's",b:", the dog stole the cake.",stem:"AMUSE",acc:["amusement"],why:"To everyone's + noun → amusement."}
+  ]}
+ ],
+ talk:["Have you ever backed out of a promise? Why?","Describe a time a story you heard didn't add up.","Which food doesn't agree with you?","When should a therapist back down, and when not?","Tell me about a lucky escape you or someone you know had.","Is it healthy to suppress your emotions?","What's essential for you to study well?","What does it take to make ends meet where you live?","Have you ever been denied something you felt you deserved?"]
+};
+/* ===== END OF DATA ===== */
+
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const norm=s=>s.toLowerCase().replace(/[’‘`]/g,"'").replace(/\s+/g," ").replace(/[.!?]+$/,"").trim();
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const R=REVIEW;
+$("stamp").textContent=R.stamp;$("eyebrow").textContent=R.eyebrow;$("title").textContent=R.title;$("lede").textContent=R.lede;
+
+/* portal saving */
+const PT=window.Portal;const canSave=!!(PT&&PT.ready&&PT.code());
+const save=(a,sc,t,d)=>{if(canSave)PT.log(R.set+"/"+a,sc,t,d)};
+$("saveState").textContent=canSave?"Your progress is saved to your portal.":"Tip: open this page from your personal portal link to save your progress.";
+
+/* tabs and panels */
+const TABS=[["cards","Flashcards"],...R.parts.map(p=>[p.id,p.tab]),...(R.talk&&R.talk.length?[["talk","Speaking"]]:[])];
+TABS.forEach(([id,name])=>{const b=document.createElement("button");b.className="tab";b.setAttribute("role","tab");b.id="t-"+id;b.innerHTML=`${esc(name)}<span class="best" id="best-${id}"></span>`;b.onclick=()=>show(id);$("tabs").appendChild(b);
+  const s=document.createElement("section");s.className="panel";s.id="p-"+id;s.setAttribute("role","tabpanel");s.hidden=true;$("panels").appendChild(s)});
+function show(id){TABS.forEach(([t])=>{$("p-"+t).hidden=t!==id;$("t-"+t).setAttribute("aria-selected",t===id)});try{if(location.hash!=="#"+id)history.replaceState(null,"","#"+id)}catch(e){}}
+
+/* flashcards */
+$("p-cards").innerHTML=`<div class="head"><span class="eyebrow">Step 1</span><h2>Flashcards</h2><p class="lede">Say the meaning out loud, then tap the card to check. "Got it" removes the card; "Again" keeps it in the pile.</p></div>
+ <div class="filters" id="filters"></div><div class="bar"><span id="bar" style="width:0"></span></div><button class="flash" id="flash"></button>
+ <div class="row"><button class="btn ghost" id="again">Again</button><button class="btn" id="gotit">Got it</button><span class="score" id="fCount"></span><button class="btn ghost" id="fReset" style="margin-left:auto">Start again</button></div>`;
+const KEY="rev-"+R.set+"-known";let filter="all",known=new Set(store.get(KEY,[])),deck=[],cur=null,flipped=false,cardTimer=null;
+const saveCards=()=>{clearTimeout(cardTimer);cardTimer=setTimeout(()=>save("cards",known.size,R.cards.length,{known:[...known]}),2500)};
+(R.filters||[["all","All"]]).forEach(([k,l])=>{const b=document.createElement("button");b.className="filter";b.textContent=l;b.setAttribute("aria-pressed",k===filter);
+  b.onclick=()=>{filter=k;$("filters").querySelectorAll(".filter").forEach(x=>x.setAttribute("aria-pressed",x===b));buildDeck()};$("filters").appendChild(b)});
+const pool=()=>R.cards.filter(w=>filter==="all"||w[1]===filter);
+function buildDeck(){deck=shuffle(pool().filter(w=>!known.has(w[0])));next()}
+function next(){cur=deck.shift()||null;flipped=false;renderCard()}
+function renderCard(){const f=$("flash"),p=pool(),k=p.filter(w=>known.has(w[0])).length;
+  $("bar").style.width=(p.length?k/p.length*100:0)+"%";$("fCount").textContent=`${k} of ${p.length} learned`;f.classList.toggle("back",flipped);
+  if(!cur){f.innerHTML=`<span class="w">All done!</span><span class="d">You know every card in this set. Try the exercises next.</span>`;return}
+  f.innerHTML=flipped?`<span class="t">${esc(cur[1])}</span><span class="w">${esc(cur[0])}</span><span class="d">${esc(cur[2])}</span><span class="e">${esc(cur[3])}</span>`
+    :`<span class="t">${esc(cur[1])}</span><span class="w">${esc(cur[0])}</span><span class="tip">Tap to see the meaning</span>`}
+$("flash").onclick=()=>{if(cur){flipped=!flipped;renderCard()}};
+$("gotit").onclick=()=>{if(!cur)return;known.add(cur[0]);store.set(KEY,[...known]);saveCards();next()};
+$("again").onclick=()=>{if(!cur)return;deck.splice(Math.min(3,deck.length),0,cur);next()};
+$("fReset").onclick=()=>{known=new Set();store.set(KEY,[]);saveCards();buildDeck()};
+buildDeck();
+
+/* exercises */
+R.parts.forEach((p,pi)=>{const el=$("p-"+p.id);
+  el.innerHTML=`<div class="head"><span class="eyebrow">Step ${pi+2}</span><h2>${esc(p.title)}</h2><p class="lede">${esc(p.lede)}</p></div>`;
+  if(p.type==="choose")buildChoose(el,p);else buildTyped(el,p)});
+
+function buildChoose(el,p){const box=document.createElement("div");el.appendChild(box);
+  const row=document.createElement("div");row.className="row";row.innerHTML=`<span class="score"></span><button class="btn ghost">Start again</button>`;el.appendChild(row);
+  const sc=row.querySelector(".score");row.querySelector("button").onclick=draw;
+  function draw(){box.className="qs";box.innerHTML="";sc.textContent="";let ok=0,tried=0,saved=false;const wrong=[];
+    shuffle(p.items).forEach(([s,opts,ans,why],i)=>{const d=document.createElement("div");d.className="q";
+      d.innerHTML=`<span class="n">${i+1}</span><p class="s">${esc(s).replace("___","<u>&nbsp;?&nbsp;</u>")}</p><div class="opts"></div><p class="why" hidden></p>`;
+      const o=d.querySelector(".opts"),w=d.querySelector(".why");let answered=false;
+      shuffle(opts).forEach(t=>{const b=document.createElement("button");b.className="opt";b.textContent=t;
+        b.onclick=()=>{if(o.querySelector(".ok"))return;o.querySelectorAll(".opt").forEach(x=>x.classList.remove("no"));
+          if(t===ans){b.classList.add("ok");w.hidden=false;w.textContent=why;d.querySelector(".s u").innerHTML=`&nbsp;${esc(ans)}&nbsp;`;if(!answered){answered=true;tried++;ok++}}
+          else{b.classList.add("no");if(!answered){answered=true;tried++;wrong.push(s.replace("___",ans))}}
+          if(tried===p.items.length&&!saved){saved=true;save(p.id,ok,p.items.length,{wrong})}
+          sc.textContent=saved?`Score: ${ok} / ${p.items.length}`+(ok/p.items.length>=.8?" ✓ passed":" · aim for 80%"):`First-try answers: ${ok} / ${tried}`};o.appendChild(b)});
+      box.appendChild(d)})}
+  draw()}
+
+function buildTyped(el,p){const ol=document.createElement("ol");ol.className="items";el.appendChild(ol);
+  p.items.forEach((it,k)=>{const li=document.createElement("li");
+    li.innerHTML=`<span class="n">${k+1}</span><div class="line"><span>${esc(it.a)}</span><input type="text" aria-label="Answer ${k+1}" autocomplete="off" autocapitalize="off" spellcheck="false"><span>${esc(it.b)}</span><span class="key">${esc(it.stem)}</span></div><p class="fb" hidden></p>`;
+    li.querySelector("input").addEventListener("keydown",e=>{if(e.key==="Enter"){const nx=ol.children[k+1];if(nx)nx.querySelector("input").focus()}});ol.appendChild(li)});
+  const row=document.createElement("div");row.className="row";row.innerHTML=`<button class="btn">Check answers</button><button class="btn ghost">Clear</button><span class="score"></span>`;el.appendChild(row);
+  const [chk,clr]=row.querySelectorAll("button"),sc=row.querySelector(".score");
+  chk.onclick=()=>{let n=0;const wrong=[];p.items.forEach((it,k)=>{const li=ol.children[k],v=norm(li.querySelector("input").value),good=it.acc.map(norm).includes(v),fb=li.querySelector(".fb");
+    li.className=good?"ok":"no";fb.hidden=false;fb.className="fb "+(good?"ok":"no");fb.innerHTML=(good?"✓ ":`✗ Answer: <span class="ans">${esc(it.acc[0])}</span>. `)+esc(it.why);if(good)n++;else wrong.push(`${it.stem} → ${it.acc[0]}`)});
+    sc.textContent=`${n} / ${p.items.length}`+(n/p.items.length>=.8?" ✓ passed":"");save(p.id,n,p.items.length,{wrong})};
+  clr.onclick=()=>{[...ol.children].forEach(li=>{li.className="";li.querySelector("input").value="";li.querySelector(".fb").hidden=true});sc.textContent=""}}
+
+/* speaking */
+if(R.talk&&R.talk.length){$("p-talk").innerHTML=`<div class="head"><span class="eyebrow">Last step</span><h2>Speaking</h2><p class="lede">Open a card and answer out loud for about a minute. Use at least two expressions from this page.</p></div><div class="cards" id="talk"></div>`;
+  R.talk.forEach((t,i)=>{const b=document.createElement("button");b.className="coin";b.textContent="Q"+(i+1);b.setAttribute("aria-label","Open question "+(i+1));b.onclick=()=>{b.classList.add("open");b.textContent=t};$("talk").appendChild(b)})}
+
+/* restore portal state */
+if(canSave)PT.getPortal(PT.code()).then(d=>{if(!d)return;const st=d.state&&d.state[R.set+"/cards"];if(st&&st.known){st.known.forEach(k=>known.add(k));store.set(KEY,[...known]);buildDeck()}
+  const r=d.results||{};TABS.forEach(([id])=>{const x=r[R.set+"/"+id];if(x&&x.total)$("best-"+id).textContent=`${Math.round(x.best/x.total*100)}%`})}).catch(()=>{});
+
+const h=location.hash.slice(1);show(TABS.some(t=>t[0]===h)?h:"cards");
+</script>
+</body>
+</html>

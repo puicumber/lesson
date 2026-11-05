@@ -6,5 +6,7 @@ window.PORTAL_CONFIG = {
 // Exercises inside each material, used to show progress
 window.PORTAL_ACTIVITIES = {
   money: { cards: "Flashcards", nouns: "Nouns", verbs: "Verbs", preps: "Prepositions", phrasal: "Phrasal verbs", spell: "Spelling" },
-  cpe: { mc: "Part 1 · Multiple choice", cloze: "Part 2 · Open cloze", wordform: "Part 3 · Word formation", kwt: "Part 4 · Transformations" }
+  cpe: { mc: "Part 1 · Multiple choice", cloze: "Part 2 · Open cloze", wordform: "Part 3 · Word formation", kwt: "Part 4 · Transformations" },
+  g28: { cards: "Flashcards", preps: "Prepositions", idioms: "Idioms", at: "At-phrases" },
+  g30: { cards: "Flashcards", refuse: "Refuse or deny", phrasal: "Phrasal verbs", confused: "Tricky pairs", derivatives: "Word formation" }
 };
