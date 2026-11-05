@@ -1,0 +1,379 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Diana's Birthday Party</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+[hidden]{display:none!important} body{margin:0}
+
+/* Layout: a pink-and-green party page. Six rooms behind gift-tag tabs, a cake whose candles light up as rooms are finished. Single light theme by choice. */
+:root{
+  --bg:#fff4f8; --paper:#ffffff; --ink:#2b1f26; --muted:#7a6470; --line:#f2cddd;
+  --pink:#e2407e; --pink-soft:#fde0ec; --pink-mid:#f7b6cf;
+  --green:#2f8a5f; --mint:#cdeedc; --mint-mid:#9ad8b8;
+  --bad:#c2453d; --bad-soft:#fbe1df;
+  --display:"Bagel Fat One","Arial Rounded MT Bold","Trebuchet MS",sans-serif;
+  --body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55;
+  background-image:radial-gradient(var(--pink-mid) 1.5px,transparent 1.6px),radial-gradient(var(--mint-mid) 1.5px,transparent 1.6px);
+  background-size:38px 38px,38px 38px;background-position:0 0,19px 19px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px 64px}
+.wrap{max-width:1000px;margin:0 auto;display:flex;flex-direction:column;gap:24px}
+h1,h2,h3{font-family:var(--display);font-weight:400;margin:0;line-height:1.05;text-wrap:balance}
+h1{font-size:clamp(46px,9vw,92px);color:var(--pink);letter-spacing:.5px}
+h2{font-size:clamp(30px,5vw,44px);color:var(--green)}
+h3{font-size:24px;color:var(--pink)}
+p{margin:0}
+.eyebrow{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.lede{color:var(--muted);max-width:62ch}
+
+/* hero */
+.hero{position:relative;background:var(--paper);border:3px solid var(--pink);border-radius:28px;padding:clamp(20px,4vw,40px);display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:20px;align-items:center;overflow:hidden;box-shadow:8px 8px 0 var(--mint-mid)}
+@media (max-width:760px){.hero{grid-template-columns:1fr}}
+.hero .txt{display:flex;flex-direction:column;gap:12px;position:relative;z-index:1}
+.hero .ko{font-family:var(--display);font-size:22px;color:var(--green)}
+.hero img{width:100%;max-width:100%;height:auto;display:block;filter:drop-shadow(0 12px 18px #e2407e33)}
+.age{display:inline-flex;align-items:center;justify-content:center;width:84px;height:84px;border-radius:50%;background:var(--green);color:#fff;font-family:var(--display);font-size:38px;transform:rotate(-8deg);box-shadow:4px 4px 0 var(--pink-mid)}
+.cake{display:flex;gap:8px;align-items:flex-end}
+.candle{width:12px;height:34px;border-radius:3px;background:repeating-linear-gradient(180deg,var(--pink-mid) 0 6px,#fff 6px 12px);position:relative;border:1px solid var(--pink)}
+.candle::before{content:"";position:absolute;left:50%;top:-14px;width:9px;height:13px;transform:translateX(-50%);border-radius:50% 50% 50% 50%/60% 60% 40% 40%}
+.candle.lit::before{background:#ffb02e;box-shadow:0 0 12px 3px #ffb02e99;animation:flick 2s infinite ease-in-out}
+@keyframes flick{50%{transform:translateX(-50%) scale(1.1,.9)}}
+.cake-label{font-size:14px;color:var(--muted)}
+
+/* tabs */
+nav.tags{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px}
+@media (max-width:760px){nav.tags{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.tag{appearance:none;cursor:pointer;font:inherit;font-weight:700;font-size:15px;color:var(--ink);background:var(--paper);border:2px solid var(--line);border-radius:14px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center;position:relative}
+.tag .n{font-family:var(--display);font-size:22px;color:var(--pink-mid);line-height:1}
+.tag:hover{border-color:var(--pink)}
+.tag[aria-selected="true"]{background:var(--pink);border-color:var(--pink);color:#fff}
+.tag[aria-selected="true"] .n{color:#fff}
+.tag.done::after{content:"✓";position:absolute;top:6px;right:8px;color:var(--green);font-size:14px}
+.tag[aria-selected="true"].done::after{color:#fff}
+.tag:focus-visible,.btn:focus-visible,.chip:focus-visible,.opt:focus-visible,select:focus-visible,textarea:focus-visible,.card:focus-visible,.box:focus-visible{outline:3px solid var(--green);outline-offset:2px}
+
+/* rooms */
+section.room{background:var(--paper);border:2px solid var(--line);border-radius:24px;padding:clamp(20px,4vw,36px);display:flex;flex-direction:column;gap:24px}
+.head{display:flex;flex-direction:column;gap:8px}
+.goal{display:inline-flex;font-size:14px;font-weight:700;color:var(--green);background:var(--mint);border-radius:999px;padding:4px 12px;width:fit-content}
+.block{display:flex;flex-direction:column;gap:12px}
+.btn{appearance:none;cursor:pointer;font:inherit;font-weight:700;font-size:16px;border-radius:999px;padding:10px 20px;border:2px solid var(--pink);background:var(--pink);color:#fff}
+.btn.ghost{background:transparent;color:var(--pink)}
+.btn.green{background:var(--green);border-color:var(--green)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.foot{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;border-top:2px dashed var(--line);padding-top:18px}
+.tip{font-size:14px;color:var(--muted);font-style:italic}
+.score{font-weight:700;color:var(--green)}
+
+/* match */
+.match{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr);gap:10px 16px}
+@media (max-width:620px){.match{grid-template-columns:1fr}}
+.col{display:flex;flex-direction:column;gap:8px;min-width:0}
+.chip{appearance:none;cursor:pointer;font:inherit;text-align:left;color:var(--ink);background:var(--bg);border:2px solid var(--line);border-radius:12px;padding:9px 14px}
+.chip.word{font-weight:700}
+.chip:hover{border-color:var(--pink)}
+.chip.sel{border-color:var(--pink);background:var(--pink-soft)}
+.chip.ok{border-color:var(--green);background:var(--mint);color:var(--green);cursor:default}
+.chip.no{animation:shake .35s;border-color:var(--bad)}
+@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+
+/* cards */
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:700px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.card{appearance:none;cursor:pointer;font:inherit;color:var(--ink);background:var(--mint);border:2px solid var(--mint-mid);border-radius:18px;min-height:120px;padding:14px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:16px}
+.card:nth-child(even){background:var(--pink-soft);border-color:var(--pink-mid)}
+.card:not(.open){font-family:var(--display);font-size:34px;color:var(--green)}
+.card:nth-child(even):not(.open){color:var(--pink)}
+.card.open{background:var(--paper)}
+.for{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--pink)}
+
+/* rules / qs */
+.rule{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+.rule div{background:var(--bg);border:2px solid var(--line);border-radius:14px;padding:12px 14px}
+.rule strong{font-family:var(--display);font-weight:400;font-size:22px;color:var(--pink);display:block}
+.rule span{font-size:14px;color:var(--muted)}
+.qs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:700px){.qs{grid-template-columns:1fr}}
+.q{background:var(--bg);border:2px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.q .n{font-size:12px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
+.q .s{font-weight:700}
+.opts{display:flex;gap:6px;flex-wrap:wrap}
+.opt{appearance:none;cursor:pointer;font:inherit;font-size:15px;border-radius:10px;padding:6px 12px;background:var(--paper);color:var(--ink);border:2px solid var(--line)}
+.opt:hover{border-color:var(--pink)}
+.opt.ok{background:var(--mint);border-color:var(--green);color:var(--green)}
+.opt.no{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.why{font-size:14px;color:var(--muted)}
+
+/* gifts */
+.gifts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+@media (max-width:760px){.gifts{grid-template-columns:1fr}}
+.gift{background:var(--bg);border:2px solid var(--line);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.box{width:86px;height:76px;margin:4px auto 0;position:relative;border:none;background:none;cursor:pointer;padding:0}
+.box .b{position:absolute;left:6px;right:6px;bottom:0;height:52px;border-radius:6px;background:var(--pink-mid)}
+.box .l{position:absolute;left:0;right:0;top:12px;height:16px;border-radius:5px;background:var(--pink);transition:transform .4s}
+.box .r1{position:absolute;left:50%;top:12px;bottom:0;width:12px;transform:translateX(-50%);background:var(--green)}
+.box .bow{position:absolute;left:50%;top:0;width:34px;height:16px;transform:translateX(-50%);border:5px solid var(--green);border-radius:50% 50% 8px 8px}
+.gift.open .l,.gift.open .bow{transform:translateY(-14px) rotate(-12deg)}
+.gift:nth-child(even) .b{background:var(--mint-mid)} .gift:nth-child(even) .l{background:var(--green)} .gift:nth-child(even) .r1,.gift:nth-child(even) .bow{background:none;border-color:var(--pink)} .gift:nth-child(even) .r1{background:var(--pink)}
+.clue{font-size:15px}
+.clue li{margin-left:-6px}
+.reveal{font-family:var(--display);font-size:22px;color:var(--green);text-align:center}
+
+/* fill */
+.fill{display:flex;flex-direction:column;gap:8px;padding:0;margin:0}
+.fill li{list-style:none;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;padding:10px 14px;border-radius:12px;background:var(--bg);border:2px solid transparent}
+.fill li.ok{border-color:var(--green)}.fill li.no{border-color:var(--bad)}
+select{font:inherit;font-size:16px;color:var(--ink);background:var(--paper);border:2px solid var(--pink-mid);border-radius:8px;padding:3px 8px;max-width:100%}
+.mark{font-size:14px;margin-left:auto}.mark.ok{color:var(--green)}.mark.no{color:var(--bad)}
+
+/* decks */
+.decks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+@media (max-width:700px){.decks{grid-template-columns:1fr}}
+.deck{background:var(--bg);border:2px solid var(--line);border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:12px}
+.deck .q2{font-size:20px;font-weight:700;min-height:3em;line-height:1.35}
+.dtag{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--pink);font-weight:700}
+
+/* letter */
+.book{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+@media (max-width:700px){.book{grid-template-columns:1fr}}
+.note{background:var(--paper);border:2px solid var(--line);border-radius:6px 18px 6px 18px;padding:18px 20px;box-shadow:5px 5px 0 var(--pink-soft)}
+.letter{background:repeating-linear-gradient(180deg,var(--paper) 0 31px,var(--pink-soft) 31px 32px);border:2px solid var(--pink-mid);border-radius:8px;padding:16px 20px 8px}
+textarea{width:100%;min-height:220px;font:inherit;font-size:18px;line-height:32px;color:var(--ink);background:transparent;border:none;resize:vertical;padding:0}
+textarea:focus{outline:none}
+.checks{display:flex;flex-wrap:wrap;gap:8px}
+.check{appearance:none;cursor:pointer;font:inherit;font-size:15px;border-radius:999px;padding:7px 14px;border:2px solid var(--line);background:var(--paper);color:var(--ink)}
+.check[aria-pressed="true"]{background:var(--mint);border-color:var(--green);color:var(--green)}
+.check[aria-pressed="true"]::before{content:"✓ "}
+
+/* finale */
+.finale{background:var(--pink);color:#fff;border-radius:28px;padding:clamp(20px,4vw,36px);display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:center}
+@media (max-width:760px){.finale{grid-template-columns:1fr}}
+.finale h2{color:#fff;font-size:clamp(34px,6vw,58px)}
+.finale img{width:100%;height:auto;display:block}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:50}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<canvas id="confetti" aria-hidden="true"></canvas>
+<div class="wrap">
+  <header class="hero">
+    <div class="txt">
+      <span class="ko">생일 축하해, 디아나!</span>
+      <h1>Happy Birthday, Diana!</h1>
+      <div class="row"><span class="age">24</span><p class="lede">Today's lesson is a party. Six rooms, six candles on the cake. Light them all and make a wish!</p></div>
+      <div><div class="cake" id="cake" aria-label="Rooms finished"></div><span class="cake-label" id="cakeLabel">0 of 6 candles lit</span></div>
+    </div>
+    <img src="img/duo1.webp" alt="Lee Know and Han holding flowers" width="680" height="532">
+  </header>
+
+  <nav class="tags" role="tablist" id="tags"></nav>
+
+  <!-- 1 PARTY -->
+  <section class="room" id="room-party" role="tabpanel">
+    <div class="head"><span class="eyebrow">Room 1</span><h2>Let's party</h2><span class="goal">Birthday vocabulary</span></div>
+    <p class="lede">Click a phrase, then click its meaning.</p>
+    <div class="match"><div class="col" id="bW"></div><div class="col" id="bD"></div></div>
+    <div class="row"><span class="score" id="bScore"></span><button class="btn ghost" id="bReset">Shuffle again</button></div>
+    <div class="block">
+      <h3>Birthday talk</h3>
+      <p class="lede">Open a card and answer. Then ask your partner the same question.</p>
+      <div class="cards" id="bdTalk"></div>
+    </div>
+    <div class="foot"><span class="tip">Next: Ask the Expert</span><button class="btn green" data-done="party">Light a candle</button></div>
+  </section>
+
+  <!-- 2 EXPERT -->
+  <section class="room" id="room-expert" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Room 2</span><h2>Ask the expert</h2><span class="goal">Speaking: Diana tells us everything about Stray Kids</span></div>
+    <div class="block">
+      <h3>Fan words</h3>
+      <p class="lede">K-pop fans have their own English. Match the words. Diana, you're the expert!</p>
+      <div class="match"><div class="col" id="kW"></div><div class="col" id="kD"></div></div>
+      <span class="score" id="kScore"></span>
+    </div>
+    <div class="block">
+      <h3>The interview</h3>
+      <p class="lede"><b>Victoria</b> is the journalist and <b>Diana</b> is the expert. Victoria opens a card and asks; Diana answers in as much detail as she can. Victoria, ask at least one follow-up question each time: <i>Why? Really? What happened next?</i></p>
+      <div class="cards" id="interview"></div>
+    </div>
+    <div class="foot"><span class="tip">Next: Concert Rules</span><button class="btn green" data-done="expert">Light a candle</button></div>
+  </section>
+
+  <!-- 3 CONCERT -->
+  <section class="room" id="room-concert" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Room 3</span><h2>Concert rules</h2><span class="goal">must / have to / mustn't / don't have to</span></div>
+    <div class="rule">
+      <div><strong>must / have to</strong><span>It's necessary.</span></div>
+      <div><strong>mustn't</strong><span>It's forbidden. Don't do it!</span></div>
+      <div><strong>don't have to</strong><span>It isn't necessary. It's your choice.</span></div>
+    </div>
+    <p class="lede">Diana has a ticket to a big concert. Here's the information on the website. Complete it.</p>
+    <ol class="fill" id="rules"></ol>
+    <div class="row"><button class="btn" id="rCheck">Check answers</button><span class="score" id="rScore"></span></div>
+    <div class="block">
+      <h3>Diana's birthday party rules</h3>
+      <p>Together, write five rules for Diana's perfect birthday party: two with <i>must / have to</i>, two with <i>mustn't</i>, one with <i>don't have to</i>. Diana decides if the rules are accepted!</p>
+    </div>
+    <div class="foot"><span class="tip">Next: Mystery Gifts</span><button class="btn green" data-done="concert">Light a candle</button></div>
+  </section>
+
+  <!-- 4 GIFTS -->
+  <section class="room" id="room-gifts" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Room 4</span><h2>Mystery gifts</h2><span class="goal">Modals of deduction: must / might / can't</span></div>
+    <p class="lede">There are six presents for Diana. Read the clues and guess what's inside: "It must be…", "It might be…", "It can't be… because…". Agree on one answer, then open the box!</p>
+    <div class="gifts" id="gifts"></div>
+    <div class="foot"><span class="tip">Next: What if…?</span><button class="btn green" data-done="gifts">Light a candle</button></div>
+  </section>
+
+  <!-- 5 WHAT IF -->
+  <section class="room" id="room-whatif" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Room 5</span><h2>What if…?</h2><span class="goal">First and second conditional</span></div>
+    <div class="rule">
+      <div><strong>If + present, will</strong><span>Real and possible: If it snows tomorrow, I'll stay at home.</span></div>
+      <div><strong>If + past, would</strong><span>Imaginary: If I met my favourite idol, I'd probably cry.</span></div>
+    </div>
+    <div class="qs" id="conds"></div>
+    <span class="score" id="cScore"></span>
+    <div class="decks">
+      <div class="deck"><span class="dtag">Real · first conditional</span><p class="q2" id="d1">Draw a card.</p><button class="btn" id="draw1">Draw a card</button></div>
+      <div class="deck"><span class="dtag">Imagine · second conditional</span><p class="q2" id="d2">Draw a card.</p><button class="btn green" id="draw2">Draw a card</button></div>
+    </div>
+    <p class="tip">Take turns. Answer with a full sentence and add one more detail.</p>
+    <div class="foot"><span class="tip">Next: Dear Friend</span><button class="btn green" data-done="whatif">Light a candle</button></div>
+  </section>
+
+  <!-- 6 DEAR FRIEND -->
+  <section class="room" id="room-letter" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Room 6</span><h2>Dear friend</h2><span class="goal">The Perks of Being a Wallflower · writing a letter</span></div>
+    <div class="book">
+      <div class="note block">
+        <h3>About the book</h3>
+        <p>Diana's favourite book is told through letters. Charlie, a shy and sensitive teenager, writes to an unknown "friend" about his first year of high school. Everything changes when he meets Patrick and his stepsister Sam, who take him into their world of music, parties and real friendship.</p>
+      </div>
+      <div class="block">
+        <h3>Talk about it</h3>
+        <div class="cards" id="bookTalk" style="grid-template-columns:repeat(2,minmax(0,1fr))"></div>
+      </div>
+    </div>
+    <div class="block">
+      <h3>A birthday letter</h3>
+      <p><b>Victoria</b> writes a birthday letter to Diana, like Charlie: it starts with "Dear friend". <b>Diana</b> writes a letter to herself on her 30th birthday: "Dear Diana, …". Use the grammar from today and tick what you use. Then read your letters out loud.</p>
+      <div class="letter"><label for="letterBox" class="eyebrow">Your letter</label><textarea id="letterBox">Dear friend,
+</textarea></div>
+      <div class="checks" id="checks"></div>
+    </div>
+    <div class="foot"><span class="tip">Last room</span><button class="btn green" data-done="letter">Light a candle</button></div>
+  </section>
+
+  <section class="finale" id="finale" hidden>
+    <div class="block"><span class="ko" style="color:#fff">생일 축하해!</span><h2>All 24… well, all 6 candles are lit!</h2><p>Make a wish, Diana. Happy birthday from Polina and Victoria!</p><div class="row"><button class="btn green" id="again">More confetti</button></div></div>
+    <img src="img/duo2.webp" alt="Han whispering to Lee Know" width="736" height="645">
+  </section>
+</div>
+
+<script>
+const ROOMS=[["party","Let's party"],["expert","Ask the expert"],["concert","Concert rules"],["gifts","Mystery gifts"],["whatif","What if…?"],["letter","Dear friend"]];
+const done=new Set();const tags=document.getElementById("tags"),cake=document.getElementById("cake");
+ROOMS.forEach(([id,name],i)=>{const b=document.createElement("button");b.className="tag";b.setAttribute("role","tab");b.id="tag-"+id;
+  b.innerHTML=`<span class="n">${i+1}</span>${name}`;b.onclick=()=>open(id);tags.appendChild(b);
+  const c=document.createElement("span");c.className="candle";c.id="candle-"+id;cake.appendChild(c)});
+function open(id){ROOMS.forEach(([r])=>{document.getElementById("room-"+r).hidden=r!==id;document.getElementById("tag-"+r).setAttribute("aria-selected",r===id)});
+  try{if(location.hash!=="#"+id)history.replaceState(null,"","#"+id)}catch(e){}}
+document.querySelectorAll("[data-done]").forEach(b=>b.onclick=()=>{const id=b.dataset.done;done.add(id);
+  document.getElementById("candle-"+id).classList.add("lit");document.getElementById("tag-"+id).classList.add("done");
+  document.getElementById("cakeLabel").textContent=`${done.size} of ${ROOMS.length} candles lit`;b.textContent="Candle lit";
+  if(done.size===ROOMS.length){document.getElementById("finale").hidden=false;burst(260);setTimeout(()=>document.getElementById("finale").scrollIntoView({behavior:"smooth"}),300);return}
+  const i=ROOMS.findIndex(r=>r[0]===id);if(i<ROOMS.length-1)setTimeout(()=>{open(ROOMS[i+1][0]);window.scrollTo({top:0,behavior:"smooth"})},500)});
+const h=location.hash.slice(1);open(ROOMS.some(r=>r[0]===h)?h:"party");
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+function match(data,wId,dId,sId){let sel=null,ok=0;const W=document.getElementById(wId),D=document.getElementById(dId),S=document.getElementById(sId);W.innerHTML="";D.innerHTML="";S.textContent=`0 / ${data.length}`;
+  shuffle(data).forEach(([w])=>{const b=document.createElement("button");b.className="chip word";b.textContent=w;b.dataset.k=w;
+    b.onclick=()=>{if(b.classList.contains("ok"))return;W.querySelectorAll(".sel").forEach(x=>x.classList.remove("sel"));b.classList.add("sel");sel=b};W.appendChild(b)});
+  shuffle(data).forEach(([w,d])=>{const b=document.createElement("button");b.className="chip";b.textContent=d;
+    b.onclick=()=>{if(!sel||b.classList.contains("ok"))return;
+      if(sel.dataset.k===w){sel.classList.remove("sel");sel.classList.add("ok");b.classList.add("ok");sel=null;ok++;S.textContent=`${ok} / ${data.length}`+(ok===data.length?" — perfect!":"");if(ok===data.length)burst(80)}
+      else{b.classList.add("no");setTimeout(()=>b.classList.remove("no"),400)}};D.appendChild(b)})}
+function flips(elId,list,label){const el=document.getElementById(elId);list.forEach((t,i)=>{const b=document.createElement("button");b.className="card";b.textContent="♡";
+  b.setAttribute("aria-label",label+" "+(i+1));b.onclick=()=>{b.classList.add("open");b.innerHTML=t};el.appendChild(b)})}
+
+/* 1 */
+const BD=[["make a wish","to secretly hope for something before you blow out the candles"],["blow out the candles","to put out the small fires on a birthday cake with your breath"],["throw a party","to organise a party for other people"],["turn 24","to become 24 years old"],["unwrap a present","to take the paper off a gift"],["Many happy returns!","a traditional way to say 'happy birthday'"],["the birthday girl","the person whose birthday it is today"],["a surprise party","a party that the guest of honour doesn't know about"],["make a toast","to say something nice and then drink together"],["celebrate","to do something special because it's an important day"]];
+match(BD,"bW","bD","bScore");document.getElementById("bReset").onclick=()=>match(BD,"bW","bD","bScore");
+flips("bdTalk",["What's the best birthday you've ever had?","Do you prefer a big party or a quiet evening with close friends?","What's the best present you've ever got?","Would you like a surprise party? Why or why not?","What do people in Russia usually do on their birthday?","What was your dream birthday when you were a child?"],"Open birthday question");
+
+/* 2 */
+match([["a bias","your favourite member of a group"],["a comeback","when a group releases new music after a break"],["a fandom","all the fans of a group together"],["a lightstick","a special glowing light that fans hold at concerts"],["a fan chant","words that fans shout together during a song"],["to stan","to be a very big, very loyal fan of someone"],["choreography","the dance moves for a song"],["to debut","to start your career for the first time"]],"kW","kD","kScore");
+flips("interview",['<span><span class="for">Victoria asks</span><br>How did you first discover Stray Kids?</span>','<span><span class="for">Victoria asks</span><br>Who is your bias, and why?</span>','<span><span class="for">Victoria asks</span><br>Who are Minsung? Why do fans love them so much?</span>','<span><span class="for">Victoria asks</span><br>Describe Lee Know and Han in three adjectives each.</span>','<span><span class="for">Victoria asks</span><br>What\'s your favourite song? What is it about?</span>','<span><span class="for">Victoria asks</span><br>Have you ever been to a K-pop concert? Would you like to go?</span>','<span><span class="for">Victoria asks</span><br>What do people get wrong about K-pop fans?</span>','<span><span class="for">Victoria asks</span><br>Which song should Victoria listen to first?</span>','<span><span class="for">Victoria asks</span><br>If you could ask Lee Know and Han one question, what would it be?</span>'],"Open interview card");
+
+/* 3 */
+const RO=["must","have to","mustn't","don't have to"];
+const RULES=[["You","show your ticket at the entrance.",["must","have to"]],["You","bring a lightstick, but it's more fun if you do!",["don't have to"]],["You","bring food or drinks into the hall.",["mustn't"]],["Fans","throw anything onto the stage.",["mustn't"]],["You","arrive early, but the queue is very long, so it's a good idea.",["don't have to"]],["Children under 14","come with an adult.",["must","have to"]],["You","film the whole concert. Enjoy the moment!",["mustn't"]],["You","wear the official T-shirt. Your own outfit is fine.",["don't have to"]]];
+const rEl=document.getElementById("rules");
+RULES.forEach(([a,b],i)=>{const li=document.createElement("li");li.innerHTML=`<span>${a}</span><select id="rule-${i}" aria-label="Rule ${i+1}"><option value="">…</option>${RO.map(o=>`<option>${o}</option>`).join("")}</select><span>${b}</span><span class="mark"></span>`;rEl.appendChild(li)});
+document.getElementById("rCheck").onclick=()=>{let ok=0;RULES.forEach(([, ,ans],i)=>{const li=rEl.children[i],v=li.querySelector("select").value,m=li.querySelector(".mark"),g=ans.includes(v);
+  li.className=v?(g?"ok":"no"):"";m.className="mark "+(g?"ok":"no");m.textContent=!v?"":g?(ans.length>1?"✓ must / have to":"✓"):"try again";if(g)ok++});
+  document.getElementById("rScore").textContent=`${ok} / ${RULES.length}`;if(ok===RULES.length)burst(80)};
+
+/* 4 */
+const GIFTS=[
+ [["It's long and thin, and it lights up.","You can only really use it at a concert.","It isn't a candle."],"A lightstick!"],
+ [["It's small and made of paper.","It has a date, a time and a seat number on it.","It's for a concert in Seoul."],"A concert ticket!"],
+ [["It's soft and it has very long ears.","It doesn't eat anything.","It sits on your bed."],"A bunny plushie!"],
+ [["It's a rectangle and it has pages.","You've already read it, maybe more than once.","It's about letters, friendship and a boy called Charlie."],"A special edition of your favourite book!"],
+ [["It's round and very sweet.","It has 24 small things on top.","You shouldn't keep it for a long time."],"A birthday cake!"],
+ [["It's big, it's soft and you wear it.","It's green and pink.","It's perfect for cold November evenings."],"A cosy hoodie!"]
+];
+const gEl=document.getElementById("gifts");
+GIFTS.forEach(([clues,ans],i)=>{const d=document.createElement("div");d.className="gift";
+  d.innerHTML=`<button class="box" aria-label="Open present ${i+1}"><span class="b"></span><span class="r1"></span><span class="l"></span><span class="bow"></span></button><span class="eyebrow" style="text-align:center">Present ${i+1}</span><ul class="clue">${clues.map(c=>`<li>${c}</li>`).join("")}</ul><p class="reveal" hidden>${ans}</p>`;
+  d.querySelector(".box").onclick=()=>{d.classList.add("open");d.querySelector(".reveal").hidden=false;burst(50)};gEl.appendChild(d)});
+
+/* 5 */
+let ok=0,tried=0;const cEl=document.getElementById("conds");
+[["If it ___ on your birthday, what will you do?",["rains","rained","will rain"],"rains","First conditional: if + present simple."],
+ ["If I ___ Lee Know, I'd ask him about his cats.",["meet","met","will meet"],"met","Second conditional: if + past simple. It's imaginary."],
+ ["If Stray Kids come to Moscow, I ___ two tickets!",["buy","would buy","'ll buy"],"'ll buy","First conditional: a real possibility, so will."],
+ ["If I ___ a K-pop idol, I'd dye my hair pink.",["was","am","will be"],"was","Second conditional. You can also say 'If I were'."],
+ ["If you ___ a wish now, it will come true.",["make","made","would make"],"make","First conditional: if + present simple."],
+ ["If I could live inside a book, I ___ The Perks of Being a Wallflower.",["'ll choose","'d choose","choose"],"'d choose","Second conditional: would + infinitive."]
+].forEach(([s,opts,ans,why],i)=>{const d=document.createElement("div");d.className="q";
+  d.innerHTML=`<span class="n">${i+1}</span><p class="s">${s.replace("___","<u>&nbsp;?&nbsp;</u>")}</p><div class="opts"></div><p class="why" hidden></p>`;
+  const o=d.querySelector(".opts"),w=d.querySelector(".why");let answered=false;
+  opts.forEach(t=>{const b=document.createElement("button");b.className="opt";b.textContent=t;
+    b.onclick=()=>{o.querySelectorAll(".opt").forEach(x=>x.classList.remove("no"));
+      if(t===ans){b.classList.add("ok");w.hidden=false;w.textContent=why;d.querySelector(".s u").innerHTML=`&nbsp;${ans}&nbsp;`;if(!answered){answered=true;tried++;ok++}}
+      else{b.classList.add("no");if(!answered){answered=true;tried++}}
+      document.getElementById("cScore").textContent=`First-try answers: ${ok} / ${tried}`};o.appendChild(b)});
+  cEl.appendChild(d)});
+function deck(list,el,btn){let d=shuffle(list),i=0;document.getElementById(btn).onclick=()=>{if(i>=d.length){d=shuffle(list);i=0}document.getElementById(el).textContent=d[i++]}}
+deck(["If you get money for your birthday, what will you buy?","If the weather is nice this weekend, what will you do?","If Stray Kids announce a new tour, will you try to go?","If you have free time tonight, how will you celebrate?","If your friends throw you a surprise party, how will you react?","If you start a new book this month, what will it be?"],"d1","draw1");
+deck(["If you met Lee Know and Han, what would you say first?","If you could be a member of Stray Kids for one day, what would you do?","If you could live inside any book, which one would you choose?","If you could have any superpower for your birthday, what would it be?","If Charlie from the book wrote you a letter, what would you write back?","If you could celebrate your birthday anywhere in the world, where would you go?","If you could meet your 14-year-old self, what would you tell her?"],"d2","draw2");
+
+/* 6 */
+flips("bookTalk",["Why do you love Patrick and Charlie so much?","What is a 'wallflower'? Are you one?","Which character are you most like: Charlie, Patrick or Sam?","What makes someone a real friend?","Have you seen the film? Is it better or worse than the book?","Who would you recommend this book to, and why?"],"Open book question");
+["must / have to","mustn't / don't have to","must / might / can't","If + present, will","If + past, would","3 birthday words"].forEach(t=>{const b=document.createElement("button");b.className="check";b.textContent=t;b.setAttribute("aria-pressed","false");
+  b.onclick=()=>b.setAttribute("aria-pressed",b.getAttribute("aria-pressed")!=="true");document.getElementById("checks").appendChild(b)});
+
+/* confetti */
+const cv=document.getElementById("confetti"),cx=cv.getContext("2d");let parts=[],raf=null;
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+function size(){cv.width=innerWidth;cv.height=innerHeight}size();addEventListener("resize",size);
+function burst(n){if(reduce)return;const cols=["#e2407e","#f7b6cf","#2f8a5f","#9ad8b8","#ffb02e"];
+  for(let i=0;i<n;i++)parts.push({x:Math.random()*cv.width,y:-20-Math.random()*cv.height*.3,vx:(Math.random()-.5)*2,vy:2+Math.random()*3,r:Math.random()*6.28,vr:(Math.random()-.5)*.2,w:6+Math.random()*6,h:8+Math.random()*8,c:cols[i%cols.length]});
+  if(!raf)tick()}
+function tick(){cx.clearRect(0,0,cv.width,cv.height);parts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;cx.save();cx.translate(p.x,p.y);cx.rotate(p.r);cx.fillStyle=p.c;cx.fillRect(-p.w/2,-p.h/2,p.w,p.h);cx.restore()});
+  parts=parts.filter(p=>p.y<cv.height+20);raf=parts.length?requestAnimationFrame(tick):(cx.clearRect(0,0,cv.width,cv.height),null)}
+document.getElementById("again").onclick=()=>burst(200);
+setTimeout(()=>burst(160),400);
+</script>
+</body>
+</html>
