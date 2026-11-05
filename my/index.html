@@ -14,7 +14,6 @@
 <body>
 <div class="wrap">
   <header class="hero">
-    <span class="eyebrow" id="level">English with Polina</span>
     <h1 id="hello">Hello!</h1>
     <p class="muted" id="sub">Loading your materials…</p>
   </header>
@@ -64,7 +63,6 @@ function card(m,results){
     if(!d||!d.student){msg.hidden=false;msg.textContent="This link doesn't work. Please ask Polina for your personal link.";document.getElementById("sub").textContent="";return}
     document.title=`${d.student.name}'s English`;
     document.getElementById("hello").innerHTML=`Hello, <span>${d.student.name}</span>!`;
-    document.getElementById("level").textContent=`English with Polina · ${d.student.level||""}`;
     const res=d.results||[],mats=d.materials||[];
     const todo=mats.filter(m=>m.activity&&!status(m,res).complete);
     document.getElementById("sub").textContent=todo.length?`You have ${todo.length} thing${todo.length>1?"s":""} to do. Your progress saves automatically.`:"Everything is done. Great job!";
