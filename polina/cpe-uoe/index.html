@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>CPE Use of English</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+[hidden]{display:none!important} body{margin:0}
+
+/* Layout: a "case file" header, pill tabs for the four exam parts, one part at a time. */
+:root{
+  --bg:#f1ece2; --card:#fbf8f2; --paper:#f6efe0; --ink:#1f2433; --muted:#5f6475; --line:#d8cfbd;
+  --navy:#2b3a67; --navy-soft:#2b3a6714; --stamp:#b8402f; --stamp-soft:#b8402f1a;
+  --ok:#2f7a52; --ok-soft:#2f7a521c; --bad:#b8402f; --bad-soft:#b8402f1c;
+  --display:"Fraunces",Georgia,serif;
+  --body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#15171f; --card:#1d2029; --paper:#232631; --ink:#e9e6df; --muted:#a6a9b6; --line:#353948;
+  --navy:#9fb2ec; --navy-soft:#9fb2ec1c; --stamp:#f08a78; --stamp-soft:#f08a7822;
+  --ok:#6cc596; --ok-soft:#6cc59622; --bad:#f08a78; --bad-soft:#f08a7822; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#15171f; --card:#1d2029; --paper:#232631; --ink:#e9e6df; --muted:#a6a9b6; --line:#353948;
+  --navy:#9fb2ec; --navy-soft:#9fb2ec1c; --stamp:#f08a78; --stamp-soft:#f08a7822;
+  --ok:#6cc596; --ok-soft:#6cc59622; --bad:#f08a78; --bad-soft:#f08a7822; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 64px}
+.wrap{max-width:920px;margin:0 auto;display:flex;flex-direction:column;gap:24px}
+h1,h2,h3{font-family:var(--display);margin:0;line-height:1.05;text-wrap:balance}
+h1{font-size:clamp(38px,7vw,62px);font-weight:800;letter-spacing:-.01em}
+h2{font-size:clamp(26px,4vw,34px);font-weight:800}
+p{margin:0}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.lede{color:var(--muted);max-width:64ch}
+.tip{font-size:14px;color:var(--muted);font-style:italic}
+
+/* case-file header */
+.file{position:relative;border:1px solid var(--line);border-radius:6px 18px 18px 18px;padding:30px clamp(20px,4vw,38px) 26px;background:var(--paper);display:flex;flex-direction:column;gap:10px;margin-top:22px}
+.file::before{content:"CASE FILE · C2";position:absolute;top:-22px;left:-1px;font-family:var(--mono);font-size:12px;letter-spacing:.12em;padding:4px 16px;background:var(--paper);border:1px solid var(--line);border-bottom:0;border-radius:10px 10px 0 0;color:var(--muted)}
+.file h1{color:var(--navy)}
+.stamp{position:absolute;right:clamp(14px,4vw,34px);top:20px;font-family:var(--mono);font-weight:600;font-size:13px;letter-spacing:.16em;color:var(--stamp);border:2px solid var(--stamp);border-radius:6px;padding:6px 10px;transform:rotate(-6deg);opacity:.85}
+@media (max-width:560px){.stamp{position:static;align-self:flex-start;transform:none}}
+
+nav.tabs{display:flex;flex-wrap:wrap;gap:8px}
+.tab{appearance:none;cursor:pointer;font:inherit;font-weight:700;font-size:15px;border-radius:999px;padding:8px 16px;border:1px solid var(--line);background:var(--card);color:var(--ink);display:inline-flex;gap:8px;align-items:center}
+.tab:hover{border-color:var(--navy)}
+.tab[aria-selected="true"]{background:var(--navy);border-color:var(--navy);color:var(--card)}
+.tab .best{font-family:var(--mono);font-size:12px;font-weight:500;opacity:.8}
+.tab:focus-visible,.btn:focus-visible,input:focus-visible,.opt:focus-visible{outline:2px solid var(--stamp);outline-offset:2px}
+
+section.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:clamp(20px,4vw,34px);display:flex;flex-direction:column;gap:22px}
+.head{display:flex;flex-direction:column;gap:8px}
+.btn{appearance:none;cursor:pointer;font:inherit;font-weight:700;font-size:16px;border-radius:999px;padding:10px 20px;border:1px solid var(--navy);background:var(--navy);color:var(--card)}
+.btn.ghost{background:transparent;color:var(--navy)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.score{font-family:var(--mono);font-weight:600;color:var(--navy);font-variant-numeric:tabular-nums}
+
+/* reading text with gaps */
+.text{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:18px 20px;line-height:2.1;max-width:72ch}
+.gap{display:inline-block;min-width:3.4em;text-align:center;border-bottom:2px solid var(--navy);font-weight:700;color:var(--navy);padding:0 4px;line-height:1.4}
+.gap .num{font-family:var(--mono);font-size:12px;color:var(--muted);margin-right:3px}
+.gap.ok{border-color:var(--ok);color:var(--ok)}.gap.no{border-color:var(--bad);color:var(--bad)}
+.gap input{width:7.5em;border:0;border-radius:4px;background:var(--card);padding:0 6px;font-weight:700;color:var(--ink);text-align:center}
+
+/* multiple choice cards */
+.qs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:700px){.qs{grid-template-columns:1fr}}
+.q{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.q .n{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.1em}
+.opts{display:flex;gap:6px;flex-wrap:wrap}
+.opt{appearance:none;cursor:pointer;font:inherit;font-size:15px;border-radius:8px;padding:6px 12px;background:var(--card);color:var(--ink);border:1px solid var(--line)}
+.opt:hover{border-color:var(--navy)}
+.opt.ok{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.opt.no{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.why{font-size:14px;color:var(--muted)}
+
+/* typed items (word formation, transformations) */
+.items{display:flex;flex-direction:column;gap:12px;padding:0;margin:0}
+.items li{list-style:none;background:var(--bg);border:1px solid transparent;border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.items li.ok{border-color:var(--ok)}.items li.no{border-color:var(--bad)}
+.items .n{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.1em}
+.key{font-family:var(--mono);font-weight:600;letter-spacing:.08em;color:var(--stamp);background:var(--stamp-soft);border-radius:6px;padding:1px 8px}
+.line{display:flex;flex-wrap:wrap;gap:6px;align-items:baseline}
+input[type=text]{font:inherit;font-size:16px;color:var(--ink);background:var(--card);border:1px solid var(--navy);border-radius:8px;padding:4px 8px;max-width:100%}
+.items input[type=text]{flex:1 1 220px;min-width:0}
+.fb{font-size:14px}
+.fb.ok{color:var(--ok)}.fb.no{color:var(--bad)}
+.fb .ans{font-weight:700}
+.feedback{display:flex;flex-direction:column;gap:6px;padding:0;margin:0}
+.feedback li{list-style:none;font-size:15px;padding:8px 12px;border-radius:10px;background:var(--bg);border-left:3px solid var(--line)}
+.feedback li.ok{border-left-color:var(--ok)}.feedback li.no{border-left-color:var(--bad)}
+.feedback b{font-family:var(--mono);font-size:13px}
+
+.rule{border-left:3px solid var(--stamp);padding:6px 0 6px 14px;font-size:15px;color:var(--muted);max-width:68ch}
+.rule b{color:var(--ink)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.js"></script>
+<script src="../../assets/config.js?v=3"></script>
+<script src="../../assets/portal.js?v=2"></script>
+</head>
+<body>
+<div class="wrap">
+  <header class="file">
+    <span class="stamp">PAPER 1</span>
+    <span class="eyebrow">Reading &amp; Use of English</span>
+    <h1>CPE Use of English</h1>
+    <p class="lede">Four exam parts, original C2 items on psychology and mental health. Do each part, check, read the explanations, and try again until you score 80% or more.</p>
+    <p class="tip" id="saveState"></p>
+  </header>
+
+  <nav class="tabs" role="tablist" id="tabs"></nav>
+
+  <section class="panel" id="p-mc" role="tabpanel">
+    <div class="head"><span class="eyebrow">Part 1 · Multiple-choice cloze</span><h2>Burnout on the ward</h2>
+      <p class="lede">Read the text, then choose A, B, C or D for each gap. Only your first try counts towards the score.</p></div>
+    <p class="text" id="mcText"></p>
+    <div class="qs" id="mc"></div>
+    <div class="row"><span class="score" id="mcScore"></span><button class="btn ghost" id="mcReset">Start again</button></div>
+  </section>
+
+  <section class="panel" id="p-cloze" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Part 2 · Open cloze</span><h2>The first session</h2>
+      <p class="lede">Write <b>one word</b> in each gap. There's no word bank, just like in the exam.</p></div>
+    <p class="text" id="clozeText"></p>
+    <div class="row"><button class="btn" id="clozeCheck">Check answers</button><button class="btn ghost" id="clozeReset">Clear</button><span class="score" id="clozeScore"></span></div>
+    <ul class="feedback" id="clozeFb"></ul>
+  </section>
+
+  <section class="panel" id="p-wordform" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Part 3 · Word formation</span><h2>Change the word</h2>
+      <p class="lede">Use the word in capitals to form a word that fits the gap.</p></div>
+    <p class="rule"><b>4 steps:</b> part of speech → suffix → positive or negative (prefix)? → spelling and plural. Words with <b>-miss-</b> and <b>-cess-</b> take <b>-ible</b> and the prefix <b>in-</b>.</p>
+    <ol class="items" id="wordform"></ol>
+    <div class="row"><button class="btn" id="wfCheck">Check answers</button><button class="btn ghost" id="wfReset">Clear</button><span class="score" id="wfScore"></span></div>
+  </section>
+
+  <section class="panel" id="p-kwt" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Part 4 · Key word transformations</span><h2>Say it another way</h2>
+      <p class="lede">Complete the second sentence so that it means the same as the first. Use <b>3–8 words</b>, including the word in capitals, and don't change that word. A contraction (<i>didn't</i>) counts as two words.</p></div>
+    <p class="rule">Read the second sentence <b>to the end</b> before you write. Your gap has to join up with the words after it.</p>
+    <ol class="items" id="kwt"></ol>
+    <div class="row"><button class="btn" id="kwtCheck">Check answers</button><button class="btn ghost" id="kwtReset">Clear</button><span class="score" id="kwtScore"></span></div>
+  </section>
+</div>
+
+<script>
+const TABS=[["mc","Part 1"],["cloze","Part 2"],["wordform","Part 3"],["kwt","Part 4"]];
+const tabsEl=document.getElementById("tabs");
+TABS.forEach(([id,name])=>{const b=document.createElement("button");b.className="tab";b.setAttribute("role","tab");b.id="t-"+id;b.innerHTML=`${name}<span class="best" id="best-${id}"></span>`;b.onclick=()=>show(id);tabsEl.appendChild(b)});
+function show(id){TABS.forEach(([t])=>{document.getElementById("p-"+t).hidden=t!==id;document.getElementById("t-"+t).setAttribute("aria-selected",t===id)});
+  try{if(location.hash!=="#"+id)history.replaceState(null,"","#"+id)}catch(e){}}
+const h=location.hash.slice(1);show(TABS.some(t=>t[0]===h)?h:"mc");
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+// lower-case, straight apostrophes, single spaces, no final full stop
+const norm=s=>s.toLowerCase().replace(/[’‘`]/g,"'").replace(/\s+/g," ").replace(/[.!?]+$/,"").trim();
+const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+/* portal saving */
+const PT=window.Portal;const canSave=!!(PT&&PT.ready&&PT.code());
+const save=(a,sc,t,d)=>{if(canSave)PT.log("cpe/"+a,sc,t,d)};
+document.getElementById("saveState").textContent=canSave?"Your progress is saved to your portal.":"Tip: open this page from your personal portal link to save your progress.";
+if(canSave)PT.getPortal(PT.code()).then(d=>{const r=(d&&d.results)||{};TABS.forEach(([id])=>{const x=r["cpe/"+id];if(x&&x.total)document.getElementById("best-"+id).textContent=`best ${Math.round(x.best/x.total*100)}%`})}).catch(()=>{});
+
+/* Part 1: multiple-choice cloze */
+const MC_TEXT="Burnout among mental health staff has (1) alarming proportions. Many nurses admit that they (2) their own feelings for months before seeking help. Managers tend to (3) the problem to heavy workloads, yet the causes run deeper. (4) all, people rarely walk away from work they find meaningful. Some clinics have (5) a stand and cut compulsory overtime; others have merely (6) lip service to well-being without changing anything. Staff who feel (7) by their managers are far less likely to resign. (8) the end, keeping experienced people costs far less than replacing them.";
+const MC=[
+ [["reached","arrived","come","got"],"reached","Reach alarming proportions is a fixed collocation. Arrive and come need a preposition (arrive at, come to)."],
+ [["suppressed","oppressed","depressed","compressed"],"suppressed","You suppress feelings (hold them back inside). You oppress people (treat a group cruelly)."],
+ [["attribute","blame","accuse","charge"],"attribute","Attribute something TO a cause. Blame needs ON (blame it on), accuse needs OF, charge needs WITH."],
+ [["After","In","At","Above"],"After","After all = because, don't forget. It gives a reason that supports what came before. It never means 'finally'."],
+ [["taken","made","held","put"],"taken","Take a stand = publicly defend a position or act on a principle."],
+ [["paid","given","made","said"],"paid","Pay lip service to something = say you support it without actually doing anything."],
+ [["valued","valuable","evaluated","invaluable"],"valued","Valued = appreciated as a person. Valuable and invaluable describe things or skills."],
+ [["In","At","By","On"],"In","In the end = finally, after a long process. 'At the end' would need 'of something'."]
+];
+function buildMC(){let ok=0,tried=0,saved=false;const wrong=[];const el=document.getElementById("mc"),sc=document.getElementById("mcScore");el.innerHTML="";sc.textContent="";
+  document.getElementById("mcText").innerHTML=esc(MC_TEXT).replace(/\((\d)\)/g,(m,n)=>`<span class="gap" id="mcg-${n}"><span class="num">${n}</span>&nbsp;</span>`);
+  MC.forEach(([opts,ans,why],k)=>{const d=document.createElement("div");d.className="q";
+    d.innerHTML=`<span class="n">GAP ${k+1}</span><div class="opts"></div><p class="why" hidden></p>`;
+    const o=d.querySelector(".opts"),w=d.querySelector(".why");let answered=false;
+    shuffle(opts).forEach((t,j)=>{const b=document.createElement("button");b.className="opt";b.textContent=`${"ABCD"[j]}  ${t}`;
+      b.onclick=()=>{if(o.querySelector(".ok"))return;o.querySelectorAll(".opt").forEach(x=>x.classList.remove("no"));
+        const g=document.getElementById("mcg-"+(k+1));
+        if(t===ans){b.classList.add("ok");w.hidden=false;w.textContent=why;g.innerHTML=`<span class="num">${k+1}</span>${esc(ans)}`;
+          if(!answered){answered=true;tried++;ok++;g.classList.add("ok")}}
+        else{b.classList.add("no");if(!answered){answered=true;tried++;wrong.push(`${k+1}: ${ans} (not ${t})`);g.classList.add("no")}}
+        sc.textContent=`First-try answers: ${ok} / ${tried}`;
+        if(tried===MC.length&&!saved){saved=true;save("mc",ok,MC.length,{wrong});sc.textContent=`Score: ${ok} / ${MC.length}`+(ok/MC.length>=.8?" ✓ passed":" · aim for 80%")}};o.appendChild(b)});
+    el.appendChild(d)})}
+buildMC();document.getElementById("mcReset").onclick=buildMC;
+
+/* Part 2: open cloze. Each gap: accepted answers + explanation */
+const CLOZE_TEXT="Few experiences are (1) daunting as a first therapy session. Clients often arrive unsure (2) what to expect, and (3) is the therapist's job to put them at ease. It was not (4) I had sat in on dozens of sessions that I understood (5) much depends on the first ten minutes. Rapport is built not so (6) through technique (7) through genuine attention. (8) trust has been established, progress usually follows.";
+const CLOZE=[
+ [["as","so"],"as … as compares two things: few experiences are as daunting as…"],
+ [["of","about"],"unsure of / about something."],
+ [["it"],"Dummy subject: it is someone's job to do something."],
+ [["until","till"],"It was not until… that… emphasises the moment you finally understood."],
+ [["how"],"Indirect question: I understood how much depends… (no inversion!)."],
+ [["much"],"not so much X as Y = it's less about X and more about Y."],
+ [["as"],"The second half of 'not so much X as Y'."],
+ [["once","when"],"Once = as soon as / after. 'If' would change the meaning to a condition."]
+];
+const cText=document.getElementById("clozeText");
+cText.innerHTML=esc(CLOZE_TEXT).replace(/\((\d)\)/g,(m,n)=>`<span class="gap" id="cg-${n}"><span class="num">${n}</span><input type="text" id="cl-${n}" aria-label="Gap ${n}" autocomplete="off" autocapitalize="off" spellcheck="false"></span>`);
+document.getElementById("clozeCheck").onclick=()=>{let n=0;const wrong=[];const fb=document.getElementById("clozeFb");fb.innerHTML="";
+  CLOZE.forEach(([acc,why],k)=>{const v=norm(document.getElementById("cl-"+(k+1)).value),good=acc.includes(v),g=document.getElementById("cg-"+(k+1));
+    g.classList.toggle("ok",good);g.classList.toggle("no",!good);if(good)n++;else wrong.push(`${k+1}: ${acc[0]}${v?` (wrote "${v}")`:""}`);
+    const li=document.createElement("li");li.className=good?"ok":"no";li.innerHTML=`<b>${k+1}</b> ${good?"✓":"✗"} <strong>${esc(acc.join(" / "))}</strong>: ${esc(why)}`;fb.appendChild(li)});
+  document.getElementById("clozeScore").textContent=`${n} / ${CLOZE.length}`+(n/CLOZE.length>=.8?" ✓ passed":"");
+  save("cloze",n,CLOZE.length,{wrong})};
+document.getElementById("clozeReset").onclick=()=>{CLOZE.forEach((_,k)=>{document.getElementById("cl-"+(k+1)).value="";document.getElementById("cg-"+(k+1)).classList.remove("ok","no")});document.getElementById("clozeFb").innerHTML="";document.getElementById("clozeScore").textContent=""};
+
+/* Typed items: Part 3 and Part 4 share one builder */
+function typed(elId,data,checkId,resetId,scoreId,act,render){
+  const el=document.getElementById(elId);
+  data.forEach((it,k)=>{const li=document.createElement("li");li.innerHTML=`<span class="n">${k+1}</span>${render(it,k)}<p class="fb" hidden></p>`;el.appendChild(li);
+    li.querySelector("input").addEventListener("keydown",e=>{if(e.key==="Enter"){const nx=el.children[k+1];if(nx)nx.querySelector("input").focus()}})});
+  document.getElementById(checkId).onclick=()=>{let n=0;const wrong=[];
+    data.forEach((it,k)=>{const li=el.children[k],v=norm(li.querySelector("input").value),acc=it.acc.map(norm),good=acc.includes(v),fb=li.querySelector(".fb");
+      li.className=good?"ok":"no";fb.hidden=false;fb.className="fb "+(good?"ok":"no");
+      fb.innerHTML=(good?"✓ ":`✗ Answer: <span class="ans">${esc(it.acc[0])}</span>. `)+esc(it.why);
+      if(good)n++;else wrong.push(`${it.key||it.stem}: ${it.acc[0]}`)});
+    document.getElementById(scoreId).textContent=`${n} / ${data.length}`+(n/data.length>=.8?" ✓ passed":"");
+    save(act,n,data.length,{wrong})};
+  document.getElementById(resetId).onclick=()=>{[...el.children].forEach(li=>{li.className="";li.querySelector("input").value="";li.querySelector(".fb").hidden=true});document.getElementById(scoreId).textContent=""};
+}
+
+/* Part 3: word formation */
+const WF=[
+ {stem:"ADMIT",a:"The judge ruled that the confession was",b:"because it had been obtained under pressure.",acc:["inadmissible"],why:"Adjective after 'was'; negative meaning → in- + -ible (admit → admission → admissible)."},
+ {stem:"ACCESS",a:"Without a staff pass, the secure ward is completely",b:"to visitors.",acc:["inaccessible"],why:"-cess- words take -ible, and -ible words take in-."},
+ {stem:"ADVISE",a:"Stopping antidepressants suddenly is highly",b:".",acc:["inadvisable"],why:"'Highly' + adjective; the sense is negative (it's a bad idea) → in-advis-able. Drop the final -e."},
+ {stem:"ADVANTAGE",a:"Children from",b:"backgrounds are less likely to receive an early diagnosis.",acc:["disadvantaged"],why:"-ed describes people or places affected by a lack of opportunity. (-ous describes a thing that causes a disadvantage.)"},
+ {stem:"DIAGNOSE",a:"Many autistic women are",b:"with anxiety or depression for years.",acc:["misdiagnosed"],why:"mis- = wrongly. Passive: are + past participle."},
+ {stem:"ADDICT",a:"Many apps are deliberately designed to be highly",b:".",acc:["addictive"],why:"Adjective for something that causes addiction: -ive. (Addicted = the person.)"},
+ {stem:"ALIEN",a:"Feelings of",b:"are common among long-term inpatients.",acc:["alienation"],why:"Abstract noun after 'feelings of': alienate → alienation."},
+ {stem:"ACCEPT",a:"Waiting eighteen months for a first appointment is simply",b:".",acc:["unacceptable"],why:"-able words (not -ible) usually take un-: unacceptable."}
+];
+typed("wordform",WF,"wfCheck","wfReset","wfScore","wordform",(it,k)=>`<div class="line"><span>${esc(it.a)}</span><input type="text" aria-label="Answer ${k+1}" autocomplete="off" autocapitalize="off" spellcheck="false"><span>${esc(it.b)}</span><span class="key">${it.stem}</span></div>`);
+
+/* Part 4: key word transformations. acc = accepted gap fillers (3–8 words) */
+const KWT=[
+ {first:"It was only when she observed him at home that the therapist understood his behaviour.",key:"UNTIL",a:"The therapist did not understand his behaviour",b:"him at home.",
+  acc:["until she observed","until she had observed","until she saw","until she had seen"],why:"not … until = only when. Past perfect is fine but not needed."},
+ {first:"Many patients find it hard to get used to the hospital routine.",key:"ACCUSTOMED",a:"Many patients struggle",b:"the hospital routine.",
+  acc:["to get accustomed to","to become accustomed to","to grow accustomed to"],why:"get / become accustomed TO something. Struggle needs to + infinitive."},
+ {first:"Nobody could say who was responsible for the error.",key:"FAULT",a:"Nobody could say who",b:"the error.",
+  acc:["was at fault for"],why:"AT fault (to blame), never 'in fault'. Then 'for' + the mistake."},
+ {first:"\"Where is the staff room?\" the new intern asked me.",key:"COULD",a:"The new intern asked me if I",b:"the staff room was.",
+  acc:["could tell her where","could tell him where","could tell them where"],why:"Indirect question: where the staff room WAS (statement word order)."},
+ {first:"What she said was really nothing but a refusal.",key:"AMOUNTED",a:"What she said",b:"a refusal.",
+  acc:["amounted to nothing more than","amounted to no more than","amounted to little more than","really amounted to nothing but","amounted to nothing but"],why:"amount to = be equal to. Keep the meaning of 'nothing but' (= only)."},
+ {first:"Despite the criticism, the consultant refused to change her position.",key:"BACK",a:"Despite the criticism, the consultant",b:"down.",
+  acc:["refused to back","would not back","wouldn't back","did not back","didn't back"],why:"back down = give up your position in an argument. (Back out of = withdraw from a deal.)"},
+ {first:"I'd really like to know why the referral was rejected.",key:"WONDER",a:"I",b:"was rejected.",
+  acc:["wonder why the referral","really wonder why the referral","do wonder why the referral"],why:"Indirect question: why the referral WAS rejected, not 'why was the referral'."},
+ {first:"People say that the clinic is about to close.",key:"VERGE",a:"The clinic is said",b:"closure.",
+  acc:["to be on the verge of"],why:"is said to + infinitive, and be on the verge of + noun."}
+];
+typed("kwt",KWT,"kwtCheck","kwtReset","kwtScore","kwt",(it,k)=>`<p>${esc(it.first)}</p><div class="line"><span class="key">${it.key}</span></div><div class="line"><span>${esc(it.a)}</span><input type="text" aria-label="Answer ${k+1}" autocomplete="off" autocapitalize="off" spellcheck="false"><span>${esc(it.b)}</span></div>`);
+</script>
+</body>
+</html>
