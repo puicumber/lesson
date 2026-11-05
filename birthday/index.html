@@ -90,6 +90,17 @@ section.room.p h3{color:var(--green-d)} section.room.g h3{color:var(--pink-d)}
 .mc.got{border-style:dashed;opacity:.75;cursor:default}
 .mc.got.v{box-shadow:inset 0 0 0 4px var(--pink)} .mc.got.d{box-shadow:inset 0 0 0 4px var(--green)}
 
+.learn{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+@media (max-width:820px){.learn{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.lc{appearance:none;cursor:pointer;font:inherit;color:var(--ink);background:var(--pink-l);border:3px solid var(--ink);border-radius:18px;min-height:150px;padding:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;box-shadow:3px 3px 0 var(--ink)}
+.lc:nth-child(even){background:var(--green-l)}
+.lc:hover{transform:translate(-1px,-1px)}
+.lc .le{font-size:34px;letter-spacing:.06em}
+.lc .lp{font-family:var(--display);font-size:20px;line-height:1.1;color:var(--pink-d)}
+.lc:nth-child(even) .lp{color:var(--green-d)}
+.lc.open{background:var(--white);cursor:default;animation:pop .3s ease-out}
+.lc .lm{font-size:14px;font-weight:700}
+.lc .lx{font-size:14px;font-style:italic;color:var(--muted)}
 .emo-card{background:var(--white);border:4px solid var(--ink);border-radius:26px;padding:24px;display:flex;flex-direction:column;gap:16px;align-items:center;text-align:center;box-shadow:6px 6px 0 var(--green)}
 .emo{font-size:clamp(64px,14vw,120px);line-height:1.1;letter-spacing:.08em}
 .hint{font-family:ui-monospace,monospace;font-size:clamp(18px,3vw,26px);font-weight:700;color:var(--green-d);white-space:pre-wrap}
@@ -240,6 +251,12 @@ textarea:focus{outline:none}
   <!-- 1 EMOJI -->
   <section class="room p" id="room-party" role="tabpanel">
     <div class="head"><span class="eyebrow">Game 1</span><h2>Emoji party</h2><span class="goal">Birthday vocabulary</span></div>
+    <div class="block">
+      <h3>First, learn the words</h3>
+      <p class="lede">Open each card. Read the phrase and the example out loud, then say what it means in your own words.</p>
+      <div class="learn" id="learn"></div>
+    </div>
+    <h3>Now play!</h3>
     <p class="lede">Look at the emojis and shout out the birthday phrase! Whoever says it first gets the point. Stuck? Ask for a hint. When the answer is revealed, the winner makes a sentence with it about a real birthday.</p>
     <div class="board"><span class="player v turn">Victoria · <b id="sv">0</b></span><span class="player d turn">Diana · <b id="sd">0</b></span></div>
     <div class="emo-card">
@@ -387,7 +404,8 @@ document.querySelectorAll("[data-done]").forEach(b=>b.onclick=()=>{const id=b.da
 const h0=location.hash.slice(1);open(ROOMS.some(r=>r[0]===h0)?h0:"party");
 const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
 
-/* 1 emoji */
+/* 1 learn + emoji */
+const EX={"blow out the candles":"Diana blew out all the candles in one go!","make a wish":"Close your eyes and make a wish before you blow out the candles.","throw a party":"Victoria is throwing a party for Diana this weekend.","turn 24":"Diana turns 24 today!","unwrap a present":"She unwrapped the present very slowly to make us wait.","make a toast":"Let me make a toast: to Diana!","the birthday girl":"The birthday girl doesn't have to wash the dishes today.","a surprise party":"We're planning a surprise party, so don't tell her!","cut the cake":"The birthday girl usually cuts the cake first.","sing 'Happy Birthday'":"Everyone sang 'Happy Birthday' when the cake came in."};
 const EMO=[["🎂💨🕯️","blow out the candles","put out the little fires on a birthday cake","Who usually helps you blow out the candles?"],
  ["🤫🙏✨","make a wish","secretly hope for something before you blow out the candles","Have any of your birthday wishes come true?"],
  ["🎉🏠👯","throw a party","organise a party for other people","Have you ever thrown a party for a friend?"],
@@ -410,6 +428,9 @@ function pt(k){sc[k]++;document.getElementById("s"+k).textContent=sc[k];burst(20
 document.getElementById("pV").onclick=()=>pt("v");document.getElementById("pD").onclick=()=>pt("d");
 document.getElementById("eNext").onclick=()=>{if(ei<deckE.length-1){ei++;drawE()}else{document.getElementById("eMsg").textContent=sc.v===sc.d?"It's a draw!":`${sc.v>sc.d?"Victoria":"Diana"} wins! ${sc.v}–${sc.d}`;burst(150)}};
 drawE();
+(function(){const el=document.getElementById("learn");EMO.forEach(([e,p,m],i)=>{const b=document.createElement("button");b.className="lc";
+  b.innerHTML=`<span class="le">${e}</span><span class="lp">${p}</span>`;b.setAttribute("aria-label","Learn: "+p);
+  b.onclick=()=>{if(b.classList.contains("open"))return;b.classList.add("open");b.innerHTML=`<span class="lp">${p}</span><span class="lm">${m}</span><span class="lx">${EX[p]}</span>`};el.appendChild(b)})})();
 
 /* 2 fan words + wheel */
 (function(){const data=[["a bias","your favourite member of a group"],["a comeback","new music after a break"],["a fandom","all the fans of a group together"],["a lightstick","a glowing light fans hold at concerts"],["a fan chant","words fans shout together during a song"],["to stan","to be a very big, very loyal fan"]];
