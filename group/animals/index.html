@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Animal Field Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.js"></script>
+<script src="../../assets/config.js?v=4"></script>
+<script src="../../assets/portal.js?v=2"></script>
+<style>
+body{margin:0}
+
+/* Layout: a naturalist's field guide. Leafy header card, pill tabs per exercise, one panel at a time. */
+:root{
+  --bg:#f1f4e8; --card:#fdfdf7; --ink:#1f2a1c; --muted:#5f6b58; --line:#d3dcc4;
+  --leaf:#3f7d2c; --leaf-soft:#3f7d2c18; --sun:#e0a419; --sun-soft:#e0a41924; --sky:#2f7fa8;
+  --ok:#3f7d2c; --ok-soft:#3f7d2c1f; --bad:#c2453d; --bad-soft:#c2453d1c;
+  --display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;
+  --body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#151a13; --card:#1d241a; --ink:#e8eee2; --muted:#a7b39e; --line:#36432f;
+  --leaf:#86c46c; --leaf-soft:#86c46c1f; --sun:#f0c04d; --sun-soft:#f0c04d24; --sky:#6db7dd;
+  --ok:#86c46c; --ok-soft:#86c46c22; --bad:#ef7d74; --bad-soft:#ef7d7422; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#151a13; --card:#1d241a; --ink:#e8eee2; --muted:#a7b39e; --line:#36432f;
+  --leaf:#86c46c; --leaf-soft:#86c46c1f; --sun:#f0c04d; --sun-soft:#f0c04d24; --sky:#6db7dd;
+  --ok:#86c46c; --ok-soft:#86c46c22; --bad:#ef7d74; --bad-soft:#ef7d7422; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 64px}
+.wrap{max-width:940px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+h1,h2,h3{font-family:var(--display);margin:0;line-height:1.05;text-wrap:balance}
+h1{font-size:clamp(40px,7vw,64px);font-weight:800;letter-spacing:-.02em;color:var(--leaf)}
+h2{font-size:clamp(28px,4vw,36px);font-weight:800}
+h3{font-size:21px;font-weight:600}
+p{margin:0}
+.eyebrow{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.lede{color:var(--muted);max-width:64ch}
+.tip{font-size:14px;color:var(--muted);font-style:italic}
+
+.guide{position:relative;border:2px solid var(--leaf);border-radius:20px;padding:26px clamp(20px,4vw,36px);background:var(--card);display:flex;flex-direction:column;gap:10px;overflow:hidden}
+.guide::before{content:"";position:absolute;right:-40px;top:-40px;width:200px;height:200px;border-radius:50%;background:var(--sun-soft)}
+.guide .critters{position:absolute;right:clamp(16px,4vw,34px);top:20px;font-size:clamp(30px,5vw,44px);letter-spacing:.1em}
+@media (max-width:560px){.guide .critters{position:static}}
+
+nav.tabs{display:flex;flex-wrap:wrap;gap:8px}
+.tab{appearance:none;cursor:pointer;font:inherit;font-weight:700;font-size:15px;border-radius:999px;padding:8px 16px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+.tab:hover{border-color:var(--leaf)}
+.tab[aria-selected="true"]{background:var(--leaf);border-color:var(--leaf);color:var(--card)}
+.tab.done::after{content:" ✓"}
+.tab:focus-visible,.btn:focus-visible,.opt:focus-visible,.flash:focus-visible,input:focus-visible,.cat:focus-visible{outline:2px solid var(--sun);outline-offset:2px}
+
+section.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:clamp(20px,4vw,34px);display:flex;flex-direction:column;gap:22px}
+.head{display:flex;flex-direction:column;gap:8px}
+.btn{appearance:none;cursor:pointer;font:inherit;font-weight:700;font-size:16px;border-radius:999px;padding:10px 20px;border:1px solid var(--leaf);background:var(--leaf);color:var(--card)}
+.btn.ghost{background:transparent;color:var(--leaf)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.score{font-weight:700;color:var(--leaf);font-variant-numeric:tabular-nums}
+.bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden}
+.bar span{display:block;height:100%;background:var(--sun);transition:width .3s}
+
+/* flashcards */
+.filters{display:flex;gap:6px;flex-wrap:wrap}
+.filter{appearance:none;cursor:pointer;font:inherit;font-size:14px;border-radius:8px;padding:5px 12px;border:1px solid var(--line);background:transparent;color:var(--muted)}
+.filter[aria-pressed="true"]{border-color:var(--sun);background:var(--sun-soft);color:var(--ink)}
+.flash{appearance:none;cursor:pointer;font:inherit;color:var(--ink);width:100%;min-height:250px;border-radius:18px;border:2px solid var(--line);background:var(--bg);padding:24px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center}
+.flash .em{font-size:clamp(70px,14vw,110px);line-height:1}
+.flash .w{font-family:var(--display);font-size:clamp(32px,6vw,48px);font-weight:800;color:var(--leaf);line-height:1.05}
+.flash .t{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.flash .d{font-size:18px;max-width:44ch}
+.flash.back{border-color:var(--sun)}
+
+/* sort */
+.sort-card{background:var(--bg);border:2px solid var(--line);border-radius:18px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center}
+.sort-card .word{font-family:var(--display);font-size:clamp(34px,6vw,50px);font-weight:800}
+.cats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;width:100%}
+@media (max-width:560px){.cats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.cat{appearance:none;cursor:pointer;font:inherit;font-weight:700;border-radius:14px;padding:14px 8px;border:2px solid var(--line);background:var(--card);color:var(--ink);display:flex;flex-direction:column;gap:4px;align-items:center}
+.cat .ic{font-size:30px}
+.cat:hover{border-color:var(--leaf)}
+.cat.ok{border-color:var(--ok);background:var(--ok-soft)}
+.cat.no{border-color:var(--bad);background:var(--bad-soft);animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.feedback{min-height:1.5em;font-weight:700}
+.feedback.ok{color:var(--ok)}.feedback.no{color:var(--bad)}
+
+/* choose */
+.qs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:700px){.qs{grid-template-columns:1fr}}
+.q{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.q .n{font-size:12px;color:var(--muted);letter-spacing:.1em}
+.q .s{font-weight:700}
+.opts{display:flex;gap:6px;flex-wrap:wrap}
+.opt{appearance:none;cursor:pointer;font:inherit;font-size:15px;border-radius:8px;padding:6px 12px;background:var(--card);color:var(--ink);border:1px solid var(--line)}
+.opt:hover{border-color:var(--leaf)}
+.opt.ok{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.opt.no{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.why{font-size:14px;color:var(--muted)}
+
+/* rules */
+.rule{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.rule div{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:4px}
+.rule strong{font-family:var(--display);font-size:22px;color:var(--leaf)}
+.rule span{font-size:15px}
+.timeline{display:flex;align-items:center;gap:0;margin:4px 0}
+.timeline .pt{font-weight:700;font-size:14px;white-space:nowrap}
+.timeline .ln{flex:1;height:4px;background:linear-gradient(90deg,var(--sun),var(--leaf));border-radius:2px;margin:0 10px;position:relative}
+.timeline .ln::after{content:"";position:absolute;right:-6px;top:-5px;border:7px solid transparent;border-left-color:var(--leaf)}
+
+/* spelling */
+.spell{padding:0;margin:0;display:flex;flex-direction:column;gap:8px}
+.spell li{list-style:none;display:grid;grid-template-columns:56px minmax(0,1fr) 200px auto;gap:10px;align-items:center;padding:10px 14px;border-radius:12px;background:var(--bg);border:1px solid transparent}
+@media (max-width:600px){.spell li{grid-template-columns:44px minmax(0,1fr)}.spell li input{grid-column:1/-1}}
+.spell li.ok{border-color:var(--ok)}.spell li.no{border-color:var(--bad)}
+.spell .em{font-size:34px;text-align:center}
+.hint{font-family:var(--display);font-weight:600;color:var(--sun)}
+input[type=text]{font:inherit;font-size:16px;color:var(--ink);background:var(--card);border:1px solid var(--leaf);border-radius:8px;padding:6px 10px;width:100%}
+.mark{font-size:14px}.mark.ok{color:var(--ok)}.mark.no{color:var(--bad)}
+
+/* talk */
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:700px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.paw{appearance:none;cursor:pointer;font:inherit;color:var(--ink);background:var(--bg);border:2px dashed var(--sun);border-radius:14px;min-height:118px;padding:14px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:15px}
+.paw:not(.open){font-size:36px}
+.paw.open{border-style:solid;border-color:var(--line)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="guide">
+    <span class="critters" aria-hidden="true">🦒🐝🐬</span>
+    <span class="eyebrow">Homework · Animals + present perfect</span>
+    <h1>Animal Field Guide</h1>
+    <p class="lede">Learn 33 animals, then practise the present perfect with <b>for</b> and <b>since</b>. Everything checks itself.</p>
+    <p class="tip" id="saveState"></p>
+  </header>
+
+  <nav class="tabs" role="tablist" id="tabs"></nav>
+
+  <section class="panel" id="p-cards" role="tabpanel">
+    <div class="head"><span class="eyebrow">Step 1</span><h2>Flashcards</h2>
+      <p class="lede">Look at the picture and say the animal out loud. Click to check. "Got it" removes the card; "Again" keeps it.</p></div>
+    <div class="filters" id="filters"></div>
+    <div class="bar"><span id="bar" style="width:0"></span></div>
+    <button class="flash" id="flash"></button>
+    <div class="row"><button class="btn ghost" id="again">Again</button><button class="btn" id="gotit">Got it</button><span class="score" id="fCount"></span><button class="btn ghost" id="fReset" style="margin-left:auto">Start again</button></div>
+  </section>
+
+  <section class="panel" id="p-sort" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Step 2</span><h2>Sort the animals</h2>
+      <p class="lede">Where does each animal belong: insects, farm animals, wild animals or sea animals?</p></div>
+    <div class="sort-card">
+      <span class="eyebrow" id="sNum"></span>
+      <span class="word" id="sWord"></span>
+      <div class="cats" id="cats"></div>
+      <p class="feedback" id="sFb"></p>
+      <button class="btn" id="sNext" hidden>Next animal</button>
+    </div>
+    <span class="score" id="sScore"></span>
+  </section>
+
+  <section class="panel" id="p-spell" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Step 3</span><h2>Spell it</h2>
+      <p class="lede">Type the animal. Careful with the tricky ones! Press Enter or "Check all".</p></div>
+    <ol class="spell" id="spell"></ol>
+    <div class="row"><button class="btn" id="spCheck">Check all</button><span class="score" id="spScore"></span></div>
+  </section>
+
+  <section class="panel" id="p-bite" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Step 4</span><h2>Bite, sting and plurals</h2></div>
+    <div class="rule">
+      <div><strong>sting</strong><span>Bees, wasps and jellyfish sting: they inject venom into your skin.</span></div>
+      <div><strong>bite</strong><span>Mosquitoes, spiders, snakes and all animals with teeth bite.</span></div>
+      <div><strong>irregular plurals</strong><span>one mouse, two <b>mice</b> · one deer, two <b>deer</b> · one sheep, two <b>sheep</b></span></div>
+    </div>
+    <div class="qs" id="bite"></div>
+    <span class="score" id="bScore"></span>
+  </section>
+
+  <section class="panel" id="p-forsince" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Step 5</span><h2>for or since?</h2></div>
+    <div class="rule">
+      <div><strong>for</strong><span>+ a period of time</span><span class="tip">for two weeks, for ten years, for ages, for a long time</span></div>
+      <div><strong>since</strong><span>+ the start of the period</span><span class="tip">since 2015, since last June, since Monday, since I was a child</span></div>
+    </div>
+    <div class="qs" id="forsince"></div>
+    <span class="score" id="fsScore"></span>
+  </section>
+
+  <section class="panel" id="p-pp" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Step 6</span><h2>Present perfect: how long?</h2></div>
+    <div class="rule">
+      <div><strong>It started in the past and is still true now</strong>
+        <div class="timeline"><span class="pt">2015</span><span class="ln"></span><span class="pt">now</span></div>
+        <span>I've <b>had</b> my cat <b>since</b> 2015. = I got her in 2015 and I still have her.</span></div>
+      <div><strong>Not the present simple!</strong><span>✗ I have my cat for ten years.<br>✓ I've had my cat for ten years.</span><span class="tip">Question: How long have you had your cat?</span></div>
+    </div>
+    <div class="qs" id="pp"></div>
+    <span class="score" id="ppScore"></span>
+  </section>
+
+  <section class="panel" id="p-talk" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">For the lesson</span><h2>Talk about it</h2>
+      <p class="lede">Open a card and answer with the present perfect + for or since. Then ask your partner.</p></div>
+    <div class="cards" id="talk"></div>
+  </section>
+</div>
+
+<script>
+const TABS=[["cards","Flashcards"],["sort","Sort"],["spell","Spelling"],["bite","Bite & sting"],["forsince","for / since"],["pp","Present perfect"],["talk","Talk"]];
+const tabsEl=document.getElementById("tabs");
+TABS.forEach(([id,name])=>{const b=document.createElement("button");b.className="tab";b.setAttribute("role","tab");b.id="t-"+id;b.textContent=name;b.onclick=()=>show(id);tabsEl.appendChild(b)});
+function show(id){TABS.forEach(([t])=>{document.getElementById("p-"+t).hidden=t!==id;document.getElementById("t-"+t).setAttribute("aria-selected",t===id)});
+  try{if(location.hash!=="#"+id)history.replaceState(null,"","#"+id)}catch(e){}}
+const h0=location.hash.slice(1);show(TABS.some(t=>t[0]===h0)?h0:"cards");
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const mark=id=>document.getElementById("t-"+id).classList.add("done");
+
+/* portal saving */
+const PT=window.Portal;const canSave=!!(PT&&PT.ready&&PT.code());
+const save=(a,sc,t,d)=>{if(canSave)PT.log("animals/"+a,sc,t,d)};
+document.getElementById("saveState").textContent=canSave?"Your progress is saved to your portal.":"Tip: open this page from your personal portal link to save your progress.";
+
+/* data */
+const A=[
+ ["bee","🐝","insects"],["butterfly","🦋","insects"],["fly","🪰","insects"],["mosquito","🦟","insects"],["spider","🕷️","insects"],["wasp","🐝","insects","a yellow and black insect that stings, but it isn't a bee"],
+ ["bull","🐂","farm"],["chicken","🐔","farm"],["cow","🐄","farm"],["goat","🐐","farm"],["horse","🐴","farm"],["pig","🐖","farm"],["sheep","🐑","farm"],
+ ["bat","🦇","wild"],["bear","🐻","wild"],["bird","🐦","wild"],["camel","🐫","wild"],["crocodile","🐊","wild"],["deer","🦌","wild"],["elephant","🐘","wild"],["giraffe","🦒","wild"],["kangaroo","🦘","wild"],["lion","🦁","wild"],["monkey","🐒","wild"],["mouse","🐁","wild"],["rabbit","🐇","wild"],["rat","🐀","wild"],["snake","🐍","wild"],["tiger","🐅","wild"],
+ ["dolphin","🐬","sea"],["jellyfish","🪼","sea"],["shark","🦈","sea"],["whale","🐋","sea"]
+];
+const CAT={insects:["Insects","🐞"],farm:["Farm animals","🚜"],wild:["Wild animals","🌳"],sea:["Sea animals","🌊"]};
+const NOTE={deer:"Plural: deer (NOT deers)",mouse:"Plural: mice",sheep:"Plural: sheep",bee:"Bees sting.",wasp:"Wasps sting.",jellyfish:"Jellyfish sting.",mosquito:"Mosquitoes bite.",spider:"Spiders bite.",snake:"Snakes bite.",rabbit:"A baby word: bunny"};
+
+/* 1 flashcards */
+let filter="all",known=new Set(store.get("an-known",[])),deck=[],cur=null,flipped=false;
+const filtersEl=document.getElementById("filters");
+[["all","All"],...Object.entries(CAT).map(([k,[l]])=>[k,l])].forEach(([k,l])=>{const b=document.createElement("button");b.className="filter";b.textContent=l;b.setAttribute("aria-pressed",k===filter);
+  b.onclick=()=>{filter=k;filtersEl.querySelectorAll(".filter").forEach(x=>x.setAttribute("aria-pressed",x===b));buildDeck()};filtersEl.appendChild(b)});
+const pool=()=>A.filter(a=>filter==="all"||a[2]===filter);
+let cardTimer=null;const saveCards=()=>{clearTimeout(cardTimer);cardTimer=setTimeout(()=>save("cards",known.size,A.length,{known:[...known]}),2500)};
+function buildDeck(){deck=shuffle(pool().filter(a=>!known.has(a[0])));next()}
+function next(){cur=deck.shift()||null;flipped=false;render()}
+function render(){const f=document.getElementById("flash"),p=pool(),k=p.filter(a=>known.has(a[0])).length;
+  document.getElementById("bar").style.width=(p.length?k/p.length*100:0)+"%";document.getElementById("fCount").textContent=`${k} of ${p.length} learned`;
+  f.classList.toggle("back",flipped);
+  if(!cur){f.innerHTML='<span class="w">All done!</span><span class="d">You know every animal in this set.</span>';if(known.size===A.length)mark("cards");return}
+  const front=cur[3]?`<span class="d">${cur[3]}</span>`:`<span class="em">${cur[1]}</span>`;
+  f.innerHTML=flipped?`${cur[3]?"":`<span class="em">${cur[1]}</span>`}<span class="w">${cur[0]}</span><span class="t">${CAT[cur[2]][0]}</span>${NOTE[cur[0]]?`<span class="d">${NOTE[cur[0]]}</span>`:""}`
+    :`${front}<span class="tip">What's this animal? Click to check.</span>`}
+document.getElementById("flash").onclick=()=>{if(cur){flipped=!flipped;render()}};
+document.getElementById("gotit").onclick=()=>{if(!cur)return;known.add(cur[0]);store.set("an-known",[...known]);saveCards();next()};
+document.getElementById("again").onclick=()=>{if(!cur)return;deck.splice(Math.min(3,deck.length),0,cur);next()};
+document.getElementById("fReset").onclick=()=>{known=new Set();store.set("an-known",[]);saveCards();buildDeck()};
+buildDeck();
+if(canSave)PT.getPortal(PT.code()).then(d=>{const st=d&&d.state&&d.state["animals/cards"];if(st&&st.known){st.known.forEach(k=>known.add(k));store.set("an-known",[...known]);buildDeck()}}).catch(()=>{});
+
+/* 2 sort */
+(function(){const list=shuffle(A);let i=0,ok=0,first=true;const wrong=[];
+  const catsEl=document.getElementById("cats"),fb=document.getElementById("sFb"),nx=document.getElementById("sNext");
+  Object.entries(CAT).forEach(([k,[l,ic]])=>{const b=document.createElement("button");b.className="cat";b.dataset.k=k;b.innerHTML=`<span class="ic">${ic}</span>${l}`;
+    b.onclick=()=>{if(!nx.hidden)return;const a=list[i];
+      if(k===a[2]){b.classList.add("ok");if(first)ok++;fb.className="feedback ok";fb.textContent=`Yes! ${a[0]} → ${CAT[a[2]][0]}`;nx.hidden=false;
+        document.getElementById("sScore").textContent=`First-try answers: ${ok} / ${i+1}`;if(i===list.length-1){nx.textContent="Finished!";save("sort",ok,list.length,{wrong});mark("sort")}}
+      else{if(first){first=false;wrong.push(a[0])}b.classList.add("no");fb.className="feedback no";fb.textContent="Not quite. Try again!";setTimeout(()=>b.classList.remove("no"),500)}};catsEl.appendChild(b)});
+  function draw(){const a=list[i];first=true;document.getElementById("sNum").textContent=`${i+1} / ${list.length}`;document.getElementById("sWord").textContent=a[0];fb.textContent="";nx.hidden=true;
+    catsEl.querySelectorAll(".cat").forEach(c=>c.classList.remove("ok","no"))}
+  nx.onclick=()=>{if(i<list.length-1){i++;draw()}};draw()})();
+
+/* 3 spelling */
+const SP=[["🦟","mosquito"],["🦒","giraffe"],["🦘","kangaroo"],["🐊","crocodile"],["🦋","butterfly"],["🪼","jellyfish"],["🐬","dolphin"],["🐘","elephant"],["🐒","monkey"],["🐫","camel"],["🐋","whale"],["🐔","chicken"]];
+const spEl=document.getElementById("spell");
+function chk(i){const li=spEl.children[i],v=li.querySelector("input").value.trim().toLowerCase(),m=li.querySelector(".mark"),g=v===SP[i][1];
+  li.className=v?(g?"ok":"no"):"";m.className="mark "+(g?"ok":"no");m.textContent=!v?"":g?"✓":"try again";return g}
+SP.forEach(([e,w],i)=>{const li=document.createElement("li");
+  li.innerHTML=`<span class="em" aria-hidden="true">${e}</span><span class="hint">${w[0]}${"_".repeat(w.length-1).split("").join(" ")}</span><input type="text" id="sp-${i}" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Spell animal ${i+1}"><span class="mark"></span>`;
+  li.querySelector("input").addEventListener("keydown",ev=>{if(ev.key==="Enter"){chk(i);const n=document.getElementById("sp-"+(i+1));if(n)n.focus()}});spEl.appendChild(li)});
+document.getElementById("spCheck").onclick=()=>{let n=0;SP.forEach((_,i)=>{if(chk(i))n++});document.getElementById("spScore").textContent=`${n} / ${SP.length}`;
+  save("spell",n,SP.length,{wrong:SP.filter((x,i)=>spEl.children[i].querySelector("input").value.trim().toLowerCase()!==x[1]).map(x=>x[1])});if(n===SP.length)mark("spell")};
+
+/* choose helper */
+function choose(elId,data,scoreId,act){let ok=0,tried=0,saved=false;const wrong=[];const el=document.getElementById(elId);
+  data.forEach(([s,opts,ans,why],i)=>{const d=document.createElement("div");d.className="q";
+    d.innerHTML=`<span class="n">${i+1}</span><p class="s">${s.replace("___","<u>&nbsp;?&nbsp;</u>")}</p><div class="opts"></div><p class="why" hidden></p>`;
+    const o=d.querySelector(".opts"),w=d.querySelector(".why");let answered=false;
+    opts.forEach(t=>{const b=document.createElement("button");b.className="opt";b.textContent=t;
+      b.onclick=()=>{o.querySelectorAll(".opt").forEach(x=>x.classList.remove("no"));
+        if(t===ans){b.classList.add("ok");w.hidden=false;w.textContent=why;d.querySelector(".s u").innerHTML=`&nbsp;${ans}&nbsp;`;if(!answered){answered=true;tried++;ok++}}
+        else{b.classList.add("no");if(!answered){answered=true;tried++;wrong.push(s.replace("___",ans))}}
+        document.getElementById(scoreId).textContent=`First-try answers: ${ok} / ${tried}`;
+        if(tried===data.length&&!saved){saved=true;save(act,ok,data.length,{wrong});mark(act)}};o.appendChild(b)});
+    el.appendChild(d)})}
+
+/* 4 bite */
+choose("bite",[
+ ["Be careful, that bee can ___ you!",["sting","bite"],"sting","Bees sting."],
+ ["I hate summer evenings: the mosquitoes always ___ me.",["bite","sting"],"bite","Mosquitoes bite."],
+ ["Don't swim there! Jellyfish ___.",["sting","bite"],"sting","Jellyfish sting."],
+ ["Most snakes don't ___ unless they're scared.",["bite","sting"],"bite","Snakes bite."],
+ ["There are two little ___ in the kitchen!",["mouses","mice","mices"],"mice","One mouse, two mice."],
+ ["We saw three ___ in the forest.",["deers","deer","deeres"],"deer","The plural of deer is deer."],
+ ["The farmer has fifty ___.",["sheeps","sheep","sheepes"],"sheep","The plural of sheep is sheep."],
+ ["A dog ___ my brother when he was a child.",["bit","stung"],"bit","Dogs have teeth, so they bite. Past: bit."]
+],"bScore","bite");
+
+/* 5 for since */
+choose("forsince",[
+ ["I've had my cat ___ 2019.",["for","since"],"since","2019 is the start."],
+ ["We've known each other ___ three years.",["for","since"],"for","Three years is a period."],
+ ["She's been afraid of spiders ___ she was a child.",["for","since"],"since","'She was a child' is the start."],
+ ["He's lived on a farm ___ ages.",["for","since"],"for","'Ages' is a (very long) period."],
+ ["I haven't seen a real elephant ___ last summer.",["for","since"],"since","'Last summer' is the start."],
+ ["They've had that horse ___ a long time.",["for","since"],"for","A long time is a period."],
+ ["The zoo has been closed ___ Monday.",["for","since"],"since","Monday is the start."],
+ ["My grandmother has had chickens ___ two months.",["for","since"],"for","Two months is a period."],
+ ["I've wanted a dog ___ I moved to this flat.",["for","since"],"since","'I moved' is the start."],
+ ["Diana has loved Stray Kids ___ five years.",["for","since"],"for","Five years is a period."]
+],"fsScore","forsince");
+
+/* 6 present perfect */
+choose("pp",[
+ ["I ___ a dog for five years. His name is Bob.",["have","'ve had","had"],"'ve had","It started 5 years ago and is still true: present perfect."],
+ ["How long ___ your rabbit?",["do you have","have you had","did you have"],"have you had","How long + present perfect."],
+ ["She ___ afraid of snakes since she was six.",["is","has been","was"],"has been","Still afraid now: present perfect of 'be'."],
+ ["We ___ in this house since 2020.",["live","'ve lived","lived"],"'ve lived","Started in 2020, still true: present perfect."],
+ ["I ___ Victoria for ten years. She's my best friend.",["know","'ve known","knew"],"'ve known","'Know' + for: present perfect, not present simple."],
+ ["They ___ a pet since their old cat died.",["haven't had","don't have","didn't have"],"haven't had","Negative present perfect: haven't had."],
+ ["How long ___ vegetarian?",["are you","have you been","were you"],"have you been","How long + have you been…?"],
+ ["My uncle ___ that old horse since 2012.",["has","has had","had"],"has had","He/she/it: has had."],
+ ["I ___ giraffes since I visited Africa as a child.",["love","'ve loved","loved"],"'ve loved","Started then, still true now."],
+ ["How long ___ each other?",["have you known","do you know","did you know"],"have you known","How long have you known…?"]
+],"ppScore","pp");
+
+/* 7 talk */
+const TALK=["Have you got a pet? How long have you had it?","Which animal have you been afraid of since you were a child?","How long have you known each other? How did you meet?","How long have you lived in your flat or house?","Which animal have you wanted to see in real life for a long time?","Have you ever been bitten or stung? What happened?","Which is the most dangerous animal: a shark, a snake or a mosquito?","If you could be any animal for a day, which would you be?","How long have you liked your favourite band or singer?"];
+const tEl=document.getElementById("talk");
+TALK.forEach((t,i)=>{const b=document.createElement("button");b.className="paw";b.textContent="🐾";b.setAttribute("aria-label","Open question "+(i+1));b.onclick=()=>{b.classList.add("open");b.textContent=t};tEl.appendChild(b)});
+</script>
+</body>
+</html>
