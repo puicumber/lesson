@@ -61,7 +61,7 @@
         <label>Title<input id="mTitle" required></label>
         <label>Link<input id="mUrl" type="url" required placeholder="https://"></label>
         <label>Type<select id="mKind"><option value="homework">Homework</option><option value="vocabulary">Vocabulary</option><option value="lesson">Lesson</option><option value="grammar">Grammar</option><option value="practice">Practice</option></select></label>
-        <label>Exercise set (optional)<input id="mAct" placeholder="money"></label>
+        <label>Exercise set<input id="mAct" placeholder="fills in automatically" list="actList"></label><datalist id="actList"></datalist>
         <label>Due (optional)<input id="mDue" type="date"></label>
         <label style="grid-column:1/-1">Note (optional)<input id="mNote"></label>
         <button class="btn" type="submit">Add</button>
@@ -134,6 +134,9 @@ function detail(x){
   $("dWeak").innerHTML=top.length?`<ul>${top.map(([w,n])=>`<li>${w} <span class="muted">· missed ${n}×</span></li>`).join("")}</ul>`:'<p class="muted">Nothing yet.</p>';
   $("detail").scrollIntoView({behavior:"smooth"});
 }
+$("actList").innerHTML=Object.keys(ACT).map(k=>`<option value="${k}">`).join("");
+$("mUrl").addEventListener("input",()=>{const u=$("mUrl").value;if($("mAct").value)return;
+  const k=Object.keys(ACT).find(k=>u.includes("/"+k+"/")||u.includes("/"+k+"-")||u.endsWith("/"+k));if(k)$("mAct").value=k});
 $("dClose").onclick=()=>$("detail").hidden=true;
 $("matForm").onsubmit=async e=>{e.preventDefault();
   const row={student_code:$("mStudent").value,title:$("mTitle").value.trim(),url:$("mUrl").value.trim(),kind:$("mKind").value,activity:$("mAct").value.trim()||null,due:$("mDue").value||null,note:$("mNote").value.trim()||null};

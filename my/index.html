@@ -64,8 +64,9 @@ function card(m,results){
     document.title=`${d.student.name}'s English`;
     document.getElementById("hello").innerHTML=`Hello, <span>${d.student.name}</span>!`;
     const res=d.results||[],mats=d.materials||[];
-    const todo=mats.filter(m=>m.activity&&!status(m,res).complete);
-    document.getElementById("sub").textContent=todo.length?`You have ${todo.length} thing${todo.length>1?"s":""} to do. Your progress saves automatically.`:"Everything is done. Great job!";
+    const todo=mats.filter(m=>(m.activity&&!status(m,res).complete)||(!m.activity&&m.kind==="homework"&&(!m.due||new Date(m.due)>=new Date(new Date().toDateString()))));
+    const tracked=mats.filter(m=>m.activity);
+    document.getElementById("sub").textContent=todo.length?`You have ${todo.length} thing${todo.length>1?"s":""} to do. Your progress saves automatically.`:tracked.length?"Everything is done. Great job!":"Here are your materials.";
     if(todo.length){document.getElementById("todoPanel").hidden=false;todo.forEach(m=>document.getElementById("todo").appendChild(card(m,res)))}
     document.getElementById("libPanel").hidden=false;
     const kinds=["all",...new Set(mats.map(m=>m.kind))];const lib=document.getElementById("lib"),fl=document.getElementById("filters");
