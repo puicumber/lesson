@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Hollow Creek Files</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+body{margin:0}
+
+/* Layout: a night-shift case board. Case files as tabs, each solved file gives one digit of the evidence-locker code. Deliberately dark, single theme. */
+:root{
+  --bg:#12141a; --board:#1b1f28; --file:#e9dcb8; --file-ink:#2b2418; --ink:#e6e8ee; --muted:#9aa1b2; --line:#2d3340;
+  --tape:#f2c230; --red:#d2463c; --red-soft:#d2463c26; --blue:#5aa0e6; --ok:#5fc48a; --ok-soft:#5fc48a26;
+  --type:"Special Elite","Courier New",monospace;
+  --body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55;
+  background-image:radial-gradient(900px 400px at 50% -100px,#5aa0e61a,transparent 70%);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px 64px}
+.wrap{max-width:980px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+h1,h2,h3{font-family:var(--type);font-weight:400;margin:0;line-height:1.1;text-wrap:balance}
+h1{font-size:clamp(38px,7vw,68px);letter-spacing:.02em}
+h2{font-size:clamp(28px,4.4vw,40px)}
+h3{font-size:22px;color:var(--tape)}
+p{margin:0}
+.eyebrow{font-family:var(--type);font-size:14px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.lede{color:var(--muted);max-width:64ch}
+.tip{font-size:14px;color:var(--muted);font-style:italic}
+
+/* tape + header */
+.tape{background:repeating-linear-gradient(-45deg,var(--tape) 0 28px,#1b1b1b 28px 34px);color:#111;font-family:var(--type);font-size:clamp(14px,2.4vw,20px);letter-spacing:.2em;text-align:center;padding:6px 0;transform:rotate(-1.2deg);border-radius:2px;white-space:nowrap;overflow:hidden}
+.tape span{background:var(--tape);padding:0 14px}
+.hero{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:22px;align-items:start}
+@media (max-width:760px){.hero{grid-template-columns:1fr}}
+.hero .txt{display:flex;flex-direction:column;gap:12px}
+.code-panel{background:var(--board);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.digits{display:flex;gap:10px}
+.dg{width:56px;height:68px;border-radius:8px;border:2px dashed var(--line);display:flex;align-items:center;justify-content:center;font-family:var(--type);font-size:38px;color:var(--muted)}
+.dg.on{border-style:solid;border-color:var(--tape);color:var(--tape);background:#f2c23014;animation:flip .5s}
+@keyframes flip{0%{transform:rotateX(90deg)}100%{transform:rotateX(0)}}
+
+/* tabs */
+nav.files{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+@media (max-width:720px){nav.files{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.ftab{appearance:none;cursor:pointer;font:inherit;text-align:left;background:var(--file);color:var(--file-ink);border:none;border-radius:4px 14px 4px 4px;padding:10px 12px 12px;display:flex;flex-direction:column;gap:2px;position:relative;opacity:.72;transition:opacity .15s,transform .15s}
+.ftab .no{font-family:var(--type);font-size:13px;color:#7a6a48}
+.ftab .nm{font-family:var(--type);font-size:17px;line-height:1.15}
+.ftab:hover{opacity:1;transform:translateY(-2px)}
+.ftab[aria-selected="true"]{opacity:1;box-shadow:0 0 0 3px var(--tape)}
+.ftab.done::after{content:"SOLVED";position:absolute;right:6px;bottom:6px;font-family:var(--type);font-size:11px;color:var(--red);border:2px solid var(--red);padding:0 4px;transform:rotate(-8deg)}
+.ftab:focus-visible,.btn:focus-visible,.opt:focus-visible,select:focus-visible,textarea:focus-visible,.card:focus-visible,.key:focus-visible{outline:3px solid var(--tape);outline-offset:2px}
+
+/* rooms */
+section.room{background:var(--board);border:1px solid var(--line);border-radius:18px;padding:clamp(20px,4vw,34px);display:flex;flex-direction:column;gap:24px}
+.head{display:flex;flex-direction:column;gap:8px}
+.goal{display:inline-flex;font-size:14px;font-weight:700;color:#111;background:var(--tape);border-radius:4px;padding:3px 10px;width:fit-content}
+.block{display:flex;flex-direction:column;gap:12px}
+.memo{background:var(--file);color:var(--file-ink);border-radius:4px;padding:46px 22px 20px;font-family:var(--type);font-size:17px;line-height:1.6;position:relative;box-shadow:0 10px 26px #0007;max-width:72ch}
+.memo .stamp{position:absolute;right:16px;top:10px;color:var(--red);border:3px solid var(--red);font-size:16px;padding:2px 8px;transform:rotate(8deg);opacity:.85}
+.memo p+p{margin-top:10px}
+.btn{appearance:none;cursor:pointer;font:inherit;font-weight:700;font-size:16px;border-radius:8px;padding:10px 20px;border:2px solid var(--tape);background:var(--tape);color:#111}
+.btn.ghost{background:transparent;color:var(--tape)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.foot{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;border-top:1px dashed var(--line);padding-top:18px;align-items:center}
+.score{font-weight:700;color:var(--tape)}
+.found{font-family:var(--type);font-size:20px;color:var(--tape)}
+
+/* rules */
+.rule{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.rule div{background:var(--bg);border:1px solid var(--line);border-left:4px solid var(--blue);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:4px}
+.rule strong{font-family:var(--type);font-weight:400;font-size:19px;color:var(--blue)}
+.rule span{font-size:15px}
+.rule em{font-size:14px;color:var(--muted)}
+
+/* fill */
+.fill{display:flex;flex-direction:column;gap:8px;padding:0;margin:0}
+.fill li{list-style:none;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;padding:10px 14px;border-radius:10px;background:var(--bg);border:1px solid transparent}
+.fill li.ok{border-color:var(--ok)}.fill li.no{border-color:var(--red)}
+.fill .t{font-family:var(--type);color:var(--muted);font-size:14px;min-width:4.5em}
+select{font:inherit;font-size:16px;color:var(--ink);background:var(--board);border:1px solid var(--tape);border-radius:6px;padding:3px 8px;max-width:100%}
+.mark{font-size:14px;margin-left:auto}.mark.ok{color:var(--ok)}.mark.no{color:var(--red)}
+
+/* choose */
+.qs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:700px){.qs{grid-template-columns:1fr}}
+.q{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.q .n{font-family:var(--type);font-size:13px;color:var(--muted)}
+.q .s{font-weight:700}
+.opts{display:flex;gap:6px;flex-wrap:wrap}
+.opt{appearance:none;cursor:pointer;font:inherit;font-size:15px;border-radius:8px;padding:6px 12px;background:var(--board);color:var(--ink);border:1px solid var(--line)}
+.opt:hover{border-color:var(--tape)}
+.opt.ok{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.opt.no{background:var(--red-soft);border-color:var(--red);color:var(--red)}
+.why{font-size:14px;color:var(--muted)}
+
+/* cards */
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:700px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.card{appearance:none;cursor:pointer;font:inherit;color:var(--file-ink);background:var(--file);border:none;border-radius:4px;min-height:120px;padding:14px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:15px;font-weight:700;box-shadow:0 6px 16px #0006;transform:rotate(-1deg)}
+.card:nth-child(even){transform:rotate(1.2deg)}
+.card:not(.open){font-family:var(--type);font-size:20px;font-weight:400;color:#7a6a48}
+.card.open{background:#fff8e6}
+
+/* chain */
+.chain{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.chain .start{font-family:var(--type);font-size:20px;color:var(--tape)}
+
+/* locker */
+.locker{display:grid;grid-template-columns:auto minmax(0,1fr);gap:24px;align-items:center}
+@media (max-width:700px){.locker{grid-template-columns:1fr;justify-items:center}}
+.safe{width:260px;max-width:100%;background:#2a2f3a;border:4px solid #3a4150;border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:12px;align-items:center;box-shadow:inset 0 0 30px #0008}
+.screen{width:100%;background:#0b0d10;border:2px solid #3a4150;border-radius:8px;font-family:var(--type);font-size:34px;letter-spacing:.3em;text-align:center;color:var(--ok);padding:6px 0;min-height:56px}
+.screen.bad{color:var(--red);animation:shake .4s}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.keys{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%}
+.key{appearance:none;cursor:pointer;font-family:var(--type);font-size:24px;background:#3a4150;color:var(--ink);border:none;border-radius:8px;padding:10px 0}
+.key:active{background:var(--tape);color:#111}
+.diary{background:var(--file);color:var(--file-ink);font-family:var(--type);border-radius:4px;padding:22px;line-height:1.7;box-shadow:0 10px 26px #0007;animation:flip .6s}
+.letter{background:var(--file);border-radius:4px;padding:14px 18px}
+textarea{width:100%;min-height:180px;font-family:var(--type);font-size:17px;line-height:1.6;color:var(--file-ink);background:transparent;border:none;resize:vertical}
+textarea:focus{outline:none}
+.checks{display:flex;flex-wrap:wrap;gap:8px}
+.check{appearance:none;cursor:pointer;font:inherit;font-size:15px;border-radius:999px;padding:6px 14px;border:1px solid var(--line);background:transparent;color:var(--ink)}
+.check[aria-pressed="true"]{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.check[aria-pressed="true"]::before{content:"✓ "}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="tape" aria-hidden="true"><span>CRIME SCENE · DO NOT CROSS · CRIME SCENE · DO NOT CROSS · CRIME SCENE · DO NOT CROSS</span></div>
+  <header class="hero">
+    <div class="txt">
+      <span class="eyebrow">Case file for Detective Denis · 31 October</span>
+      <h1>The Hollow Creek Files</h1>
+      <p class="lede">At midnight on Halloween, the keeper of the old clock tower disappeared. The only witness is a ghost. Solve each file to find one digit of the code, then open the evidence locker.</p>
+    </div>
+    <div class="code-panel">
+      <span class="eyebrow">Evidence locker code</span>
+      <div class="digits" id="digits"></div>
+      <span class="tip">Hint: every ghost knows this date.</span>
+    </div>
+  </header>
+
+  <nav class="files" role="tablist" id="files"></nav>
+
+  <!-- 1 BRIEFING -->
+  <section class="room" id="room-brief" role="tabpanel">
+    <div class="head"><span class="eyebrow">File 01</span><h2>Night briefing</h2><span class="goal">Warm-up</span></div>
+    <div class="memo"><span class="stamp">URGENT</span>
+      <p>Hollow Creek, 31 October. 23:47. A call from the old clock tower: the keeper, Mr Abel Finch, isn't answering his phone. The tower door is open. The clock has stopped at exactly midnight.</p>
+      <p>Before you go in, Detective, a few questions.</p></div>
+    <div class="cards" id="briefCards"></div>
+    <div class="foot"><span class="tip">Next: the crime scene</span><button class="btn" data-done="brief">Close the file</button></div>
+  </section>
+
+  <!-- 2 SCENE -->
+  <section class="room" id="room-scene" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">File 02</span><h2>The crime scene</h2><span class="goal">Prepositions of time and place: at / in / on</span></div>
+    <div class="rule">
+      <div><strong>at</strong><span>a point: at midnight, at 11:47, at night, at the bus stop, at the end of the corridor</span></div>
+      <div><strong>in</strong><span>inside or a longer period: in the corner of the room, in the mud, in Hollow Creek, in the morning, in time</span></div>
+      <div><strong>on</strong><span>a surface, a day or a line: on the door, on the top floor, on the corner of two streets, on Halloween night, on time</span></div>
+    </div>
+    <div class="block">
+      <h3>The officer's report has gaps. Fill them in.</h3>
+      <ol class="fill" id="report"></ol>
+      <div class="row"><button class="btn" id="repCheck">Check the report</button><span class="score" id="repScore"></span></div>
+    </div>
+    <div class="block">
+      <h3>Your alibi, please</h3>
+      <p>Where were you, and what were you doing, at these times? Answer like a suspect: "At 9 p.m. on Friday I was in…"</p>
+      <div class="cards" id="alibi"></div>
+    </div>
+    <div class="foot"><span class="tip">Next: the witnesses</span><button class="btn" data-done="scene">Close the file</button></div>
+  </section>
+
+  <!-- 3 WITNESSES -->
+  <section class="room" id="room-witness" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">File 03</span><h2>The witnesses</h2><span class="goal">Conditionals: zero, first, second, third</span></div>
+    <div class="rule">
+      <div><strong>Zero</strong><span>If + present, present</span><em>Always true: If you touch the clock, it stops.</em></div>
+      <div><strong>First</strong><span>If + present, will</span><em>Real future: If he calls, I'll tell you.</em></div>
+      <div><strong>Second</strong><span>If + past, would</span><em>Imaginary now: If I were a ghost, I'd haunt the station.</em></div>
+      <div><strong>Third</strong><span>If + past perfect, would have + p.p.</span><em>Imaginary past: If he had locked the door, nobody would have got in.</em></div>
+    </div>
+    <div class="block">
+      <h3>Statements from the night</h3>
+      <div class="qs" id="conds"></div>
+      <span class="score" id="cScore"></span>
+    </div>
+    <div class="block">
+      <h3>Chain of events</h3>
+      <p>Third conditional chain: take the result and make it the next "if". Take turns until someone gets stuck. <i>If the keeper hadn't gone up the tower, he wouldn't have heard the music. If he hadn't heard the music, …</i></p>
+      <div class="chain"><span class="eyebrow">Start with</span><p class="start" id="chainStart"></p><div class="row"><button class="btn ghost" id="chainNew">Another start</button></div></div>
+    </div>
+    <div class="block">
+      <h3>Interrogation room</h3>
+      <p class="lede">Open a card and answer. Watch the conditional type!</p>
+      <div class="cards" id="interro"></div>
+    </div>
+    <div class="foot"><span class="tip">Next: the ghost</span><button class="btn" data-done="witness">Close the file</button></div>
+  </section>
+
+  <!-- 4 GHOST -->
+  <section class="room" id="room-ghost" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">File 04</span><h2>The ghost's confession</h2><span class="goal">wish + past simple / would / past perfect</span></div>
+    <div class="rule">
+      <div><strong>wish + past simple</strong><span>The present: I want it to be different, but it isn't.</span><em>I wish I had a warm coat. I wish I were alive. I wish I could leave.</em></div>
+      <div><strong>wish + would</strong><span>Things that annoy us. We want someone else to change.</span><em>I wish the bats would stop screaming. (Not about yourself!)</em></div>
+      <div><strong>wish + past perfect</strong><span>Past regrets. It's too late now.</span><em>I wish I hadn't opened that door in 1926.</em></div>
+    </div>
+    <div class="memo"><span class="stamp">TRANSCRIPT</span><p>The ghost of Officer Edmund Grey, who has haunted the tower since 1926, agreed to talk. He has a lot of wishes. Complete what he said.</p></div>
+    <div class="qs" id="wishes"></div>
+    <span class="score" id="wScore"></span>
+    <div class="block">
+      <h3>Your turn: your wishes</h3>
+      <p class="lede">Open a card and answer with the right wish form. Explain why.</p>
+      <div class="cards" id="myWishes"></div>
+    </div>
+    <div class="foot"><span class="tip">Next: open the locker</span><button class="btn" data-done="ghost">Close the file</button></div>
+  </section>
+
+  <!-- 5 LOCKER -->
+  <section class="room" id="room-locker" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">File 05</span><h2>The evidence locker</h2><span class="goal">Enter the code</span></div>
+    <div class="locker">
+      <div class="safe">
+        <div class="screen" id="screen">____</div>
+        <div class="keys" id="keys"></div>
+      </div>
+      <div class="block">
+        <p class="lede">Use the four digits from the solved files. Wrong code? Check which files you haven't closed yet.</p>
+        <div class="diary" id="diary" hidden>
+          <p><b>Abel Finch's notebook, last page.</b></p>
+          <p>"If you're reading this, I'm safe. I'm in the room behind the clock face. I found my great-grandfather's badge there: Officer Edmund Grey, 1926. He's been trying to tell me something for years, and tonight I finally listened. He wishes he had solved his last case. I wish I had believed him earlier. The answer is in the clock. If you stop it at midnight, he can finally rest."</p>
+        </div>
+      </div>
+    </div>
+    <div class="block" id="closeCase" hidden>
+      <h3>Close the case</h3>
+      <p>Write the final report (5–6 sentences): what happened, where and when, and what the ghost wishes. Use at least one wish and one conditional, then read it out loud.</p>
+      <div class="letter"><label for="report-text" class="eyebrow" style="color:#7a6a48">Final report</label><textarea id="report-text">On Halloween night, at 23:47, …</textarea></div>
+      <div class="checks" id="checks"></div>
+    </div>
+  </section>
+</div>
+
+<script>
+const FILES=[["brief","Night briefing","1"],["scene","Crime scene","0"],["witness","Witnesses","3"],["ghost","The ghost","1"],["locker","Evidence locker",null]];
+const CODE="1031";const done=new Set();
+const filesEl=document.getElementById("files"),dg=document.getElementById("digits");
+FILES.forEach(([id,name,d],i)=>{const b=document.createElement("button");b.className="ftab";b.setAttribute("role","tab");b.id="f-"+id;
+  b.innerHTML=`<span class="no">FILE 0${i+1}</span><span class="nm">${name}</span>`;b.onclick=()=>open(id);filesEl.appendChild(b);
+  if(d){const s=document.createElement("span");s.className="dg";s.id="dg-"+id;s.textContent="?";dg.appendChild(s)}});
+function open(id){FILES.forEach(([r])=>{document.getElementById("room-"+r).hidden=r!==id;document.getElementById("f-"+r).setAttribute("aria-selected",r===id)});
+  try{if(location.hash!=="#"+id)history.replaceState(null,"","#"+id)}catch(e){}}
+document.querySelectorAll("[data-done]").forEach(b=>b.onclick=()=>{const id=b.dataset.done,f=FILES.find(x=>x[0]===id);done.add(id);
+  const d=document.getElementById("dg-"+id);d.textContent=f[2];d.classList.add("on");document.getElementById("f-"+id).classList.add("done");
+  b.outerHTML=`<span class="found">Evidence found: ${f[2]}</span>`;
+  const i=FILES.findIndex(x=>x[0]===id);setTimeout(()=>{open(FILES[i+1][0]);window.scrollTo({top:0,behavior:"smooth"})},1200)});
+const h0=location.hash.slice(1);open(FILES.some(f=>f[0]===h0)?h0:"brief");
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+function cards(elId,list,label){const el=document.getElementById(elId);list.forEach((t,i)=>{const b=document.createElement("button");b.className="card";b.textContent="CASE NOTE "+(i+1);
+  b.setAttribute("aria-label",label+" "+(i+1));b.onclick=()=>{b.classList.add("open");b.textContent=t};el.appendChild(b)})}
+function choose(elId,data,scoreId){let ok=0,tried=0;const el=document.getElementById(elId);
+  data.forEach(([s,opts,ans,why],i)=>{const d=document.createElement("div");d.className="q";
+    d.innerHTML=`<span class="n">#${String(i+1).padStart(2,"0")}</span><p class="s">${s.replace("___","<u>&nbsp;?&nbsp;</u>")}</p><div class="opts"></div><p class="why" hidden></p>`;
+    const o=d.querySelector(".opts"),w=d.querySelector(".why");let answered=false;
+    opts.forEach(t=>{const b=document.createElement("button");b.className="opt";b.textContent=t;
+      b.onclick=()=>{o.querySelectorAll(".opt").forEach(x=>x.classList.remove("no"));
+        if(t===ans){b.classList.add("ok");w.hidden=false;w.textContent=why;d.querySelector(".s u").innerHTML=`&nbsp;${ans}&nbsp;`;if(!answered){answered=true;tried++;ok++}}
+        else{b.classList.add("no");if(!answered){answered=true;tried++}}
+        document.getElementById(scoreId).textContent=`First-try answers: ${ok} / ${tried}`};o.appendChild(b)});
+    el.appendChild(d)})}
+
+/* 1 */
+cards("briefCards",["What's the creepiest place you've ever been to at night?","Which video game has scared you the most? Why?","Do you prefer horror games or horror films?","Night shifts or day shifts: which do you prefer, and why?","Have you ever heard a sound you couldn't explain?","If you were a detective in a game, what would your special skill be?"],"Open briefing question");
+
+/* 2 */
+const REP=[["23:47","The call came in","11:47 p.m.","at"],["","The tower stands","the corner of Mill Street and Bridge Road.","on"],["","It all happened","Halloween night.","on"],["","The clock stopped exactly","midnight.","at"],["","We arrived just","time to see a light go out.","in"],["","The light was","the top floor.","on"],["","A note was pinned","the door: \"Don't stop the clock.\"","on"],["","Fresh footprints were found","the mud by the gate.","in"],["","An old lamp was still warm","the corner of the keeper's room.","in"],["","A locked door was","the end of the corridor.","at"],["","Mr Finch usually works","night and sleeps during the day.","at"],["","He has lived","Hollow Creek since 1998.","in"]];
+const repEl=document.getElementById("report");
+REP.forEach(([t,a,b],i)=>{const li=document.createElement("li");li.innerHTML=`<span>${a}</span><select id="rep-${i}" aria-label="Gap ${i+1}"><option value="">…</option><option>at</option><option>in</option><option>on</option></select><span>${b}</span><span class="mark"></span>`;repEl.appendChild(li)});
+document.getElementById("repCheck").onclick=()=>{let n=0;REP.forEach(([,,,ans],i)=>{const li=repEl.children[i],v=li.querySelector("select").value,m=li.querySelector(".mark"),g=v===ans;
+  li.className=v?(g?"ok":"no"):"";m.className="mark "+(g?"ok":"no");m.textContent=!v?"":g?"✓":"check again";if(g)n++});document.getElementById("repScore").textContent=`${n} / ${REP.length}`};
+cards("alibi",["at 9 p.m. last Friday","on the morning of your last birthday","in the summer of 2020","at the weekend","on New Year's Eve","in the middle of last night"],"Open alibi card");
+
+/* 3 */
+choose("conds",[
+ ["In this town, if a black cat crosses your path, people ___ you're cursed.",["say","will say","would say"],"say","Zero: a general truth, present + present."],
+ ["If you ___ the tower at night, you always hear strange music.",["visit","will visit","visited"],"visit","Zero: always true, present + present."],
+ ["If the clock ___ midnight again tonight, I'll call you immediately.",["strikes","will strike","struck"],"strikes","First: if + present simple, will."],
+ ["Unless you ___ me the truth, I'll have to arrest you.",["tell","will tell","told"],"tell","First with unless (= if not): present simple."],
+ ["If we don't find the keeper tonight, his family ___ terribly worried.",["will be","would be","is"],"will be","First: a real possibility, so will."],
+ ["If I ___ a ghost, I'd haunt the police station.",["were","am","had been"],"were","Second: imaginary present, if + past (were)."],
+ ["What would you do if you ___ a ghost on patrol tonight?",["met","meet","had met"],"met","Second: if + past simple, would."],
+ ["If the guard hadn't fallen asleep, he ___ the thief.",["would have seen","would see","will see"],"would have seen","Third: imaginary past, would have + past participle."],
+ ["If Mr Finch ___ the door, nobody would have got in.",["had locked","locked","would lock"],"had locked","Third: if + past perfect."],
+ ["We ___ the case faster if the witness had told the truth.",["would have solved","would solve","solved"],"would have solved","Third: would have + past participle."]
+],"cScore");
+const STARTS=["If the keeper hadn't gone up the tower, …","If the clock hadn't stopped at midnight, …","If the ghost hadn't opened the door in 1926, …","If I hadn't become a police officer, …","If I hadn't played that game last night, …"];
+let si=0;const startsS=shuffle(STARTS);document.getElementById("chainStart").textContent=startsS[0];
+document.getElementById("chainNew").onclick=()=>{si=(si+1)%startsS.length;document.getElementById("chainStart").textContent=startsS[si]};
+cards("interro",["What happens if you don't sleep for 24 hours? (zero)","If you have a free evening this week, what will you do? (first)","What would you do if you found a ghost in your flat? (second)","If you could live inside any video game, which would you choose? (second)","What would you have done if you hadn't joined the police? (third)","If you had been born 100 years ago, what job would you have had? (third)"],"Open interrogation card");
+
+/* 4 */
+choose("wishes",[
+ ["I'm always freezing. I wish I ___ a warm coat.",["had","would have","had had"],"had","Present situation: wish + past simple."],
+ ["I wish I ___ alive again, just for one day.",["were","would be","had been"],"were","Present: wish + past simple (were)."],
+ ["I've been stuck in this tower for 100 years. I wish I ___ leave it.",["could","would","can"],"could","Present ability: wish + could."],
+ ["I wish those bats ___ screaming every night. It drives me crazy!",["would stop","stopped","had stopped"],"would stop","Annoying behaviour of others: wish + would."],
+ ["I wish tourists ___ taking selfies in my tower.",["would stop","stop","had stopped"],"would stop","Annoyance: we want them to change: would."],
+ ["I wish the new keeper ___ his music so loud.",["wouldn't play","didn't play","hadn't played"],"wouldn't play","Annoyance: wish + wouldn't."],
+ ["I wish I ___ that door in 1926.",["hadn't opened","didn't open","wouldn't open"],"hadn't opened","Past regret: wish + past perfect."],
+ ["I wish I ___ my wife goodbye that night.",["had said","said","would say"],"had said","Past regret: wish + past perfect."],
+ ["I wish I ___ my last case before I died.",["had solved","solved","would solve"],"had solved","Past regret: wish + had + past participle."],
+ ["If only I ___ the stairs that night!",["hadn't climbed","didn't climb","wouldn't climb"],"hadn't climbed","If only = I wish (stronger). Past regret: past perfect."]
+],"wScore");
+cards("myWishes",["Something you wish you had right now","Something at work you wish people would stop doing","A skill you wish you could learn instantly","A game you wish you had played earlier, or never played","Something about your city you wish were different","A decision you wish you had made differently (only if you're happy to share!)"],"Open wish card");
+
+/* 5 */
+let entry="";const scr=document.getElementById("screen"),keys=document.getElementById("keys");
+function upd(){scr.textContent=(entry+"____").slice(0,4);scr.classList.remove("bad")}
+["1","2","3","4","5","6","7","8","9","C","0","OK"].forEach(k=>{const b=document.createElement("button");b.className="key";b.textContent=k;b.setAttribute("aria-label",k==="C"?"Clear":k==="OK"?"Enter":k);
+  b.onclick=()=>{if(k==="C"){entry="";upd();return}
+    if(k==="OK"){if(entry===CODE){scr.textContent="OPEN";document.getElementById("diary").hidden=false;document.getElementById("closeCase").hidden=false;document.getElementById("f-locker").classList.add("done")}
+      else{scr.textContent="DENIED";scr.classList.add("bad");entry="";setTimeout(upd,900)}return}
+    if(entry.length<4){entry+=k;upd()}};keys.appendChild(b)});
+upd();
+["a wish + past simple","a wish + would","a wish + past perfect","a conditional","at / in / on for time","at / in / on for place"].forEach(t=>{const b=document.createElement("button");b.className="check";b.textContent=t;b.setAttribute("aria-pressed","false");
+  b.onclick=()=>b.setAttribute("aria-pressed",b.getAttribute("aria-pressed")!=="true");document.getElementById("checks").appendChild(b)});
+</script>
+</body>
+</html>
