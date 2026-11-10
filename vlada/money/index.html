@@ -122,9 +122,9 @@ select,input[type=text]{font:inherit;font-size:16px;color:var(--ink);background:
 .coin.open{border-style:solid;border-color:var(--line)}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.js"></script>
 <script src="../../assets/config.js?v=4"></script>
-<script src="../../assets/portal.js?v=2"></script>
+<script src="../../assets/portal.js?v=3"></script>
+<script src="../../assets/track.js?v=2"></script>
 </head>
 <body>
 <div class="wrap">
@@ -200,10 +200,9 @@ const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math
 const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 
 /* portal saving */
-const PT=window.Portal;const canSave=!!(PT&&PT.ready&&PT.code());
-const save=(a,sc,t,d)=>{if(canSave)PT.log("money/"+a,sc,t,d)};
-document.getElementById("saveState").textContent=canSave?"Your progress is saved to your portal.":"Tip: open this page from your personal portal link to save your progress.";
-let cardTimer=null;const saveCards=()=>{clearTimeout(cardTimer);cardTimer=setTimeout(()=>save("cards",known.size,WORDS.length,{known:[...known]}),2500)};
+const TR=window.Track;const canSave=TR.online;const RESTORE=[];
+TR.onStatus(st=>{document.getElementById("saveState").textContent=!canSave?"Tip: open this page from your personal portal link to save your progress.":st==="saving"?"Saving…":st==="offline"?"No connection right now: your answers are kept on this device and will be sent later.":"Your progress saves automatically after every answer."});
+const saveCards=()=>TR.extra("cards",{known:[...known]},known.size,WORDS.length);
 /* flashcards */
 const WORDS=[
  ["be worth","verb","to have a particular value","This old ring is worth about €500."],
@@ -254,32 +253,39 @@ document.getElementById("gotit").onclick=()=>{if(!cur)return;known.add(cur[0]);s
 document.getElementById("again").onclick=()=>{if(!cur)return;deck.splice(Math.min(3,deck.length),0,cur);next()};
 document.getElementById("fReset").onclick=()=>{known=new Set();store.set("mm-known",[]);saveCards();buildDeck()};
 buildDeck();
-if(canSave)PT.getPortal(PT.code()).then(d=>{const st=d&&d.state&&d.state["money/cards"];if(st&&st.known){st.known.forEach(k=>known.add(k));store.set("mm-known",[...known]);buildDeck()}}).catch(()=>{});
+RESTORE.push(S=>{const k=S.cards&&S.cards.extra&&S.cards.extra.known;if(k&&k.length){k.forEach(x=>known.add(x));store.set("mm-known",[...known]);buildDeck()}});
 
 /* match */
 const NOUNS=WORDS.filter(w=>w[1]==="noun").map(w=>[w[0].replace(/^an? /,""),w[2]]);
-function buildMatch(){let sel=null,ok=0;const wrong=new Set();const W=document.getElementById("mW"),D=document.getElementById("mD"),sc=document.getElementById("mScore");W.innerHTML="";D.innerHTML="";sc.textContent=`0 / ${NOUNS.length}`;
-  shuffle(NOUNS).forEach(([w])=>{const b=document.createElement("button");b.className="chip word";b.textContent=w;b.dataset.k=w;
+function buildMatch(prev){prev=prev||{};let sel=null,ok=0,clean=0;const wrong=new Set();const W=document.getElementById("mW"),D=document.getElementById("mD"),sc=document.getElementById("mScore");W.innerHTML="";D.innerHTML="";
+  shuffle(NOUNS).forEach(([w])=>{const b=document.createElement("button");b.className="chip word";b.textContent=w;b.dataset.k=w;if(prev[w]){b.classList.add("ok")}
     b.onclick=()=>{if(b.classList.contains("ok"))return;W.querySelectorAll(".sel").forEach(x=>x.classList.remove("sel"));b.classList.add("sel");sel=b};W.appendChild(b)});
-  shuffle(NOUNS).forEach(([w,d])=>{const b=document.createElement("button");b.className="chip";b.textContent=d;
+  shuffle(NOUNS).forEach(([w,d])=>{const b=document.createElement("button");b.className="chip";b.textContent=d;if(prev[w]){b.classList.add("ok");ok++;if(prev[w].ok)clean++}
     b.onclick=()=>{if(!sel||b.classList.contains("ok"))return;
-      if(sel.dataset.k===w){sel.classList.remove("sel");sel.classList.add("ok");b.classList.add("ok");sel=null;ok++;sc.textContent=`${ok} / ${NOUNS.length}`+(ok===NOUNS.length?" — perfect!":"");
-        if(ok===NOUNS.length)save("nouns",NOUNS.length-wrong.size,NOUNS.length,{wrong:[...wrong]})}
+      if(sel.dataset.k===w){sel.classList.remove("sel");sel.classList.add("ok");b.classList.add("ok");sel=null;ok++;if(!wrong.has(w))clean++;sc.textContent=`${ok} / ${NOUNS.length}`+(ok===NOUNS.length?" — perfect!":"");
+        TR.answer("nouns",w,w,wrong.has(w)?"mismatched first":d,d,!wrong.has(w),clean,NOUNS.length);if(ok===NOUNS.length)TR.finish("nouns",clean,NOUNS.length)}
       else{wrong.add(sel.dataset.k);b.classList.add("no");setTimeout(()=>b.classList.remove("no"),400)}};D.appendChild(b)})}
-buildMatch();document.getElementById("mReset").onclick=buildMatch;
+buildMatch();document.getElementById("mScore").textContent=`0 / ${NOUNS.length}`;
+document.getElementById("mReset").onclick=()=>{TR.reset("nouns");buildMatch();document.getElementById("mScore").textContent=`0 / ${NOUNS.length}`};
+RESTORE.push(S=>{const a=S.nouns&&S.nouns.answers;if(a&&Object.keys(a).length){buildMatch(a);const n=Object.keys(a).length;document.getElementById("mScore").textContent=`${n} / ${NOUNS.length}`}});
 
 /* choose */
-function choose(elId,data,scoreId,act){let ok=0,tried=0,saved=false;const wrong=[];const el=document.getElementById(elId);
+function choose(elId,data,scoreId,act){let ok=0,tried=0;const el=document.getElementById(elId);const apply=[];
+  const upd=()=>{document.getElementById(scoreId).textContent=`First-try answers: ${ok} / ${tried}`};
   data.forEach(([s,opts,ans,why],i)=>{const d=document.createElement("div");d.className="q";
     d.innerHTML=`<span class="n">${i+1}</span><p class="s">${s.replace("___","<u>&nbsp;?&nbsp;</u>")}</p><div class="opts"></div><p class="why" hidden></p>`;
     const o=d.querySelector(".opts"),w=d.querySelector(".why");let answered=false;
     shuffle(opts).forEach(t=>{const b=document.createElement("button");b.className="opt";b.textContent=t;
       b.onclick=()=>{o.querySelectorAll(".opt").forEach(x=>x.classList.remove("no"));
+        const first=!answered;
         if(t===ans){b.classList.add("ok");w.hidden=false;w.textContent=why;d.querySelector(".s u").innerHTML=`&nbsp;${ans}&nbsp;`;if(!answered){answered=true;tried++;ok++}}
-        else{b.classList.add("no");if(!answered){answered=true;tried++;wrong.push(ans)}}
-        document.getElementById(scoreId).textContent=`First-try answers: ${ok} / ${tried}`;
-        if(tried===data.length&&!saved){saved=true;save(act,ok,data.length,{wrong})}};o.appendChild(b)});
-    el.appendChild(d)})}
+        else{b.classList.add("no");if(!answered){answered=true;tried++}}
+        upd();if(first){TR.answer(act,i,s,t,ans,t===ans,ok,data.length);if(tried===data.length)TR.finish(act,ok,data.length)}};o.appendChild(b)});
+    apply[i]=rec=>{if(answered)return;answered=true;tried++;if(rec.ok)ok++;
+      o.querySelectorAll(".opt").forEach(x=>{if(x.textContent===ans)x.classList.add("ok");else if(!rec.ok&&x.textContent===rec.a)x.classList.add("no")});
+      w.hidden=false;w.textContent=why;d.querySelector(".s u").innerHTML=`&nbsp;${ans}&nbsp;`};
+    el.appendChild(d)});
+  RESTORE.push(S=>{const a=S[act]&&S[act].answers;if(!a)return;Object.entries(a).forEach(([i,rec])=>apply[i]&&apply[i](rec));if(tried)upd()})}
 choose("verbs",[
  ["Could you ___ me €20 until Friday?",["lend","borrow"],"lend","Lend = give. You lend something TO someone."],
  ["I had to ___ money from the bank to start my business.",["borrow","lend"],"borrow","Borrow = take. You borrow something FROM someone."],
@@ -322,11 +328,13 @@ const PREPS=[
 ];
 const pEl=document.getElementById("preps");
 PREPS.forEach(([a,b],i)=>{const li=document.createElement("li");
-  li.innerHTML=`<span>${a}</span><select id="prep-${i}" aria-label="Gap ${i+1}"><option value="">…</option>${P.map(x=>`<option>${x}</option>`).join("")}</select><span>${b}</span><span class="mark"></span>`;pEl.appendChild(li)});
+  li.innerHTML=`<span>${a}</span><select id="prep-${i}" aria-label="Gap ${i+1}"><option value="">…</option>${P.map(x=>`<option>${x}</option>`).join("")}</select><span>${b}</span><span class="mark"></span>`;pEl.appendChild(li);
+  li.querySelector("select").addEventListener("change",e=>{const v=e.target.value;if(v)TR.answer("preps",i,`${a} ___ ${b}`,v,PREPS[i][2],v===PREPS[i][2],PREPS.filter((x,j)=>pEl.children[j].querySelector("select").value===x[2]).length,PREPS.length)})});
+RESTORE.push(S=>{const a=S.preps&&S.preps.answers;if(a)Object.entries(a).forEach(([i,r])=>{const sel=pEl.children[i]&&pEl.children[i].querySelector("select");if(sel&&r.a)sel.value=r.a})});
 document.getElementById("pCheck").onclick=()=>{let n=0;PREPS.forEach(([, ,ans],i)=>{const li=pEl.children[i],v=li.querySelector("select").value,m=li.querySelector(".mark"),good=v===ans;
   li.className=v?(good?"ok":"no"):"";m.className="mark "+(good?"ok":"no");m.textContent=!v?"":good?"✓":"try again";if(good)n++});
   document.getElementById("pScore").textContent=`${n} / ${PREPS.length}`;
-  save("preps",n,PREPS.length,{wrong:PREPS.filter((x,i)=>pEl.children[i].querySelector("select").value!==x[2]).map(x=>`${x[0]} ${x[2]}…`)})};
+  TR.finish("preps",n,PREPS.length)};
 
 /* spelling */
 const SPELL=[["money that you have to pay to the government","tax"],["a big loan from a bank to buy a flat","mortgage"],["the money you get for your job every month","salary"],["to get money for the work you do","earn"],["to get money from someone after they die","inherit"],["to have to pay money back to someone","owe"],["a paper that shows how much you must pay","bill"],["a plan for how to spend your money","budget"],["to spend money badly","waste"],["to collect money for a good cause","raise"]];
@@ -335,13 +343,16 @@ function checkOne(i){const li=sEl.children[i],v=li.querySelector("input").value.
   li.className=v?(good?"ok":"no"):"";m.className="mark "+(good?"ok":"no");m.textContent=!v?"":good?"✓":"try again";return good}
 SPELL.forEach(([d,w],i)=>{const li=document.createElement("li");
   li.innerHTML=`<span>${d} <span class="hint">${w[0]}…</span></span><input type="text" id="sp-${i}" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="${d}"><span class="mark"></span>`;
-  li.querySelector("input").addEventListener("keydown",e=>{if(e.key==="Enter"){checkOne(i);const n=document.getElementById("sp-"+(i+1));if(n)n.focus()}});sEl.appendChild(li)});
+  const inp=li.querySelector("input");inp.addEventListener("keydown",e=>{if(e.key==="Enter"){checkOne(i);const n=document.getElementById("sp-"+(i+1));if(n)n.focus()}});
+  inp.addEventListener("change",()=>{const v=inp.value.trim().toLowerCase();if(v)TR.answer("spell",i,d,v,w,v===w,SPELL.filter((x,j)=>sEl.children[j].querySelector("input").value.trim().toLowerCase()===x[1]).length,SPELL.length)});sEl.appendChild(li)});
+RESTORE.push(S=>{const a=S.spell&&S.spell.answers;if(a)Object.entries(a).forEach(([i,r])=>{const inp=sEl.children[i]&&sEl.children[i].querySelector("input");if(inp&&r.a)inp.value=r.a})});
 document.getElementById("sCheck").onclick=()=>{let n=0;SPELL.forEach((_,i)=>{if(checkOne(i))n++});document.getElementById("sScore").textContent=`${n} / ${SPELL.length}`;
-  save("spell",n,SPELL.length,{wrong:SPELL.filter((x,i)=>sEl.children[i].querySelector("input").value.trim().toLowerCase()!==x[1]).map(x=>x[1])})};
+  TR.finish("spell",n,SPELL.length)};
 
 /* talk */
 const TALK=["Are you a saver or a spender? Give an example.","Have you ever lent money to a friend? Did you get it back?","What's the last thing you wasted money on?","What can't you afford right now that you'd love to buy?","High salary in a boring job, or low salary in your dream job?","Do you usually pay by card or in cash? Why?","Is it OK to live off your parents at 25? Why or why not?","Do you plan a budget for the month? Do you stick to it?","Would you ever take out a mortgage? What would you buy?","What would you invest in, if you had €10,000?","What's something expensive that is really worth the money?","Should children get pocket money? How much?"];
 const tEl=document.getElementById("talk");
+TR.init("money").then(S=>RESTORE.forEach(f=>{try{f(S)}catch(e){console.error(e)}}));
 TALK.forEach((t,i)=>{const b=document.createElement("button");b.className="coin";b.textContent="€";b.setAttribute("aria-label","Open question "+(i+1));b.onclick=()=>{b.classList.add("open");b.textContent=t};tEl.appendChild(b)});
 </script>
 </body>

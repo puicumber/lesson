@@ -6,9 +6,9 @@
 <title>Animal Field Guide</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.js"></script>
 <script src="../../assets/config.js?v=4"></script>
-<script src="../../assets/portal.js?v=2"></script>
+<script src="../../assets/portal.js?v=3"></script>
+<script src="../../assets/track.js?v=2"></script>
 <style>
 body{margin:0}
 
@@ -223,9 +223,8 @@ const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v)
 const mark=id=>document.getElementById("t-"+id).classList.add("done");
 
 /* portal saving */
-const PT=window.Portal;const canSave=!!(PT&&PT.ready&&PT.code());
-const save=(a,sc,t,d)=>{if(canSave)PT.log("animals/"+a,sc,t,d)};
-document.getElementById("saveState").textContent=canSave?"Your progress is saved to your portal.":"Tip: open this page from your personal portal link to save your progress.";
+const TR=window.Track;const canSave=TR.online;const RESTORE=[];
+TR.onStatus(st=>{document.getElementById("saveState").textContent=!canSave?"Tip: open this page from your personal portal link to save your progress.":st==="saving"?"Saving…":st==="offline"?"No connection right now: your answers are kept on this device and will be sent later.":"Your progress saves automatically after every answer."});
 
 /* data */
 const A=[
@@ -243,7 +242,7 @@ const filtersEl=document.getElementById("filters");
 [["all","All"],...Object.entries(CAT).map(([k,[l]])=>[k,l])].forEach(([k,l])=>{const b=document.createElement("button");b.className="filter";b.textContent=l;b.setAttribute("aria-pressed",k===filter);
   b.onclick=()=>{filter=k;filtersEl.querySelectorAll(".filter").forEach(x=>x.setAttribute("aria-pressed",x===b));buildDeck()};filtersEl.appendChild(b)});
 const pool=()=>A.filter(a=>filter==="all"||a[2]===filter);
-let cardTimer=null;const saveCards=()=>{clearTimeout(cardTimer);cardTimer=setTimeout(()=>save("cards",known.size,A.length,{known:[...known]}),2500)};
+const saveCards=()=>TR.extra("cards",{known:[...known]},known.size,A.length);
 function buildDeck(){deck=shuffle(pool().filter(a=>!known.has(a[0])));next()}
 function next(){cur=deck.shift()||null;flipped=false;render()}
 function render(){const f=document.getElementById("flash"),p=pool(),k=p.filter(a=>known.has(a[0])).length;
@@ -258,19 +257,23 @@ document.getElementById("gotit").onclick=()=>{if(!cur)return;known.add(cur[0]);s
 document.getElementById("again").onclick=()=>{if(!cur)return;deck.splice(Math.min(3,deck.length),0,cur);next()};
 document.getElementById("fReset").onclick=()=>{known=new Set();store.set("an-known",[]);saveCards();buildDeck()};
 buildDeck();
-if(canSave)PT.getPortal(PT.code()).then(d=>{const st=d&&d.state&&d.state["animals/cards"];if(st&&st.known){st.known.forEach(k=>known.add(k));store.set("an-known",[...known]);buildDeck()}}).catch(()=>{});
+RESTORE.push(S=>{const k=S.cards&&S.cards.extra&&S.cards.extra.known;if(k&&k.length){k.forEach(x=>known.add(x));store.set("an-known",[...known]);buildDeck()}});
 
 /* 2 sort */
-(function(){const list=shuffle(A);let i=0,ok=0,first=true;const wrong=[];
+(function(){let list=shuffle(A);let i=0,ok=0,first=true,firstPick=null;
   const catsEl=document.getElementById("cats"),fb=document.getElementById("sFb"),nx=document.getElementById("sNext");
   Object.entries(CAT).forEach(([k,[l,ic]])=>{const b=document.createElement("button");b.className="cat";b.dataset.k=k;b.innerHTML=`<span class="ic">${ic}</span>${l}`;
     b.onclick=()=>{if(!nx.hidden)return;const a=list[i];
-      if(k===a[2]){b.classList.add("ok");if(first)ok++;fb.className="feedback ok";fb.textContent=`Yes! ${a[0]} → ${CAT[a[2]][0]}`;nx.hidden=false;
-        document.getElementById("sScore").textContent=`First-try answers: ${ok} / ${i+1}`;if(i===list.length-1){nx.textContent="Finished!";save("sort",ok,list.length,{wrong});mark("sort")}}
-      else{if(first){first=false;wrong.push(a[0])}b.classList.add("no");fb.className="feedback no";fb.textContent="Not quite. Try again!";setTimeout(()=>b.classList.remove("no"),500)}};catsEl.appendChild(b)});
+      if(k===a[2]){b.classList.add("ok");if(first)ok++;TR.answer("sort",a[0],a[0],first?CAT[k][0]:CAT[firstPick][0],CAT[a[2]][0],first,ok,list.length);fb.className="feedback ok";fb.textContent=`Yes! ${a[0]} → ${CAT[a[2]][0]}`;nx.hidden=false;
+        document.getElementById("sScore").textContent=`First-try answers: ${ok} / ${i+1}`;if(i===list.length-1){nx.textContent="Finished!";TR.finish("sort",ok,list.length);mark("sort")}}
+      else{if(first){first=false;firstPick=k}b.classList.add("no");fb.className="feedback no";fb.textContent="Not quite. Try again!";setTimeout(()=>b.classList.remove("no"),500)}};catsEl.appendChild(b)});
   function draw(){const a=list[i];first=true;document.getElementById("sNum").textContent=`${i+1} / ${list.length}`;document.getElementById("sWord").textContent=a[0];fb.textContent="";nx.hidden=true;
     catsEl.querySelectorAll(".cat").forEach(c=>c.classList.remove("ok","no"))}
-  nx.onclick=()=>{if(i<list.length-1){i++;draw()}};draw()})();
+  nx.onclick=()=>{if(i<list.length-1){i++;draw()}};draw();
+  RESTORE.push(S=>{const a=S.sort&&S.sort.answers;if(!a)return;const done=Object.keys(a);if(!done.length)return;
+    list=[...list.filter(x=>done.includes(x[0])),...list.filter(x=>!done.includes(x[0]))];ok=Object.values(a).filter(r=>r.ok).length;
+    i=Math.min(done.length,list.length-1);document.getElementById("sScore").textContent=`First-try answers: ${ok} / ${done.length}`;
+    if(done.length>=list.length){draw();nx.hidden=false;nx.textContent="Finished!";fb.className="feedback ok";fb.textContent="You've sorted all the animals.";mark("sort")}else draw()})})();
 
 /* 3 spelling */
 const SP=[["🦟","mosquito"],["🦒","giraffe"],["🦘","kangaroo"],["🐊","crocodile"],["🦋","butterfly"],["🪼","jellyfish"],["🐬","dolphin"],["🐘","elephant"],["🐒","monkey"],["🐫","camel"],["🐋","whale"],["🐔","chicken"]];
@@ -279,22 +282,29 @@ function chk(i){const li=spEl.children[i],v=li.querySelector("input").value.trim
   li.className=v?(g?"ok":"no"):"";m.className="mark "+(g?"ok":"no");m.textContent=!v?"":g?"✓":"try again";return g}
 SP.forEach(([e,w],i)=>{const li=document.createElement("li");
   li.innerHTML=`<span class="em" aria-hidden="true">${e}</span><span class="hint">${w[0]}${"_".repeat(w.length-1).split("").join(" ")}</span><input type="text" id="sp-${i}" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Spell animal ${i+1}"><span class="mark"></span>`;
-  li.querySelector("input").addEventListener("keydown",ev=>{if(ev.key==="Enter"){chk(i);const n=document.getElementById("sp-"+(i+1));if(n)n.focus()}});spEl.appendChild(li)});
+  const inp=li.querySelector("input");inp.addEventListener("keydown",ev=>{if(ev.key==="Enter"){chk(i);const n=document.getElementById("sp-"+(i+1));if(n)n.focus()}});
+  inp.addEventListener("change",()=>{const v=inp.value.trim().toLowerCase();if(v)TR.answer("spell",i,"spell: "+w[0]+"… ("+e+")",v,w,v===w,SP.filter((x,j)=>spEl.children[j].querySelector("input").value.trim().toLowerCase()===x[1]).length,SP.length)});spEl.appendChild(li)});
+RESTORE.push(S=>{const a=S.spell&&S.spell.answers;if(a)Object.entries(a).forEach(([i,r])=>{const inp=spEl.children[i]&&spEl.children[i].querySelector("input");if(inp&&r.a)inp.value=r.a})});
 document.getElementById("spCheck").onclick=()=>{let n=0;SP.forEach((_,i)=>{if(chk(i))n++});document.getElementById("spScore").textContent=`${n} / ${SP.length}`;
-  save("spell",n,SP.length,{wrong:SP.filter((x,i)=>spEl.children[i].querySelector("input").value.trim().toLowerCase()!==x[1]).map(x=>x[1])});if(n===SP.length)mark("spell")};
+  TR.finish("spell",n,SP.length);if(n===SP.length)mark("spell")};
 
 /* choose helper */
-function choose(elId,data,scoreId,act){let ok=0,tried=0,saved=false;const wrong=[];const el=document.getElementById(elId);
+function choose(elId,data,scoreId,act){let ok=0,tried=0;const el=document.getElementById(elId);const apply=[];
+  const upd=()=>{document.getElementById(scoreId).textContent=`First-try answers: ${ok} / ${tried}`;if(tried===data.length)mark(act)};
   data.forEach(([s,opts,ans,why],i)=>{const d=document.createElement("div");d.className="q";
     d.innerHTML=`<span class="n">${i+1}</span><p class="s">${s.replace("___","<u>&nbsp;?&nbsp;</u>")}</p><div class="opts"></div><p class="why" hidden></p>`;
     const o=d.querySelector(".opts"),w=d.querySelector(".why");let answered=false;
     opts.forEach(t=>{const b=document.createElement("button");b.className="opt";b.textContent=t;
       b.onclick=()=>{o.querySelectorAll(".opt").forEach(x=>x.classList.remove("no"));
+        const first=!answered;
         if(t===ans){b.classList.add("ok");w.hidden=false;w.textContent=why;d.querySelector(".s u").innerHTML=`&nbsp;${ans}&nbsp;`;if(!answered){answered=true;tried++;ok++}}
-        else{b.classList.add("no");if(!answered){answered=true;tried++;wrong.push(s.replace("___",ans))}}
-        document.getElementById(scoreId).textContent=`First-try answers: ${ok} / ${tried}`;
-        if(tried===data.length&&!saved){saved=true;save(act,ok,data.length,{wrong});mark(act)}};o.appendChild(b)});
-    el.appendChild(d)})}
+        else{b.classList.add("no");if(!answered){answered=true;tried++}}
+        upd();if(first){TR.answer(act,i,s,t,ans,t===ans,ok,data.length);if(tried===data.length)TR.finish(act,ok,data.length)}};o.appendChild(b)});
+    apply[i]=rec=>{if(answered)return;answered=true;tried++;if(rec.ok)ok++;
+      o.querySelectorAll(".opt").forEach(x=>{if(x.textContent===ans)x.classList.add("ok");else if(!rec.ok&&x.textContent===rec.a)x.classList.add("no")});
+      w.hidden=false;w.textContent=why;d.querySelector(".s u").innerHTML=`&nbsp;${ans}&nbsp;`};
+    el.appendChild(d)});
+  RESTORE.push(S=>{const a=S[act]&&S[act].answers;if(!a)return;Object.entries(a).forEach(([i,rec])=>apply[i]&&apply[i](rec));if(tried)upd()})}
 
 /* 4 bite */
 choose("bite",[
@@ -338,6 +348,7 @@ choose("pp",[
 
 /* 7 talk */
 const TALK=["Have you got a pet? How long have you had it?","Which animal have you been afraid of since you were a child?","How long have you known each other? How did you meet?","How long have you lived in your flat or house?","Which animal have you wanted to see in real life for a long time?","Have you ever been bitten or stung? What happened?","Which is the most dangerous animal: a shark, a snake or a mosquito?","If you could be any animal for a day, which would you be?","How long have you liked your favourite band or singer?"];
+TR.init("animals").then(S=>RESTORE.forEach(f=>{try{f(S)}catch(e){console.error(e)}}));
 const tEl=document.getElementById("talk");
 TALK.forEach((t,i)=>{const b=document.createElement("button");b.className="paw";b.textContent="🐾";b.setAttribute("aria-label","Open question "+(i+1));b.onclick=()=>{b.classList.add("open");b.textContent=t};tEl.appendChild(b)});
 </script>

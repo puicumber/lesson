@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="../assets/portal.css?v=2">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.js"></script>
 <script src="../assets/config.js?v=4"></script>
-<script src="../assets/portal.js?v=2"></script>
+<script src="../assets/portal.js?v=3"></script>
 </head>
 <body>
 <div class="wrap">
@@ -44,7 +44,12 @@
       <h3>Given materials</h3>
       <div class="table-wrap"><table><thead><tr><th>Title</th><th>Type</th><th>Set</th><th>Due</th><th>Added</th><th></th></tr></thead><tbody id="dMat"></tbody></table></div>
       <h3>Progress</h3>
-      <div class="table-wrap"><table><thead><tr><th>Material</th><th>Exercise</th><th>Best</th><th>Tries</th><th>Last</th></tr></thead><tbody id="dRes"></tbody></table></div>
+      <div class="table-wrap"><table><thead><tr><th>Material</th><th>Exercise</th><th>Best</th><th>Finished</th><th>Last</th><th></th></tr></thead><tbody id="dRes"></tbody></table></div>
+      <div class="panel" id="ansBox" hidden style="padding:16px;gap:10px">
+        <div class="row" style="justify-content:space-between"><h3 id="ansTitle"></h3><button class="btn ghost small" id="ansClose">Close</button></div>
+        <p class="muted" id="ansMeta"></p>
+        <div class="table-wrap"><table><thead><tr><th>#</th><th>Question</th><th>Answer</th><th>Correct</th><th></th></tr></thead><tbody id="ansRows"></tbody></table></div>
+      </div>
       <h3>Most missed</h3>
       <div class="weak" id="dWeak"></div>
     </section>
@@ -82,6 +87,7 @@
 </div>
 <script>
 const ACT=window.PORTAL_ACTIVITIES||{};
+const isPartial=r=>!!(r.details&&r.details.partial);
 const db=Portal.client;
 const PORTAL_URL=new URL("../my/",location.href).href;
 let S=[],M=[],R=[];
@@ -101,11 +107,11 @@ function draw(){
   const st=$("students");st.innerHTML="";
   S.forEach(x=>{const mine=R.filter(r=>r.student_code===x.code);const last=mine[0];
     const b=document.createElement("button");b.className="item";b.style.cssText="text-align:left;cursor:pointer;font:inherit";
-    b.innerHTML=`<div class="top"><span class="kind">${x.level||""}</span>${last?`<span class="pill go">${when(last.created_at)}</span>`:'<span class="pill new">No activity yet</span>'}</div><h3>${x.name}</h3><p class="muted">${M.filter(m=>m.student_code===x.code).length} materials · ${mine.length} results</p>`;
+    b.innerHTML=`<div class="top"><span class="kind">${x.level||""}</span>${last?`<span class="pill go">${when(last.created_at)}</span>`:'<span class="pill new">No activity yet</span>'}</div><h3>${x.name}</h3><p class="muted">${M.filter(m=>m.student_code===x.code).length} materials · ${mine.filter(r=>!isPartial(r)).length} finished exercises</p>`;
     b.onclick=()=>detail(x);st.appendChild(b)});
   const rc=$("recent");rc.innerHTML="";
-  R.slice(0,25).forEach(r=>{const n=(S.find(x=>x.code===r.student_code)||{}).name||r.student_code;
-    rc.insertAdjacentHTML("beforeend",`<tr><td>${when(r.created_at)}</td><td>${n}</td><td>${actName(r.activity)}</td><td>${r.total?`${r.score} / ${r.total}`:"–"}</td></tr>`)});
+  const seen=new Set();R.filter(r=>{if(!isPartial(r))return true;const k=r.student_code+"|"+r.activity;if(seen.has(k))return false;seen.add(k);return true}).slice(0,25).forEach(r=>{const n=(S.find(x=>x.code===r.student_code)||{}).name||r.student_code;
+    rc.insertAdjacentHTML("beforeend",`<tr><td>${when(r.created_at)}</td><td>${n}</td><td>${actName(r.activity)}${isPartial(r)?' <span class="muted">· in progress</span>':""}</td><td>${r.total?`${r.score} / ${r.total}`:"–"}</td></tr>`)});
   if(!R.length)rc.innerHTML='<tr><td colspan="4" class="muted">No results yet. They will appear here when students do the exercises.</td></tr>';
   $("mStudent").innerHTML=S.map(x=>`<option value="${x.code}">${x.name}</option>`).join("");
 }
@@ -126,10 +132,14 @@ function detail(x){
   M.filter(m=>m.student_code===x.code).forEach(m=>{
     const subs=m.activity&&ACT[m.activity]?Object.keys(ACT[m.activity]):[];
     if(!subs.length){tb.insertAdjacentHTML("beforeend",`<tr><td>${m.title}</td><td class="muted">no exercises</td><td></td><td></td><td></td></tr>`);return}
-    subs.forEach((s,i)=>{const rs=mine.filter(r=>r.activity===m.activity+"/"+s);
+    subs.forEach((s,i)=>{const rs=mine.filter(r=>r.activity===m.activity+"/"+s);const fin=rs.filter(r=>!isPartial(r));
       const best=rs.reduce((a,r)=>r.total&&(!a||r.score/r.total>a.score/a.total)?r:a,null);
-      tb.insertAdjacentHTML("beforeend",`<tr><td>${i?"":m.title}</td><td>${ACT[m.activity][s]}</td><td>${best?`${best.score} / ${best.total}`:"–"}</td><td>${rs.length||"–"}</td><td>${rs[0]?when(rs[0].created_at):"–"}</td></tr>`)})});
-  const cnt={};mine.forEach(r=>(r.details&&r.details.wrong||[]).forEach(w=>cnt[w]=(cnt[w]||0)+1));
+      const tr=document.createElement("tr");
+      tr.innerHTML=`<td>${i?"":m.title}</td><td>${ACT[m.activity][s]}</td><td>${best?`${best.score} / ${best.total}`:"–"}</td><td>${fin.length||"–"}${rs[0]&&isPartial(rs[0])?' <span class="muted">· in progress</span>':""}</td><td>${rs[0]?when(rs[0].created_at):"–"}</td><td></td>`;
+      if(rs.some(r=>r.details&&r.details.answers&&Object.keys(r.details.answers).length)){const b=document.createElement("button");b.className="btn ghost small";b.textContent="Answers";b.onclick=()=>answers(x,m,s,rs);tr.lastElementChild.appendChild(b)}
+      tb.appendChild(tr)})});
+  const cnt={};const lastBy={};mine.forEach(r=>{if(!lastBy[r.activity])lastBy[r.activity]=r});
+  mine.filter(r=>!isPartial(r)||lastBy[r.activity]===r).forEach(r=>(r.details&&r.details.wrong||[]).forEach(w=>cnt[w]=(cnt[w]||0)+1));
   const top=Object.entries(cnt).sort((a,b)=>b[1]-a[1]).slice(0,10);
   $("dWeak").innerHTML=top.length?`<ul>${top.map(([w,n])=>`<li>${w} <span class="muted">· missed ${n}×</span></li>`).join("")}</ul>`:'<p class="muted">Nothing yet.</p>';
   $("detail").scrollIntoView({behavior:"smooth"});
@@ -138,6 +148,13 @@ $("actList").innerHTML=Object.keys(ACT).map(k=>`<option value="${k}">`).join("")
 $("mUrl").addEventListener("input",()=>{const u=$("mUrl").value;if($("mAct").value)return;
   const k=Object.keys(ACT).find(k=>u.includes("/"+k+"/")||u.includes("/"+k+"-")||u.endsWith("/"+k));if(k)$("mAct").value=k});
 $("dClose").onclick=()=>$("detail").hidden=true;
+$("ansClose").onclick=()=>$("ansBox").hidden=true;
+function answers(x,m,s,rs){const r=rs.find(z=>z.details&&z.details.answers&&Object.keys(z.details.answers).length);const a=r.details.answers;
+  $("ansTitle").textContent=`${x.name} · ${m.title} · ${ACT[m.activity][s]}`;
+  $("ansMeta").textContent=`${isPartial(r)?"In progress":"Finished"} · last saved ${when(r.created_at)} · ${r.score} / ${r.total}. Shows the first answer to each question.`;
+  const esc=t=>String(t==null?"":t).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+  $("ansRows").innerHTML=Object.entries(a).map(([k,v],n)=>`<tr><td>${n+1}</td><td style="white-space:normal;min-width:220px">${esc(v.q)}</td><td style="color:${v.ok?"var(--ok)":"var(--bad)"};font-weight:700">${esc(v.a)}</td><td>${v.ok?"":esc(v.c)}</td><td>${v.ok?"✓":"✗"}</td></tr>`).join("");
+  $("ansBox").hidden=false;$("ansBox").scrollIntoView({behavior:"smooth"})}
 $("matForm").onsubmit=async e=>{e.preventDefault();
   const row={student_code:$("mStudent").value,title:$("mTitle").value.trim(),url:$("mUrl").value.trim(),kind:$("mKind").value,activity:$("mAct").value.trim()||null,due:$("mDue").value||null,note:$("mNote").value.trim()||null};
   const {error}=await db.from("materials").insert(row);$("matMsg").textContent=error?"Error: "+error.message:`Added "${row.title}".`;
@@ -153,7 +170,7 @@ $("logout").onclick=async()=>{await db.auth.signOut();location.reload()};
 async function start(){const {data}=await db.auth.getSession();
   if(!data.session){$("login").hidden=false;$("app").hidden=true;return}
   $("login").hidden=true;$("app").hidden=false;$("who").textContent="Signed in as "+data.session.user.email;load()}
-if(!Portal.ready){$("msg").hidden=false;$("msg").textContent=""+(!window.supabase?"The database library didn't load. Check your internet connection or turn off ad blockers, then refresh.":"Supabase isn't connected yet. Add the project URL and key to assets/config.js.")+""}else start();
+if(!Portal.ready||!Portal.client){$("msg").hidden=false;$("msg").textContent=""+(!window.supabase?"The database library didn't load. Check your internet connection or turn off ad blockers, then refresh.":"Supabase isn't connected yet. Add the project URL and key to assets/config.js.")+""}else start();
 </script>
 </body>
 </html>
