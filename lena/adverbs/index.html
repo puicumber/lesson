@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Adverbs at the Clinic</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<script src="../../assets/config.js?v=6"></script>
+<script src="../../assets/portal.js?v=3"></script>
+<script src="../../assets/track.js?v=2"></script>
+<style>
+body{margin:0}
+
+body{margin:0}
+
+body{margin:0}
+
+/* Layout: Dr Fang's clinic, daytime edition. Header card, pill tabs per exercise, one panel at a time. */
+:root{
+  --bg:#f3f1f8; --card:#fefdff; --ink:#221a30; --muted:#655c75; --line:#dcd5e8;
+  --leaf:#6a3fb5; --leaf-soft:#6a3fb518; --sun:#d4486e; --sun-soft:#d4486e22; --sky:#2f7fa8;
+  --ok:#1f8a5b; --ok-soft:#1f8a5b1f; --bad:#c2453d; --bad-soft:#c2453d1c;
+  --display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;
+  --body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#15121c; --card:#1e1a28; --ink:#ece8f4; --muted:#aaa1bb; --line:#352f44;
+  --leaf:#b39af0; --leaf-soft:#b39af01f; --sun:#f08aa4; --sun-soft:#f08aa424; --sky:#6db7dd;
+  --ok:#86c46c; --ok-soft:#86c46c22; --bad:#ef7d74; --bad-soft:#ef7d7422; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#15121c; --card:#1e1a28; --ink:#ece8f4; --muted:#aaa1bb; --line:#352f44;
+  --leaf:#b39af0; --leaf-soft:#b39af01f; --sun:#f08aa4; --sun-soft:#f08aa424; --sky:#6db7dd;
+  --ok:#86c46c; --ok-soft:#86c46c22; --bad:#ef7d74; --bad-soft:#ef7d7422; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 64px}
+.wrap{max-width:940px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+h1,h2,h3{font-family:var(--display);margin:0;line-height:1.05;text-wrap:balance}
+h1{font-size:clamp(40px,7vw,64px);font-weight:800;letter-spacing:-.02em;color:var(--leaf)}
+h2{font-size:clamp(28px,4vw,36px);font-weight:800}
+h3{font-size:21px;font-weight:600}
+p{margin:0}
+.eyebrow{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.lede{color:var(--muted);max-width:64ch}
+.tip{font-size:14px;color:var(--muted);font-style:italic}
+
+.guide{position:relative;border:2px solid var(--leaf);border-radius:20px;padding:26px clamp(20px,4vw,36px);background:var(--card);display:flex;flex-direction:column;gap:10px;overflow:hidden}
+.guide::before{content:"";position:absolute;right:-40px;top:-40px;width:200px;height:200px;border-radius:50%;background:var(--sun-soft)}
+.guide .critters{position:absolute;right:clamp(16px,4vw,34px);top:20px;font-size:clamp(30px,5vw,44px);letter-spacing:.1em}
+@media (max-width:560px){.guide .critters{position:static}}
+
+nav.tabs{display:flex;flex-wrap:wrap;gap:8px}
+.tab{appearance:none;cursor:pointer;font:inherit;font-weight:700;font-size:15px;border-radius:999px;padding:8px 16px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+.tab:hover{border-color:var(--leaf)}
+.tab[aria-selected="true"]{background:var(--leaf);border-color:var(--leaf);color:var(--card)}
+.tab.done::after{content:" ✓"}
+.tab:focus-visible,.btn:focus-visible,.opt:focus-visible,.flash:focus-visible,input:focus-visible,.cat:focus-visible{outline:2px solid var(--sun);outline-offset:2px}
+
+section.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:clamp(20px,4vw,34px);display:flex;flex-direction:column;gap:22px}
+.head{display:flex;flex-direction:column;gap:8px}
+.btn{appearance:none;cursor:pointer;font:inherit;font-weight:700;font-size:16px;border-radius:999px;padding:10px 20px;border:1px solid var(--leaf);background:var(--leaf);color:var(--card)}
+.btn.ghost{background:transparent;color:var(--leaf)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.score{font-weight:700;color:var(--leaf);font-variant-numeric:tabular-nums}
+.bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden}
+.bar span{display:block;height:100%;background:var(--sun);transition:width .3s}
+
+/* flashcards */
+.filters{display:flex;gap:6px;flex-wrap:wrap}
+.filter{appearance:none;cursor:pointer;font:inherit;font-size:14px;border-radius:8px;padding:5px 12px;border:1px solid var(--line);background:transparent;color:var(--muted)}
+.filter[aria-pressed="true"]{border-color:var(--sun);background:var(--sun-soft);color:var(--ink)}
+.flash{appearance:none;cursor:pointer;font:inherit;color:var(--ink);width:100%;min-height:250px;border-radius:18px;border:2px solid var(--line);background:var(--bg);padding:24px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center}
+.flash .em{font-size:clamp(70px,14vw,110px);line-height:1}
+.flash .w{font-family:var(--display);font-size:clamp(32px,6vw,48px);font-weight:800;color:var(--leaf);line-height:1.05}
+.flash .t{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.flash .d{font-size:18px;max-width:44ch}
+.flash.back{border-color:var(--sun)}
+
+/* sort */
+.sort-card{background:var(--bg);border:2px solid var(--line);border-radius:18px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center}
+.sort-card .word{font-family:var(--display);font-size:clamp(34px,6vw,50px);font-weight:800}
+.cats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;width:100%}
+@media (max-width:560px){.cats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.cat{appearance:none;cursor:pointer;font:inherit;font-weight:700;border-radius:14px;padding:14px 8px;border:2px solid var(--line);background:var(--card);color:var(--ink);display:flex;flex-direction:column;gap:4px;align-items:center}
+.cat .ic{font-size:30px}
+.cat:hover{border-color:var(--leaf)}
+.cat.ok{border-color:var(--ok);background:var(--ok-soft)}
+.cat.no{border-color:var(--bad);background:var(--bad-soft);animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.feedback{min-height:1.5em;font-weight:700}
+.feedback.ok{color:var(--ok)}.feedback.no{color:var(--bad)}
+
+/* choose */
+.qs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:700px){.qs{grid-template-columns:1fr}}
+.q{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.q .n{font-size:12px;color:var(--muted);letter-spacing:.1em}
+.q .s{font-weight:700}
+.opts{display:flex;gap:6px;flex-wrap:wrap}
+.opt{appearance:none;cursor:pointer;font:inherit;font-size:15px;border-radius:8px;padding:6px 12px;background:var(--card);color:var(--ink);border:1px solid var(--line)}
+.opt:hover{border-color:var(--leaf)}
+.opt.ok{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.opt.no{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.why{font-size:14px;color:var(--muted)}
+
+/* rules */
+.rule{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.rule div{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:4px}
+.rule strong{font-family:var(--display);font-size:22px;color:var(--leaf)}
+.rule span{font-size:15px}
+.timeline{display:flex;align-items:center;gap:0;margin:4px 0}
+.timeline .pt{font-weight:700;font-size:14px;white-space:nowrap}
+.timeline .ln{flex:1;height:4px;background:linear-gradient(90deg,var(--sun),var(--leaf));border-radius:2px;margin:0 10px;position:relative}
+.timeline .ln::after{content:"";position:absolute;right:-6px;top:-5px;border:7px solid transparent;border-left-color:var(--leaf)}
+
+/* spelling */
+.spell{padding:0;margin:0;display:flex;flex-direction:column;gap:8px}
+.spell li{list-style:none;display:grid;grid-template-columns:56px minmax(0,1fr) 200px auto;gap:10px;align-items:center;padding:10px 14px;border-radius:12px;background:var(--bg);border:1px solid transparent}
+@media (max-width:600px){.spell li{grid-template-columns:44px minmax(0,1fr)}.spell li input{grid-column:1/-1}}
+.spell li.ok{border-color:var(--ok)}.spell li.no{border-color:var(--bad)}
+.spell .em{font-size:34px;text-align:center}
+.hint{font-family:var(--display);font-weight:600;color:var(--sun)}
+input[type=text]{font:inherit;font-size:16px;color:var(--ink);background:var(--card);border:1px solid var(--leaf);border-radius:8px;padding:6px 10px;width:100%}
+.mark{font-size:14px}.mark.ok{color:var(--ok)}.mark.no{color:var(--bad)}
+
+/* talk */
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:700px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.paw{appearance:none;cursor:pointer;font:inherit;color:var(--ink);background:var(--bg);border:2px dashed var(--sun);border-radius:14px;min-height:118px;padding:14px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:15px}
+.paw:not(.open){font-size:36px}
+.paw.open{border-style:solid;border-color:var(--line)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+.col{display:flex;flex-direction:column;gap:8px}
+.chip{appearance:none;cursor:pointer;font:inherit;text-align:left;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+.chip:hover{border-color:var(--leaf)}
+.chip.ok{border-color:var(--ok);background:var(--ok-soft);color:var(--ok);cursor:default}
+.chip.no{animation:shake .35s;border-color:var(--bad)}
+.chip .ord{font-weight:700}
+.fill{display:flex;flex-direction:column;gap:8px;padding:0;margin:0}
+.fill li{list-style:none;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;padding:10px 14px;border-radius:12px;background:var(--bg);border:1px solid transparent}
+.fill li.ok{border-color:var(--ok)}.fill li.no{border-color:var(--bad)}
+.fill .mark{margin-left:auto}
+select{font:inherit;font-size:16px;color:var(--ink);background:var(--card);border:1px solid var(--leaf);border-radius:8px;padding:4px 8px;max-width:100%}
+.note-box{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+textarea{width:100%;min-height:220px;font:inherit;font-size:17px;line-height:1.6;color:var(--ink);background:transparent;border:none;resize:vertical}
+textarea:focus{outline:2px solid var(--sun);outline-offset:4px;border-radius:6px}
+.checks{display:flex;flex-wrap:wrap;gap:8px}
+.check{appearance:none;cursor:pointer;font:inherit;font-size:15px;border-radius:999px;padding:6px 14px;border:1px solid var(--line);background:transparent;color:var(--ink)}
+.check[aria-pressed="true"]{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.check[aria-pressed="true"]::before{content:"✓ "}
+
+.cats7{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;width:100%}
+@media (max-width:640px){.cats7{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.cats7 .cat{padding:10px 6px;font-size:14px}
+.slotq{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.slotq .adv{font-weight:700;color:var(--sun)}
+.sent{display:flex;flex-wrap:wrap;align-items:center;gap:2px;font-size:19px;line-height:2}
+.slot{appearance:none;cursor:pointer;font:inherit;font-size:14px;font-weight:700;border:2px dashed var(--line);background:var(--card);color:var(--muted);border-radius:8px;min-width:30px;height:30px;padding:0 6px;display:inline-flex;align-items:center;justify-content:center}
+.slot:hover{border-color:var(--leaf);color:var(--leaf)}
+.slot.ok{border-style:solid;border-color:var(--ok);background:var(--ok-soft);color:var(--ok)}
+.slot.no{border-color:var(--bad);color:var(--bad);animation:shake .35s}
+.slot.used{display:none}
+.tok{padding:0 3px}
+.ref{width:100%;border-collapse:collapse;font-size:15px}
+.ref th,.ref td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.ref th{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.ref td:first-child{font-weight:700;color:var(--leaf);white-space:nowrap}
+.tablewrap{overflow-x:auto}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="guide">
+    <span class="critters" aria-hidden="true">🦷🦇📋</span>
+    <span class="eyebrow">Homework · Adjectives, adverbs and where to put them</span>
+    <h1>Adverbs at the Clinic</h1>
+    <p class="lede">Dr Fang is back from his holiday, and his clinic is full of adverbs. Choose, sort and place them, then write about your own day.</p>
+    <p class="tip" id="saveState"></p>
+  </header>
+
+  <nav class="tabs" role="tablist" id="tabs"></nav>
+
+  <section class="panel" id="p-adjadv" role="tabpanel">
+    <div class="head"><span class="eyebrow">Step 1</span><h2>Adjective or adverb?</h2></div>
+    <div class="rule">
+      <div><strong>adjective</strong><span>describes a noun, and comes after linking verbs: <i>be, look, seem, feel, sound, taste, smell, become</i>.</span><span class="tip">The patient looked nervous.</span></div>
+      <div><strong>adverb</strong><span>describes a verb, an adjective or another adverb: how, how much.</span><span class="tip">She looked carefully at the X-ray. It was surprisingly cheap.</span></div>
+      <div><strong>no -ly adverb</strong><span><i>friendly, lovely, lonely, silly</i> are adjectives. Use "in a … way".</span><span class="tip">She smiled in a friendly way.</span></div>
+    </div>
+    <div class="qs" id="adjadv"></div>
+    <span class="score" id="s-adjadv"></span>
+  </section>
+
+  <section class="panel" id="p-pairs" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Step 2</span><h2>Tricky pairs</h2>
+      <p class="lede">Some adverbs have two forms with <b>different meanings</b>: hard / hardly, late / lately, high / highly, near / nearly, most / mostly, free / freely.</p></div>
+    <div class="qs" id="pairs"></div>
+    <span class="score" id="s-pairs"></span>
+  </section>
+
+  <section class="panel" id="p-types" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Step 3</span><h2>What kind of adverb?</h2>
+      <p class="lede">Each type has its usual place in the sentence. First, learn the types: sort each adverb.</p></div>
+    <div class="tablewrap"><table class="ref">
+      <tr><th>Type</th><th>Examples</th><th>Usual position</th></tr>
+      <tr><td>Manner</td><td>carefully, quietly, fast</td><td>after the verb, or after the object: <i>She explained the procedure <b>clearly</b>.</i> Never between the verb and its object.</td></tr>
+      <tr><td>Frequency</td><td>always, usually, rarely, never</td><td>before the main verb, after <i>be</i> and auxiliaries: <i>I <b>usually</b> start at 8. She is <b>never</b> late.</i></td></tr>
+      <tr><td>Degree</td><td>very, extremely, quite, fairly, absolutely</td><td>before the adjective or adverb: <i><b>extremely</b> painful, <b>quite</b> slowly</i></td></tr>
+      <tr><td>Time</td><td>yesterday, soon, last week</td><td>at the end (or the start): <i>I saw him <b>yesterday</b>.</i> But <i>already, still</i>: mid position; <i>yet</i>: at the end.</td></tr>
+      <tr><td>Comment</td><td>unfortunately, luckily, apparently</td><td>at the start of the sentence: <i><b>Luckily</b>, the tooth was fine.</i></td></tr>
+      <tr><td>Certainty</td><td>probably, definitely, certainly</td><td>after <i>be</i> / auxiliaries, before the main verb, <b>before</b> <i>won't / isn't</i>: <i>She'll <b>probably</b> come. She <b>probably</b> won't come.</i></td></tr>
+      <tr><td>Focus</td><td>even, only, just</td><td>before the word they focus on: <i>He didn't <b>even</b> say goodbye.</i></td></tr>
+    </table></div>
+    <div class="sort-card">
+      <span class="eyebrow" id="tyNum"></span>
+      <span class="word" id="tyWord"></span>
+      <div class="cats7" id="tyCats"></div>
+      <p class="feedback" id="tyFb"></p>
+      <button class="btn" id="tyNext" hidden>Next adverb</button>
+    </div>
+    <span class="score" id="s-types"></span>
+  </section>
+
+  <section class="panel" id="p-place" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Step 4</span><h2>Put it in the right place</h2>
+      <p class="lede">Click the gap where the adverb should go. Check the table in Step 3 if you're not sure.</p></div>
+    <div class="col" id="place" style="gap:12px"></div>
+    <span class="score" id="s-place"></span>
+  </section>
+
+  <section class="panel" id="p-write" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Step 5</span><h2>A day at your clinic</h2>
+      <p class="lede">Write 6–8 sentences about a typical (or a very strange) working day. Use at least one adverb of each type: manner, frequency, degree, time, comment, certainty and focus. Careful with the position! Polina will read it.</p></div>
+    <div class="note-box"><label for="story" class="eyebrow">Your text</label><textarea id="story" placeholder="I usually arrive at the clinic at 8. Unfortunately, …"></textarea></div>
+    <div class="row"><button class="btn" id="sendStory">Send to Polina</button><span class="score" id="storyMsg"></span></div>
+    <div class="checks" id="checks"></div>
+  </section>
+</div>
+
+<script>
+const TABS=[["adjadv","Adjective or adverb?"],["pairs","Tricky pairs"],["types","Types"],["place","Position"],["write","Your text"]];
+const tabsEl=document.getElementById("tabs");
+TABS.forEach(([id,name])=>{const b=document.createElement("button");b.className="tab";b.setAttribute("role","tab");b.id="t-"+id;b.textContent=name;b.onclick=()=>show(id);tabsEl.appendChild(b)});
+function show(id){TABS.forEach(([t])=>{document.getElementById("p-"+t).hidden=t!==id;document.getElementById("t-"+t).setAttribute("aria-selected",t===id)});
+  try{if(location.hash!=="#"+id)history.replaceState(null,"","#"+id)}catch(e){}}
+const h0=location.hash.slice(1);show(TABS.some(t=>t[0]===h0)?h0:"adjadv");
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const mark=id=>document.getElementById("t-"+id).classList.add("done");
+const TR=window.Track;const canSave=TR.online;const RESTORE=[];
+TR.onStatus(st=>{document.getElementById("saveState").textContent=!canSave?"Tip: open this page from your personal portal link to save your progress.":st==="saving"?"Saving…":st==="offline"?"No connection right now: your answers are kept on this device and will be sent later.":"Your progress saves automatically after every answer."});
+
+function choose(act,data){let ok=0,tried=0;const el=document.getElementById(act),apply=[];
+  const upd=()=>{document.getElementById("s-"+act).textContent=`First-try answers: ${ok} / ${tried}`;if(tried===data.length)mark(act)};
+  data.forEach(([s,opts,ans,why],i)=>{const d=document.createElement("div");d.className="q";
+    d.innerHTML=`<span class="n">${i+1}</span><p class="s">${s.replace("___","<u>&nbsp;?&nbsp;</u>")}</p><div class="opts"></div><p class="why" hidden></p>`;
+    const o=d.querySelector(".opts"),w=d.querySelector(".why");let answered=false;
+    shuffle(opts).forEach(t=>{const b=document.createElement("button");b.className="opt";b.textContent=t;
+      b.onclick=()=>{o.querySelectorAll(".opt").forEach(x=>x.classList.remove("no"));const first=!answered;
+        if(t===ans){b.classList.add("ok");w.hidden=false;w.textContent=why;d.querySelector(".s u").innerHTML=`&nbsp;${ans}&nbsp;`;if(!answered){answered=true;tried++;ok++}}
+        else{b.classList.add("no");if(!answered){answered=true;tried++}}
+        upd();if(first){TR.answer(act,i,s,t,ans,t===ans,ok,data.length);if(tried===data.length)TR.finish(act,ok,data.length)}};o.appendChild(b)});
+    apply[i]=rec=>{if(answered)return;answered=true;tried++;if(rec.ok)ok++;
+      o.querySelectorAll(".opt").forEach(x=>{if(x.textContent===ans)x.classList.add("ok");else if(!rec.ok&&x.textContent===rec.a)x.classList.add("no")});
+      w.hidden=false;w.textContent=why;d.querySelector(".s u").innerHTML=`&nbsp;${ans}&nbsp;`};
+    el.appendChild(d)});
+  RESTORE.push(S=>{const a=S[act]&&S[act].answers;if(!a)return;Object.entries(a).forEach(([i,r])=>apply[i]&&apply[i](r));if(tried)upd()})}
+
+/* 1 */
+choose("adjadv",[
+ ["The patient looked ___ when he saw the needle.",["nervous","nervously"],"nervous","'Look' = seem here, a linking verb: adjective."],
+ ["Dr Fang looked ___ at the X-ray.",["careful","carefully"],"carefully","'Look at' is an action: how did he look? Adverb."],
+ ["The coffee in the staff room tastes ___.",["awful","awfully"],"awful","'Taste' is a linking verb: adjective."],
+ ["She speaks English very ___.",["good","well"],"well","How does she speak? Adverb: well."],
+ ["I don't feel ___ today. I think I'm getting a cold.",["well","good"],"well","Here 'well' is an adjective meaning healthy."],
+ ["The receptionist smiled at us in a ___ way.",["friendly","friendlily"],"friendly","'Friendly' is an adjective with no -ly adverb: in a friendly way."],
+ ["The new clinic seems very ___.",["modern","modernly"],"modern","'Seem' is a linking verb: adjective."],
+ ["He drives far too ___.",["fast","fastly"],"fast","'Fast' is both an adjective and an adverb. 'Fastly' doesn't exist."],
+ ["The procedure was ___ quick.",["surprising","surprisingly"],"surprisingly","An adverb modifies the adjective 'quick'."],
+ ["She became very ___ after the operation.",["quiet","quietly"],"quiet","'Become' is a linking verb: adjective."],
+ ["The patient was ___ injured in the accident.",["serious","seriously"],"seriously","How badly injured? Adverb before a past participle."],
+ ["Everything happened so ___ that nobody noticed.",["quick","quickly"],"quickly","How did it happen? Adverb."]
+]);
+
+/* 2 */
+choose("pairs",[
+ ["I've ___ had time to eat today.",["hard","hardly"],"hardly","hardly = almost not."],
+ ["Dental surgeons work very ___.",["hard","hardly"],"hard","work hard = with a lot of effort. 'Hard' is the adverb."],
+ ["Have you read any good books ___?",["late","lately"],"lately","lately = recently."],
+ ["The last operation finished ___, at 9 p.m.",["late","lately"],"late","late = not early."],
+ ["Dr Fang is ___ respected by his colleagues.",["highly","high"],"highly","highly = very much."],
+ ["The bat flew ___ above the clinic.",["high","highly"],"high","high = far above the ground."],
+ ["I ___ missed my train this morning!",["nearly","near"],"nearly","nearly = almost."],
+ ["Our patients are ___ elderly people.",["mostly","most"],"mostly","mostly = mainly, in most cases."],
+ ["Children under five are treated ___ at this clinic.",["free","freely"],"free","free = without paying. Freely = without limits."]
+]);
+
+/* 3 types */
+(function(){const C={manner:"Manner",frequency:"Frequency",degree:"Degree",time:"Time",comment:"Comment",certainty:"Certainty",focus:"Focus"};
+  const W=[["carefully","manner"],["quietly","manner"],["rarely","frequency"],["occasionally","frequency"],["extremely","degree"],["fairly","degree"],["absolutely","degree"],["yesterday","time"],["soon","time"],["unfortunately","comment"],["luckily","comment"],["apparently","comment"],["definitely","certainty"],["probably","certainty"],["even","focus"],["only","focus"]];
+  let list=shuffle(W),i=0,ok=0,first=true,pick=null;const cats=document.getElementById("tyCats"),fb=document.getElementById("tyFb"),nx=document.getElementById("tyNext");
+  Object.entries(C).forEach(([k,l])=>{const b=document.createElement("button");b.className="cat";b.textContent=l;
+    b.onclick=()=>{if(!nx.hidden)return;const a=list[i];
+      if(k===a[1]){b.classList.add("ok");if(first)ok++;TR.answer("types",a[0],a[0],first?C[k]:C[pick],C[a[1]],first,ok,list.length);
+        fb.className="feedback ok";fb.textContent=`Yes! "${a[0]}" is an adverb of ${C[a[1]].toLowerCase()}.`;nx.hidden=false;
+        document.getElementById("s-types").textContent=`First-try answers: ${ok} / ${i+1}`;if(i===list.length-1){nx.textContent="Finished!";TR.finish("types",ok,list.length);mark("types")}}
+      else{if(first){first=false;pick=k}b.classList.add("no");fb.className="feedback no";fb.textContent="Not quite. Check the table and try again.";setTimeout(()=>b.classList.remove("no"),500)}};cats.appendChild(b)});
+  function draw(){const a=list[i];first=true;document.getElementById("tyNum").textContent=`${i+1} / ${list.length}`;document.getElementById("tyWord").textContent=a[0];fb.textContent="";nx.hidden=true;cats.querySelectorAll(".cat").forEach(c=>c.classList.remove("ok","no"))}
+  nx.onclick=()=>{if(i<list.length-1){i++;draw()}};draw();
+  RESTORE.push(S=>{const a=S.types&&S.types.answers;if(!a)return;const d=Object.keys(a);if(!d.length)return;
+    list=[...list.filter(x=>d.includes(x[0])),...list.filter(x=>!d.includes(x[0]))];ok=Object.values(a).filter(r=>r.ok).length;i=Math.min(d.length,list.length-1);
+    document.getElementById("s-types").textContent=`First-try answers: ${ok} / ${d.length}`;draw();if(d.length>=list.length){nx.hidden=false;nx.textContent="Finished!";fb.className="feedback ok";fb.textContent="You've sorted all the adverbs.";mark("types")}})})();
+
+/* 4 place: [tokens, adverb, correct slot indexes, end punctuation, why] slot k = before token k; slot n = at the end */
+const PL=[
+ [["I","check","every patient's X-ray"],"always",[1],".","Frequency: before the main verb."],
+ [["Dr Fang","is","late","for appointments"],"never",[2],".","Frequency: after 'be'."],
+ [["The patient","explained","his symptoms"],"clearly",[3],".","Manner: after the object, not between the verb and the object."],
+ [["The procedure","was","painful"],"extremely",[2],".","Degree: before the adjective."],
+ [["We","have","finished","the treatment"],"already",[2],".","'Already': after the auxiliary, before the main verb."],
+ [["She","won't","come","to the conference"],"probably",[1],".","Certainty: before won't (She probably won't come)."],
+ [["He","didn't","say","goodbye"],"even",[2],".","Focus: before the word it focuses on (didn't even say)."],
+ [["I","saw","Dr Fang","in the corridor"],"yesterday",[4,0],".","Time: at the end (or at the start)."],
+ [["the anaesthetic","didn't work"],"Unfortunately,",[0],".","Comment: at the start of the sentence."],
+ [["You","should","brush","your teeth"],"gently",[4,2],".","Manner: after the object (or before the main verb). Not between 'brush' and 'your teeth'."],
+ [["Have","you","finished","the report"],"yet",[4],"?","'Yet': at the end of questions and negatives."],
+ [["My hands","are","steady","during surgery"],"usually",[2],".","Frequency: after 'be'."]
+];
+(function(){const el=document.getElementById("place");let ok=0,tried=0;const apply=[];
+  const upd=()=>{document.getElementById("s-place").textContent=`First-try answers: ${ok} / ${tried}`;if(tried===PL.length)mark("place")};
+  PL.forEach(([toks,adv,good,end,why],qi)=>{const d=document.createElement("div");d.className="slotq";
+    d.innerHTML=`<span class="n">${qi+1} · add <span class="adv">${adv}</span></span><div class="sent"></div><p class="why" hidden></p>`;
+    const sent=d.querySelector(".sent"),w=d.querySelector(".why");let answered=false;const slots=[];
+    const text=k=>{const t=[...toks];t.splice(k,0,adv);let s=t.join(" ")+end;return s.charAt(0).toUpperCase()+s.slice(1)};
+    function place(k){slots.forEach(s=>s.classList.add("used"));const span=document.createElement("span");span.className="tok";
+      span.innerHTML=`<b style="color:var(--ok)">${k===0?adv.charAt(0).toUpperCase()+adv.slice(1):adv}</b>`;sent.insertBefore(span,slots[k]);
+      if(k===0){const t0=slots[0].nextSibling;if(t0)t0.textContent=toks[0]}w.hidden=false;w.textContent=why}
+    for(let k=0;k<=toks.length;k++){const s=document.createElement("button");s.className="slot";s.textContent="^";s.setAttribute("aria-label",`Put "${adv}" in gap ${k+1}`);
+      s.onclick=()=>{if(answered&&s.classList.contains("used"))return;const right=good.includes(k);const first=!answered;
+        if(right){if(!answered){answered=true;tried++;ok++}place(k)}
+        else{s.classList.add("no");setTimeout(()=>s.classList.remove("no"),500);if(!answered){answered=true;tried++}}
+        upd();if(first){TR.answer("place",qi,text(good[0]).replace(adv,"___"),text(k),text(good[0]),right,ok,PL.length);if(tried===PL.length)TR.finish("place",ok,PL.length)}};
+      slots.push(s);sent.appendChild(s);
+      if(k<toks.length){const t=document.createElement("span");t.className="tok";t.textContent=k===0?toks[0].charAt(0).toUpperCase()+toks[0].slice(1):toks[k];sent.appendChild(t)}}
+    const e=document.createElement("span");e.className="tok";e.textContent=end;sent.appendChild(e);
+    apply[qi]=rec=>{if(answered)return;answered=true;tried++;if(rec.ok)ok++;place(good[0])};
+    el.appendChild(d)});
+  RESTORE.push(S=>{const a=S.place&&S.place.answers;if(!a)return;Object.entries(a).forEach(([i,r])=>apply[i]&&apply[i](r));if(tried)upd()})})();
+
+/* 5 write */
+const story=document.getElementById("story");let draftT=null,sent=false;
+story.addEventListener("input",()=>{clearTimeout(draftT);draftT=setTimeout(()=>{if(!story.value.trim())return;TR.answer("write",0,sent?"A day at the clinic":"A day at the clinic (draft)",story.value.trim(),"",true,sent?1:0,1);if(sent)TR.finish("write",1,1)},2000)});
+document.getElementById("sendStory").onclick=()=>{const t=story.value.trim();if(t.split(/\s+/).length<35){document.getElementById("storyMsg").textContent="A bit more, please: write at least 6 sentences.";return}
+  clearTimeout(draftT);sent=true;TR.answer("write",0,"A day at the clinic",t,"",true,1,1);TR.finish("write",1,1);mark("write");
+  document.getElementById("storyMsg").textContent=canSave?"Sent! Polina will read it.":"Saved on this device. Open the page from your portal link to send it to Polina."};
+RESTORE.push(S=>{const a=S.write&&S.write.answers;if(a&&a[0]&&a[0].a&&!story.value)story.value=a[0].a;if(S.write&&S.write.final){sent=true;mark("write")}});
+["manner","frequency","degree","time","comment","certainty","focus"].forEach(t=>{const b=document.createElement("button");b.className="check";b.textContent=t;b.setAttribute("aria-pressed","false");
+  b.onclick=()=>b.setAttribute("aria-pressed",b.getAttribute("aria-pressed")!=="true");document.getElementById("checks").appendChild(b)});
+
+TR.init("adv").then(S=>RESTORE.forEach(f=>{try{f(S)}catch(e){console.error(e)}}));
+</script>
+</body>
+</html>
