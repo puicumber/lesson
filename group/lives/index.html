@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Life Stories</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<script src="../../assets/config.js?v=5"></script>
+<script src="../../assets/portal.js?v=3"></script>
+<script src="../../assets/track.js?v=2"></script>
+<style>
+body{margin:0}
+
+body{margin:0}
+
+/* Layout: a family album. Header card, pill tabs per exercise, one panel at a time. */
+:root{
+  --bg:#eef4f5; --card:#fdfefe; --ink:#16282b; --muted:#56696c; --line:#cddcdf;
+  --leaf:#137a86; --leaf-soft:#137a8618; --sun:#e2577a; --sun-soft:#e2577a22; --sky:#2f7fa8;
+  --ok:#1f8a5b; --ok-soft:#1f8a5b1f; --bad:#c2453d; --bad-soft:#c2453d1c;
+  --display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;
+  --body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#111a1c; --card:#182326; --ink:#e4eef0; --muted:#9db0b3; --line:#2e3f43;
+  --leaf:#5cc6d2; --leaf-soft:#5cc6d21f; --sun:#f08aa4; --sun-soft:#f08aa424; --sky:#6db7dd;
+  --ok:#86c46c; --ok-soft:#86c46c22; --bad:#ef7d74; --bad-soft:#ef7d7422; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111a1c; --card:#182326; --ink:#e4eef0; --muted:#9db0b3; --line:#2e3f43;
+  --leaf:#5cc6d2; --leaf-soft:#5cc6d21f; --sun:#f08aa4; --sun-soft:#f08aa424; --sky:#6db7dd;
+  --ok:#86c46c; --ok-soft:#86c46c22; --bad:#ef7d74; --bad-soft:#ef7d7422; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 64px}
+.wrap{max-width:940px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+h1,h2,h3{font-family:var(--display);margin:0;line-height:1.05;text-wrap:balance}
+h1{font-size:clamp(40px,7vw,64px);font-weight:800;letter-spacing:-.02em;color:var(--leaf)}
+h2{font-size:clamp(28px,4vw,36px);font-weight:800}
+h3{font-size:21px;font-weight:600}
+p{margin:0}
+.eyebrow{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.lede{color:var(--muted);max-width:64ch}
+.tip{font-size:14px;color:var(--muted);font-style:italic}
+
+.guide{position:relative;border:2px solid var(--leaf);border-radius:20px;padding:26px clamp(20px,4vw,36px);background:var(--card);display:flex;flex-direction:column;gap:10px;overflow:hidden}
+.guide::before{content:"";position:absolute;right:-40px;top:-40px;width:200px;height:200px;border-radius:50%;background:var(--sun-soft)}
+.guide .critters{position:absolute;right:clamp(16px,4vw,34px);top:20px;font-size:clamp(30px,5vw,44px);letter-spacing:.1em}
+@media (max-width:560px){.guide .critters{position:static}}
+
+nav.tabs{display:flex;flex-wrap:wrap;gap:8px}
+.tab{appearance:none;cursor:pointer;font:inherit;font-weight:700;font-size:15px;border-radius:999px;padding:8px 16px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+.tab:hover{border-color:var(--leaf)}
+.tab[aria-selected="true"]{background:var(--leaf);border-color:var(--leaf);color:var(--card)}
+.tab.done::after{content:" ✓"}
+.tab:focus-visible,.btn:focus-visible,.opt:focus-visible,.flash:focus-visible,input:focus-visible,.cat:focus-visible{outline:2px solid var(--sun);outline-offset:2px}
+
+section.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:clamp(20px,4vw,34px);display:flex;flex-direction:column;gap:22px}
+.head{display:flex;flex-direction:column;gap:8px}
+.btn{appearance:none;cursor:pointer;font:inherit;font-weight:700;font-size:16px;border-radius:999px;padding:10px 20px;border:1px solid var(--leaf);background:var(--leaf);color:var(--card)}
+.btn.ghost{background:transparent;color:var(--leaf)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.score{font-weight:700;color:var(--leaf);font-variant-numeric:tabular-nums}
+.bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden}
+.bar span{display:block;height:100%;background:var(--sun);transition:width .3s}
+
+/* flashcards */
+.filters{display:flex;gap:6px;flex-wrap:wrap}
+.filter{appearance:none;cursor:pointer;font:inherit;font-size:14px;border-radius:8px;padding:5px 12px;border:1px solid var(--line);background:transparent;color:var(--muted)}
+.filter[aria-pressed="true"]{border-color:var(--sun);background:var(--sun-soft);color:var(--ink)}
+.flash{appearance:none;cursor:pointer;font:inherit;color:var(--ink);width:100%;min-height:250px;border-radius:18px;border:2px solid var(--line);background:var(--bg);padding:24px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center}
+.flash .em{font-size:clamp(70px,14vw,110px);line-height:1}
+.flash .w{font-family:var(--display);font-size:clamp(32px,6vw,48px);font-weight:800;color:var(--leaf);line-height:1.05}
+.flash .t{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.flash .d{font-size:18px;max-width:44ch}
+.flash.back{border-color:var(--sun)}
+
+/* sort */
+.sort-card{background:var(--bg);border:2px solid var(--line);border-radius:18px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center}
+.sort-card .word{font-family:var(--display);font-size:clamp(34px,6vw,50px);font-weight:800}
+.cats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;width:100%}
+@media (max-width:560px){.cats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.cat{appearance:none;cursor:pointer;font:inherit;font-weight:700;border-radius:14px;padding:14px 8px;border:2px solid var(--line);background:var(--card);color:var(--ink);display:flex;flex-direction:column;gap:4px;align-items:center}
+.cat .ic{font-size:30px}
+.cat:hover{border-color:var(--leaf)}
+.cat.ok{border-color:var(--ok);background:var(--ok-soft)}
+.cat.no{border-color:var(--bad);background:var(--bad-soft);animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.feedback{min-height:1.5em;font-weight:700}
+.feedback.ok{color:var(--ok)}.feedback.no{color:var(--bad)}
+
+/* choose */
+.qs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:700px){.qs{grid-template-columns:1fr}}
+.q{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.q .n{font-size:12px;color:var(--muted);letter-spacing:.1em}
+.q .s{font-weight:700}
+.opts{display:flex;gap:6px;flex-wrap:wrap}
+.opt{appearance:none;cursor:pointer;font:inherit;font-size:15px;border-radius:8px;padding:6px 12px;background:var(--card);color:var(--ink);border:1px solid var(--line)}
+.opt:hover{border-color:var(--leaf)}
+.opt.ok{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.opt.no{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.why{font-size:14px;color:var(--muted)}
+
+/* rules */
+.rule{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.rule div{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:4px}
+.rule strong{font-family:var(--display);font-size:22px;color:var(--leaf)}
+.rule span{font-size:15px}
+.timeline{display:flex;align-items:center;gap:0;margin:4px 0}
+.timeline .pt{font-weight:700;font-size:14px;white-space:nowrap}
+.timeline .ln{flex:1;height:4px;background:linear-gradient(90deg,var(--sun),var(--leaf));border-radius:2px;margin:0 10px;position:relative}
+.timeline .ln::after{content:"";position:absolute;right:-6px;top:-5px;border:7px solid transparent;border-left-color:var(--leaf)}
+
+/* spelling */
+.spell{padding:0;margin:0;display:flex;flex-direction:column;gap:8px}
+.spell li{list-style:none;display:grid;grid-template-columns:56px minmax(0,1fr) 200px auto;gap:10px;align-items:center;padding:10px 14px;border-radius:12px;background:var(--bg);border:1px solid transparent}
+@media (max-width:600px){.spell li{grid-template-columns:44px minmax(0,1fr)}.spell li input{grid-column:1/-1}}
+.spell li.ok{border-color:var(--ok)}.spell li.no{border-color:var(--bad)}
+.spell .em{font-size:34px;text-align:center}
+.hint{font-family:var(--display);font-weight:600;color:var(--sun)}
+input[type=text]{font:inherit;font-size:16px;color:var(--ink);background:var(--card);border:1px solid var(--leaf);border-radius:8px;padding:6px 10px;width:100%}
+.mark{font-size:14px}.mark.ok{color:var(--ok)}.mark.no{color:var(--bad)}
+
+/* talk */
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:700px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.paw{appearance:none;cursor:pointer;font:inherit;color:var(--ink);background:var(--bg);border:2px dashed var(--sun);border-radius:14px;min-height:118px;padding:14px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:15px}
+.paw:not(.open){font-size:36px}
+.paw.open{border-style:solid;border-color:var(--line)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+.col{display:flex;flex-direction:column;gap:8px}
+.chip{appearance:none;cursor:pointer;font:inherit;text-align:left;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+.chip:hover{border-color:var(--leaf)}
+.chip.ok{border-color:var(--ok);background:var(--ok-soft);color:var(--ok);cursor:default}
+.chip.no{animation:shake .35s;border-color:var(--bad)}
+.chip .ord{font-weight:700}
+.fill{display:flex;flex-direction:column;gap:8px;padding:0;margin:0}
+.fill li{list-style:none;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;padding:10px 14px;border-radius:12px;background:var(--bg);border:1px solid transparent}
+.fill li.ok{border-color:var(--ok)}.fill li.no{border-color:var(--bad)}
+.fill .mark{margin-left:auto}
+select{font:inherit;font-size:16px;color:var(--ink);background:var(--card);border:1px solid var(--leaf);border-radius:8px;padding:4px 8px;max-width:100%}
+.note-box{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+textarea{width:100%;min-height:220px;font:inherit;font-size:17px;line-height:1.6;color:var(--ink);background:transparent;border:none;resize:vertical}
+textarea:focus{outline:2px solid var(--sun);outline-offset:4px;border-radius:6px}
+.checks{display:flex;flex-wrap:wrap;gap:8px}
+.check{appearance:none;cursor:pointer;font:inherit;font-size:15px;border-radius:999px;padding:6px 14px;border:1px solid var(--line);background:transparent;color:var(--ink)}
+.check[aria-pressed="true"]{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.check[aria-pressed="true"]::before{content:"✓ "}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="guide">
+    <span class="critters" aria-hidden="true">👶🎓💍</span>
+    <span class="eyebrow">Homework · Life stages + present perfect or past simple</span>
+    <h1>Life Stories</h1>
+    <p class="lede">From being born to retiring: learn the life events, practise the /ɔː/ sound, and decide between the present perfect and the past simple.</p>
+    <p class="tip" id="saveState"></p>
+  </header>
+
+  <nav class="tabs" role="tablist" id="tabs"></nav>
+
+  <section class="panel" id="p-cards" role="tabpanel">
+    <div class="head"><span class="eyebrow">Step 1</span><h2>Life events</h2>
+      <p class="lede">Read the phrase and remember what it means. Click to check. "Got it" removes the card; "Again" keeps it.</p></div>
+    <div class="bar"><span id="bar" style="width:0"></span></div>
+    <button class="flash" id="flash"></button>
+    <div class="row"><button class="btn ghost" id="again">Again</button><button class="btn" id="gotit">Got it</button><span class="score" id="fCount"></span><button class="btn ghost" id="fReset" style="margin-left:auto">Start again</button></div>
+  </section>
+
+  <section class="panel" id="p-order" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Step 2</span><h2>A typical life</h2>
+      <p class="lede">Click the events in a logical order, from "be born" to "die". There's more than one possible order in real life, but here, follow the usual one.</p></div>
+    <div class="col" id="order"></div>
+    <div class="row"><span class="score" id="oScore"></span><button class="btn ghost" id="oReset">Start again</button></div>
+  </section>
+
+  <section class="panel" id="p-words" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Step 3</span><h2>Which word?</h2>
+      <p class="lede">Choose the right word. Watch out for get married / be married, marry somebody, and die / death / dead.</p></div>
+    <div class="qs" id="words"></div>
+    <span class="score" id="wScore"></span>
+  </section>
+
+  <section class="panel" id="p-sound" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Step 4</span><h2>Horse or bird?</h2>
+      <p class="lede">Say each word out loud. Does it have the sound in <span style="white-space:nowrap"><b>horse</b> /ɔː/</span> or the sound in <span style="white-space:nowrap"><b>bird</b> /ɜː/</span>?</p></div>
+    <div class="rule"><div><strong>The wor- rule</strong><span>wor + consonant usually sounds like <b>bird</b>: work, world, word, worse.</span></div></div>
+    <div class="sort-card">
+      <span class="eyebrow" id="snNum"></span>
+      <span class="word" id="snWord"></span>
+      <div class="cats" id="snCats" style="grid-template-columns:repeat(2,minmax(0,1fr))"></div>
+      <p class="feedback" id="snFb"></p>
+      <button class="btn" id="snNext" hidden>Next word</button>
+    </div>
+    <span class="score" id="snScore"></span>
+  </section>
+
+  <section class="panel" id="p-tense" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Step 5</span><h2>Finished or not?</h2></div>
+    <div class="rule">
+      <div><strong>past simple</strong><span>A finished period: the person is dead, or the situation has ended.</span>
+        <div class="timeline"><span class="pt">1960</span><span class="ln" style="background:var(--muted)"></span><span class="pt">1990 ✕</span></div>
+        <span class="tip">Grandad was married for 30 years. (He's dead now.)</span></div>
+      <div><strong>present perfect</strong><span>An unfinished period: from the past until now, still true.</span>
+        <div class="timeline"><span class="pt">2015</span><span class="ln"></span><span class="pt">now</span></div>
+        <span class="tip">My parents have been married since 2015. (They're still married.)</span></div>
+    </div>
+    <div class="qs" id="tense"></div>
+    <span class="score" id="tScore"></span>
+  </section>
+
+  <section class="panel" id="p-bio" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Step 6</span><h2>Like grandmother, like granddaughter</h2>
+      <p class="lede">Rosa (1938–2019) was a singer. Her granddaughter Mia (born 1996) is a singer too. Complete their story with the right forms, then press "Check".</p></div>
+    <ol class="fill" id="bio"></ol>
+    <div class="row"><button class="btn" id="bioCheck">Check</button><span class="score" id="bioScore"></span></div>
+  </section>
+
+  <section class="panel" id="p-write" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Step 7</span><h2>Your family story</h2>
+      <p class="lede">Write about two people in your family (5–8 sentences): one person who is no longer alive, or a situation that has finished, and one that is still true now. Use the past simple <i>and</i> the present perfect, and at least four life events from Step 1. Polina will read it.</p></div>
+    <div class="note-box"><label for="story" class="eyebrow">Your text</label><textarea id="story" placeholder="My grandmother was born in 1950. She went to school in…"></textarea></div>
+    <div class="row"><button class="btn" id="sendStory">Send to Polina</button><span class="score" id="storyMsg"></span></div>
+    <div class="checks" id="checks"></div>
+  </section>
+</div>
+
+<script>
+const TABS=[["cards","Life events"],["order","Order"],["words","Which word?"],["sound","Horse or bird?"],["tense","Finished or not?"],["bio","Rosa & Mia"],["write","Your story"]];
+const tabsEl=document.getElementById("tabs");
+TABS.forEach(([id,name])=>{const b=document.createElement("button");b.className="tab";b.setAttribute("role","tab");b.id="t-"+id;b.textContent=name;b.onclick=()=>show(id);tabsEl.appendChild(b)});
+function show(id){TABS.forEach(([t])=>{document.getElementById("p-"+t).hidden=t!==id;document.getElementById("t-"+t).setAttribute("aria-selected",t===id)});
+  try{if(location.hash!=="#"+id)history.replaceState(null,"","#"+id)}catch(e){}}
+const h0=location.hash.slice(1);show(TABS.some(t=>t[0]===h0)?h0:"cards");
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const mark=id=>document.getElementById("t-"+id).classList.add("done");
+const TR=window.Track;const canSave=TR.online;const RESTORE=[];
+TR.onStatus(st=>{document.getElementById("saveState").textContent=!canSave?"Tip: open this page from your personal portal link to save your progress.":st==="saving"?"Saving…":st==="offline"?"No connection right now: your answers are kept on this device and will be sent later.":"Your progress saves automatically after every answer."});
+
+/* 1 cards */
+const EV=[["be born","👶","to start your life","I was born in 2001."],["go to primary school","🎒","go to school from about 6 to 10 or 11","She went to primary school in her village."],["go to secondary school","🏫","go to school from about 11 to 17 (US: middle school, then high school)","I went to secondary school in Maykop."],["leave school","🚪","finish school and stop going there","He left school at 17."],["go to university","🎓","study for a degree after school","She went to university in Moscow."],["get a job","💼","start working for money","I got my first job when I was 19."],["fall in love","😍","start to love someone romantically","They fell in love at a concert."],["get married / marry somebody","💍","become husband and wife (marry somebody: no preposition!)","They got married in 2020. She married a teacher."],["be married","👫","the state of being husband and wife","My parents have been married for 25 years."],["have children","👨‍👩‍👧","become a parent","They had two children."],["separate","💔","stop living together as a couple","They separated after ten years."],["get divorced / divorce somebody","📄","end a marriage officially","They got divorced in 2015."],["retire","🏖️","stop working, usually because you're older","My grandad retired at 60."],["die · death · dead","🕯️","die (verb), death (noun), dead (adjective)","He died in 2004. His death was a shock. He's dead."]];
+let known=new Set(),deck=[],cur=null,flipped=false;
+const saveCards=()=>TR.extra("cards",{known:[...known]},known.size,EV.length);
+function buildDeck(){deck=shuffle(EV.filter(a=>!known.has(a[0])));next()}
+function next(){cur=deck.shift()||null;flipped=false;render()}
+function render(){const f=document.getElementById("flash"),k=known.size;
+  document.getElementById("bar").style.width=(k/EV.length*100)+"%";document.getElementById("fCount").textContent=`${k} of ${EV.length} learned`;
+  f.classList.toggle("back",flipped);
+  if(!cur){f.innerHTML='<span class="w">All done!</span><span class="d">You know all the life events. Go to Step 2.</span>';mark("cards");return}
+  f.innerHTML=flipped?`<span class="em">${cur[1]}</span><span class="w">${cur[0]}</span><span class="d">${cur[2]}</span><span class="d" style="font-style:italic;color:var(--muted)">${cur[3]}</span>`
+    :`<span class="w">${cur[0]}</span><span class="tip">What does it mean? Click to check.</span>`}
+document.getElementById("flash").onclick=()=>{if(cur){flipped=!flipped;render()}};
+document.getElementById("gotit").onclick=()=>{if(!cur)return;known.add(cur[0]);saveCards();next()};
+document.getElementById("again").onclick=()=>{if(!cur)return;deck.splice(Math.min(3,deck.length),0,cur);next()};
+document.getElementById("fReset").onclick=()=>{known=new Set();saveCards();buildDeck()};
+buildDeck();
+RESTORE.push(S=>{const k=S.cards&&S.cards.extra&&S.cards.extra.known;if(k&&k.length){k.forEach(x=>known.add(x));buildDeck()}});
+
+/* 2 order */
+const ORDER=["be born","go to primary school","go to secondary school","leave school","go to university","get a job","fall in love","get married","have children","separate","get divorced","retire","die"];
+(function(){const el=document.getElementById("order");let step=0,ok=0,firstWrong=null;let btns=[];
+  function build(doneN){el.innerHTML="";step=0;ok=0;firstWrong=null;btns=[];
+    shuffle(ORDER.map((e,i)=>[e,i])).forEach(([e,i])=>{const b=document.createElement("button");b.className="chip";b.dataset.i=i;b.innerHTML=`<span class="ord"></span>${e}`;
+      b.onclick=()=>{if(b.classList.contains("ok"))return;
+        if(i===step){b.classList.add("ok");b.querySelector(".ord").textContent=(i+1)+". ";if(firstWrong===null)ok++;
+          TR.answer("order",step,`Step ${step+1}`,firstWrong===null?e:ORDER[firstWrong],ORDER[step],firstWrong===null,ok,ORDER.length);
+          step++;firstWrong=null;el.appendChild(b);[...el.children].filter(c=>!c.classList.contains("ok")).forEach(c=>el.appendChild(c));
+          document.getElementById("oScore").textContent=step===ORDER.length?`Done! First-try steps: ${ok} / ${ORDER.length}`:`${step} / ${ORDER.length}`;
+          if(step===ORDER.length){TR.finish("order",ok,ORDER.length);mark("order")}}
+        else{if(firstWrong===null)firstWrong=i;b.classList.add("no");setTimeout(()=>b.classList.remove("no"),400)}};
+      el.appendChild(b);btns[i]=b});
+    for(let k=0;k<doneN;k++){const b=btns[k];b.classList.add("ok");b.querySelector(".ord").textContent=(k+1)+". ";el.appendChild(b)}
+    [...el.children].filter(c=>!c.classList.contains("ok")).forEach(c=>el.appendChild(c));step=doneN;
+    document.getElementById("oScore").textContent=doneN?`${doneN} / ${ORDER.length}`:""}
+  build(0);
+  document.getElementById("oReset").onclick=()=>{TR.reset("order");build(0)};
+  RESTORE.push(S=>{const a=S.order&&S.order.answers;if(!a)return;const n=Object.keys(a).length;if(!n)return;build(n);ok=Object.values(a).filter(r=>r.ok).length;if(n>=ORDER.length){document.getElementById("oScore").textContent=`Done! First-try steps: ${ok} / ${ORDER.length}`;mark("order")}})})();
+
+/* choose helper */
+function choose(elId,data,scoreId,act){let ok=0,tried=0;const el=document.getElementById(elId);const apply=[];
+  const upd=()=>{document.getElementById(scoreId).textContent=`First-try answers: ${ok} / ${tried}`;if(tried===data.length)mark(act)};
+  data.forEach(([s,opts,ans,why],i)=>{const d=document.createElement("div");d.className="q";
+    d.innerHTML=`<span class="n">${i+1}</span><p class="s">${s.replace("___","<u>&nbsp;?&nbsp;</u>")}</p><div class="opts"></div><p class="why" hidden></p>`;
+    const o=d.querySelector(".opts"),w=d.querySelector(".why");let answered=false;
+    opts.forEach(t=>{const b=document.createElement("button");b.className="opt";b.textContent=t;
+      b.onclick=()=>{o.querySelectorAll(".opt").forEach(x=>x.classList.remove("no"));const first=!answered;
+        if(t===ans){b.classList.add("ok");w.hidden=false;w.textContent=why;d.querySelector(".s u").innerHTML=`&nbsp;${ans}&nbsp;`;if(!answered){answered=true;tried++;ok++}}
+        else{b.classList.add("no");if(!answered){answered=true;tried++}}
+        upd();if(first){TR.answer(act,i,s,t,ans,t===ans,ok,data.length);if(tried===data.length)TR.finish(act,ok,data.length)}};o.appendChild(b)});
+    apply[i]=rec=>{if(answered)return;answered=true;tried++;if(rec.ok)ok++;
+      o.querySelectorAll(".opt").forEach(x=>{if(x.textContent===ans)x.classList.add("ok");else if(!rec.ok&&x.textContent===rec.a)x.classList.add("no")});
+      w.hidden=false;w.textContent=why;d.querySelector(".s u").innerHTML=`&nbsp;${ans}&nbsp;`};
+    el.appendChild(d)});
+  RESTORE.push(S=>{const a=S[act]&&S[act].answers;if(!a)return;Object.entries(a).forEach(([i,rec])=>apply[i]&&apply[i](rec));if(tried)upd()})}
+
+/* 3 words */
+choose("words",[
+ ["They ___ married in 2010, in a small church by the sea.",["got","did","made"],"got","get married → got married (the event)."],
+ ["She married ___ a doctor from Kazan.",["with","to","— (nothing)"],"— (nothing)","marry somebody: no preposition."],
+ ["He got married ___ his university girlfriend.",["with","to","on"],"to","get married TO somebody."],
+ ["My grandparents ___ married for 50 years now.",["have been","are","got"],"have been","be married (the state) + for: have been married."],
+ ["She ___ in love with him at first sight.",["fell","felt","fall"],"fell","fall in love → fell in love."],
+ ["My aunt and uncle ___ last year. Now they live in different flats.",["separated","separate","divorce"],"separated","separate → separated (stopped living together)."],
+ ["He ___ school at 16 and got a job in a garage.",["left","went","finished from"],"left","leave school → left school."],
+ ["His grandfather's ___ was a shock for the whole family.",["death","dead","die"],"death","We need a noun: death."],
+ ["Is that actor still alive? — No, he's ___.",["dead","death","died"],"dead","After 'be' we need an adjective: dead."],
+ ["She wants to ___ at 60 and travel around the world.",["retire","retired","get retired"],"retire","retire = stop working."],
+ ["In the USA, after middle school you go to ___ school.",["high","higher","upper"],"high","middle school → high school (US)."]
+],"wScore","words");
+
+/* 4 sound */
+(function(){const W=[["more","o"],["work","e"],["world","e"],["small","o"],["walk","o"],["worse","e"],["talk","o"],["ball","o"],["form","o"],["bought","o"],["four","o"],["word","e"],["born","o"],["divorced","o"],["fall","o"],["worth","e"]];
+  const C={o:["horse /ɔː/","🐴"],e:["bird /ɜː/","🐦"]};let list=shuffle(W),i=0,ok=0,first=true,pick=null;
+  const cats=document.getElementById("snCats"),fb=document.getElementById("snFb"),nx=document.getElementById("snNext");
+  Object.entries(C).forEach(([k,[l,ic]])=>{const b=document.createElement("button");b.className="cat";b.innerHTML=`<span class="ic">${ic}</span>${l}`;
+    b.onclick=()=>{if(!nx.hidden)return;const a=list[i];
+      if(k===a[1]){b.classList.add("ok");if(first)ok++;TR.answer("sound",a[0],a[0],first?C[k][0]:C[pick][0],C[a[1]][0],first,ok,list.length);
+        fb.className="feedback ok";fb.textContent=`Yes! ${a[0]} sounds like ${C[a[1]][0].split(" ")[0]}.`;nx.hidden=false;
+        document.getElementById("snScore").textContent=`First-try answers: ${ok} / ${i+1}`;if(i===list.length-1){nx.textContent="Finished!";TR.finish("sound",ok,list.length);mark("sound")}}
+      else{if(first){first=false;pick=k}b.classList.add("no");fb.className="feedback no";fb.textContent="Say it again, slowly. Try the other one!";setTimeout(()=>b.classList.remove("no"),500)}};cats.appendChild(b)});
+  function draw(){const a=list[i];first=true;document.getElementById("snNum").textContent=`${i+1} / ${list.length}`;document.getElementById("snWord").textContent=a[0];fb.textContent="";nx.hidden=true;cats.querySelectorAll(".cat").forEach(c=>c.classList.remove("ok","no"))}
+  nx.onclick=()=>{if(i<list.length-1){i++;draw()}};draw();
+  RESTORE.push(S=>{const a=S.sound&&S.sound.answers;if(!a)return;const d=Object.keys(a);if(!d.length)return;
+    list=[...list.filter(x=>d.includes(x[0])),...list.filter(x=>!d.includes(x[0]))];ok=Object.values(a).filter(r=>r.ok).length;i=Math.min(d.length,list.length-1);
+    document.getElementById("snScore").textContent=`First-try answers: ${ok} / ${d.length}`;draw();if(d.length>=list.length){nx.hidden=false;nx.textContent="Finished!";fb.className="feedback ok";fb.textContent="You've done all the words.";mark("sound")}})})();
+
+/* 5 tense */
+choose("tense",[
+ ["Rosa ___ married to Tom for 30 years. He died in 2005.",["was","has been"],"was","Finished period (Tom is dead): past simple."],
+ ["My parents ___ married since 1998.",["have been","were"],"have been","Still married now + since: present perfect."],
+ ["How long ___ your grandparents married? — For 40 years, until Grandpa died.",["were","have been"],"were","The marriage ended: past simple."],
+ ["How long ___ you known Diana?",["have","did"],"have","You still know her: present perfect."],
+ ["Agatha Christie ___ more than 60 detective novels.",["wrote","has written"],"wrote","She's dead, so her life is a finished period: past simple."],
+ ["Mia ___ two albums so far, and she's working on a third.",["has made","made"],"has made","Her career isn't finished ('so far'): present perfect."],
+ ["My grandad ___ in a factory for 40 years. Then he retired.",["worked","has worked"],"worked","He doesn't work there now: past simple."],
+ ["I ___ in this city since I was 18.",["'ve lived","lived"],"'ve lived","Still true now + since: present perfect."],
+ ["When ___ you leave school?",["did","have"],"did","'When' asks about a finished time: past simple."],
+ ["We ___ in Paris for five years, and then we moved to London.",["lived","have lived"],"lived","You don't live there now: past simple."]
+],"tScore","tense");
+
+/* 6 bio */
+const BIO=[["Rosa","in Naples in 1938.",["was born","has been born"],"was born"],["She","in small clubs for ten years before she became famous.",["sang","has sung"],"sang"],["She","married to a pianist for 40 years.",["was","has been"],"was"],["During her life she","25 albums.",["recorded","has recorded"],"recorded"],["Her granddaughter Mia","singing when she was six.",["started","has started"],"started"],["Mia","in London since 2018.",["has lived","lived"],"has lived"],["She","two albums so far.",["has recorded","recorded"],"has recorded"],["She","married to her manager since 2022.",["has been","was"],"has been"],["Last year she","her first music award.",["won","has won"],"won"],["Mia says: \"I","my grandmother's songs all my life.\"",["have loved","loved"],"have loved"]];
+const bioEl=document.getElementById("bio");
+const bioScore=()=>BIO.filter((x,j)=>bioEl.children[j].querySelector("select").value===x[3]).length;
+BIO.forEach(([a,b,opts,ans],i)=>{const li=document.createElement("li");
+  li.innerHTML=`<span>${a}</span><select id="bio-${i}" aria-label="Gap ${i+1}"><option value="">…</option>${shuffle(opts).map(x=>`<option>${x}</option>`).join("")}</select><span>${b}</span><span class="mark"></span>`;bioEl.appendChild(li);
+  li.querySelector("select").addEventListener("change",e=>{const v=e.target.value;if(v)TR.answer("bio",i,`${a} ___ ${b}`,v,ans,v===ans,bioScore(),BIO.length)})});
+document.getElementById("bioCheck").onclick=()=>{let n=0;BIO.forEach(([,,,ans],i)=>{const li=bioEl.children[i],v=li.querySelector("select").value,m=li.querySelector(".mark"),g=v===ans;
+  li.className=v?(g?"ok":"no"):"";m.className="mark "+(g?"ok":"no");m.textContent=!v?"":g?"✓":"try again";if(g)n++});
+  document.getElementById("bioScore").textContent=`${n} / ${BIO.length}`;TR.finish("bio",n,BIO.length);if(n===BIO.length)mark("bio")};
+RESTORE.push(S=>{const a=S.bio&&S.bio.answers;if(a)Object.entries(a).forEach(([i,r])=>{const s=bioEl.children[i]&&bioEl.children[i].querySelector("select");if(s&&r.a)s.value=r.a})});
+
+/* 7 write */
+const story=document.getElementById("story");let draftT=null;
+let sent=false;
+story.addEventListener("input",()=>{clearTimeout(draftT);draftT=setTimeout(()=>{if(!story.value.trim())return;TR.answer("write",0,sent?"Family story":"Family story (draft)",story.value.trim(),"",true,sent?1:0,1);if(sent)TR.finish("write",1,1)},2000)});
+document.getElementById("sendStory").onclick=()=>{const t=story.value.trim();if(t.split(/\s+/).length<25){document.getElementById("storyMsg").textContent="A bit more, please: write at least 5 sentences.";return}
+  clearTimeout(draftT);sent=true;TR.answer("write",0,"Family story",t,"",true,1,1);TR.finish("write",1,1);mark("write");document.getElementById("storyMsg").textContent=canSave?"Sent! Polina will read it.":"Saved on this device. Open the page from your portal link to send it to Polina."};
+RESTORE.push(S=>{const a=S.write&&S.write.answers;if(a&&a[0]&&a[0].a&&!story.value)story.value=a[0].a;if(S.write&&S.write.final){sent=true;mark("write")}});
+["past simple","present perfect","for / since","4 life events"].forEach(t=>{const b=document.createElement("button");b.className="check";b.textContent=t;b.setAttribute("aria-pressed","false");
+  b.onclick=()=>b.setAttribute("aria-pressed",b.getAttribute("aria-pressed")!=="true");document.getElementById("checks").appendChild(b)});
+
+TR.init("lives").then(S=>RESTORE.forEach(f=>{try{f(S)}catch(e){console.error(e)}}));
+</script>
+</body>
+</html>
