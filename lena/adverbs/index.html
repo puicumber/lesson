@@ -6,7 +6,7 @@
 <title>Adverbs at the Clinic</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
-<script src="../../assets/config.js?v=6"></script>
+<script src="../../assets/config.js?v=7"></script>
 <script src="../../assets/portal.js?v=3"></script>
 <script src="../../assets/track.js?v=2"></script>
 <style>
@@ -152,6 +152,10 @@ textarea:focus{outline:2px solid var(--sun);outline-offset:4px;border-radius:6px
 .check[aria-pressed="true"]{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
 .check[aria-pressed="true"]::before{content:"✓ "}
 
+.match{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.8fr);gap:10px 16px}
+@media (max-width:600px){.match{grid-template-columns:1fr}}
+.chip.word{font-weight:700}
+.chip.sel{border-color:var(--sun);background:var(--sun-soft)}
 .cats7{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;width:100%}
 @media (max-width:640px){.cats7{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .cats7 .cat{padding:10px 6px;font-size:14px}
@@ -177,7 +181,7 @@ textarea:focus{outline:2px solid var(--sun);outline-offset:4px;border-radius:6px
     <span class="critters" aria-hidden="true">🦷🦇📋</span>
     <span class="eyebrow">Homework · Adjectives, adverbs and where to put them</span>
     <h1>Adverbs at the Clinic</h1>
-    <p class="lede">Dr Fang is back from his holiday, and his clinic is full of adverbs. Choose, sort and place them, then write about your own day.</p>
+    <p class="lede">Dr Fang is back from his holiday, and his clinic is full of adverbs. Adjectives or adverbs, confusing pairs, comment adverbs and where to put them, then write about your own day.</p>
     <p class="tip" id="saveState"></p>
   </header>
 
@@ -201,8 +205,31 @@ textarea:focus{outline:2px solid var(--sun);outline-offset:4px;border-radius:6px
     <span class="score" id="s-pairs"></span>
   </section>
 
+  <section class="panel" id="p-confusing" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Step 3</span><h2>Confusing adverbs</h2></div>
+    <div class="rule">
+      <div><strong>at the moment / actually</strong><span>at the moment = now. <b>actually</b> = in fact, really (NOT «актуально»!).</span></div>
+      <div><strong>especially / specially</strong><span>especially = above all, particularly. specially = for a specific purpose.</span></div>
+      <div><strong>ever / even</strong><span>ever = at any time (Have you ever…?). even = to emphasise something surprising.</span></div>
+      <div><strong>in the end / at the end</strong><span>in the end = finally, after a lot of time or problems. at the end (of) = at the last part of something.</span></div>
+      <div><strong>still / yet</strong><span>still = something continues (often longer than expected). yet = something we expect to happen (questions and negatives, at the end).</span></div>
+    </div>
+    <div class="qs" id="confusing"></div>
+    <span class="score" id="s-confusing"></span>
+  </section>
+
+  <section class="panel" id="p-comment" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Step 4</span><h2>Comment adverbs</h2>
+      <p class="lede">These adverbs show what the speaker thinks or how something happened. First match them with their meanings, then use them.</p></div>
+    <div class="match"><div class="col" id="cmW"></div><div class="col" id="cmD"></div></div>
+    <div class="row"><span class="score" id="s-cmatch"></span><button class="btn ghost" id="cmReset">Shuffle again</button></div>
+    <h3>Now use them</h3>
+    <div class="qs" id="comment"></div>
+    <span class="score" id="s-comment"></span>
+  </section>
+
   <section class="panel" id="p-types" role="tabpanel" hidden>
-    <div class="head"><span class="eyebrow">Step 3</span><h2>What kind of adverb?</h2>
+    <div class="head"><span class="eyebrow">Step 5</span><h2>What kind of adverb?</h2>
       <p class="lede">Each type has its usual place in the sentence. First, learn the types: sort each adverb.</p></div>
     <div class="tablewrap"><table class="ref">
       <tr><th>Type</th><th>Examples</th><th>Usual position</th></tr>
@@ -225,15 +252,15 @@ textarea:focus{outline:2px solid var(--sun);outline-offset:4px;border-radius:6px
   </section>
 
   <section class="panel" id="p-place" role="tabpanel" hidden>
-    <div class="head"><span class="eyebrow">Step 4</span><h2>Put it in the right place</h2>
-      <p class="lede">Click the gap where the adverb should go. Check the table in Step 3 if you're not sure.</p></div>
+    <div class="head"><span class="eyebrow">Step 6</span><h2>Put it in the right place</h2>
+      <p class="lede">Click the gap where the adverb should go. Check the table in Step 5 if you're not sure.</p></div>
     <div class="col" id="place" style="gap:12px"></div>
     <span class="score" id="s-place"></span>
   </section>
 
   <section class="panel" id="p-write" role="tabpanel" hidden>
-    <div class="head"><span class="eyebrow">Step 5</span><h2>A day at your clinic</h2>
-      <p class="lede">Write 6–8 sentences about a typical (or a very strange) working day. Use at least one adverb of each type: manner, frequency, degree, time, comment, certainty and focus. Careful with the position! Polina will read it.</p></div>
+    <div class="head"><span class="eyebrow">Step 7</span><h2>A day at your clinic</h2>
+      <p class="lede">Write 6–8 sentences about a typical (or a very strange) working day. Use at least one adverb of each type (manner, frequency, degree, time, comment, certainty, focus), two comment adverbs from Step 4 and two confusing adverbs from Step 3. Careful with the position! Polina will read it.</p></div>
     <div class="note-box"><label for="story" class="eyebrow">Your text</label><textarea id="story" placeholder="I usually arrive at the clinic at 8. Unfortunately, …"></textarea></div>
     <div class="row"><button class="btn" id="sendStory">Send to Polina</button><span class="score" id="storyMsg"></span></div>
     <div class="checks" id="checks"></div>
@@ -241,7 +268,7 @@ textarea:focus{outline:2px solid var(--sun);outline-offset:4px;border-radius:6px
 </div>
 
 <script>
-const TABS=[["adjadv","Adjective or adverb?"],["pairs","Tricky pairs"],["types","Types"],["place","Position"],["write","Your text"]];
+const TABS=[["adjadv","Adjective or adverb?"],["pairs","Tricky pairs"],["confusing","Confusing adverbs"],["comment","Comment adverbs"],["types","Types"],["place","Position"],["write","Your text"]];
 const tabsEl=document.getElementById("tabs");
 TABS.forEach(([id,name])=>{const b=document.createElement("button");b.className="tab";b.setAttribute("role","tab");b.id="t-"+id;b.textContent=name;b.onclick=()=>show(id);tabsEl.appendChild(b)});
 function show(id){TABS.forEach(([t])=>{document.getElementById("p-"+t).hidden=t!==id;document.getElementById("t-"+t).setAttribute("aria-selected",t===id)});
@@ -295,6 +322,46 @@ choose("pairs",[
  ["I ___ missed my train this morning!",["nearly","near"],"nearly","nearly = almost."],
  ["Our patients are ___ elderly people.",["mostly","most"],"mostly","mostly = mainly, in most cases."],
  ["Children under five are treated ___ at this clinic.",["free","freely"],"free","free = without paying. Freely = without limits."]
+]);
+
+/* confusing */
+choose("confusing",[
+ ["We're very busy ___, so we can't take new patients until December.",["at the moment","actually"],"at the moment","at the moment = now."],
+ ["People think all dentists are rich, but ___ many of us still have big loans.",["actually","at the moment"],"actually","actually = in fact, the truth is."],
+ ["I love all sweets, ___ chocolate. That's why I need a dentist!",["especially","specially"],"especially","especially = above all, particularly."],
+ ["This toothpaste was ___ made for sensitive teeth.",["specially","especially"],"specially","specially = for a specific purpose."],
+ ["Have you ___ had a wisdom tooth removed?",["ever","even"],"ever","ever = at any time in your life."],
+ ["It hurt so much that I couldn't ___ talk.",["even","ever"],"even","even = emphasises something surprising or extreme."],
+ ["The patient was very nervous, but ___ he agreed to have the operation.",["in the end","at the end"],"in the end","in the end = finally, after a lot of doubts."],
+ ["Please pay at reception ___ of your appointment.",["at the end","in the end"],"at the end","at the end of = the last part of something."],
+ ["Has the lab sent the X-rays ___?",["yet","still"],"yet","yet: questions and negatives, at the end."],
+ ["It's 4 p.m. and I ___ haven't had lunch!",["still","yet"],"still","still = it continues longer than expected (before haven't)."],
+ ["I've been at the clinic since 7 a.m. and I'm ___ here.",["still","yet"],"still","still = it's continuing."],
+ ["We haven't finished the treatment ___. Two more visits to go.",["yet","still"],"yet","yet at the end of a negative sentence."]
+]);
+
+/* comment adverbs */
+const CM=[["in fact","the truth is (often the opposite of what you said before)"],["eventually","finally, after a long time or many problems"],["ideally","in a perfect world"],["basically","in the most important and simple way"],["apparently","according to what you've heard or read"],["certainly","without any doubt"],["obviously","clearly; as anyone would expect"],["gradually","slowly, little by little"]];
+function buildCM(prev){prev=prev||{};let sel=null,ok=0,clean=0;const wrong=new Set();const W=document.getElementById("cmW"),D=document.getElementById("cmD"),S=document.getElementById("s-cmatch");W.innerHTML="";D.innerHTML="";
+  shuffle(CM).forEach(([w])=>{const b=document.createElement("button");b.className="chip word";b.textContent=w;b.dataset.k=w;if(prev[w])b.classList.add("ok");
+    b.onclick=()=>{if(b.classList.contains("ok"))return;W.querySelectorAll(".sel").forEach(x=>x.classList.remove("sel"));b.classList.add("sel");sel=b};W.appendChild(b)});
+  shuffle(CM).forEach(([w,d])=>{const b=document.createElement("button");b.className="chip";b.textContent=d;if(prev[w]){b.classList.add("ok");ok++;if(prev[w].ok)clean++}
+    b.onclick=()=>{if(!sel||b.classList.contains("ok"))return;
+      if(sel.dataset.k===w){sel.classList.remove("sel");sel.classList.add("ok");b.classList.add("ok");sel=null;ok++;if(!wrong.has(w))clean++;S.textContent=`${ok} / ${CM.length}`;
+        TR.answer("cmatch",w,w,wrong.has(w)?"mismatched first":d,d,!wrong.has(w),clean,CM.length);if(ok===CM.length)TR.finish("cmatch",clean,CM.length)}
+      else{wrong.add(sel.dataset.k);b.classList.add("no");setTimeout(()=>b.classList.remove("no"),400)}};D.appendChild(b)});
+  S.textContent=`${ok} / ${CM.length}`}
+buildCM();document.getElementById("cmReset").onclick=()=>{TR.reset("cmatch");buildCM()};
+RESTORE.push(S=>{const a=S.cmatch&&S.cmatch.answers;if(a&&Object.keys(a).length)buildCM(a)});
+choose("comment",[
+ ["I thought the filling would hurt, but ___ I didn't feel a thing.",["in fact","ideally","gradually"],"in fact","in fact: the opposite of what you expected."],
+ ["The queue was enormous, but ___ we got to see the doctor.",["eventually","basically","obviously"],"eventually","eventually = finally, after a long wait."],
+ ["___, patients should see a dentist twice a year, but most only come when it hurts.",["Ideally","Apparently","Certainly"],"Ideally","Ideally = in a perfect world."],
+ ["___, a root canal means cleaning the inside of the tooth.",["Basically","Eventually","Gradually"],"Basically","Basically = in a simple way, the main idea."],
+ ["___, Dr Fang never sleeps. At least, that's what the nurses say.",["Apparently","Ideally","Basically"],"Apparently","Apparently = according to what people say."],
+ ["I'm ___ not eating sweets again after that toothache!",["certainly","gradually","ideally"],"certainly","certainly = without any doubt."],
+ ["He hasn't brushed his teeth for a week, so ___ he has bad breath.",["obviously","eventually","in fact"],"obviously","obviously = as anyone would expect."],
+ ["After the operation, the swelling ___ went down.",["gradually","apparently","ideally"],"gradually","gradually = little by little."]
 ]);
 
 /* 3 types */
