@@ -285,12 +285,12 @@ function choose(act,data){let ok=0,tried=0;const el=document.getElementById(act)
     const o=d.querySelector(".opts"),w=d.querySelector(".why");let answered=false;
     shuffle(opts).forEach(t=>{const b=document.createElement("button");b.className="opt";b.textContent=t;
       b.onclick=()=>{o.querySelectorAll(".opt").forEach(x=>x.classList.remove("no"));const first=!answered;
-        if(t===ans){b.classList.add("ok");w.hidden=false;w.textContent=why;d.querySelector(".s u").innerHTML=`&nbsp;${ans}&nbsp;`;if(!answered){answered=true;tried++;ok++}}
+        if(t===ans){b.classList.add("ok");w.hidden=false;w.textContent=why;(d.querySelector(".s u")||{}).innerHTML=`&nbsp;${ans}&nbsp;`;if(!answered){answered=true;tried++;ok++}}
         else{b.classList.add("no");if(!answered){answered=true;tried++}}
         upd();if(first){TR.answer(act,i,s,t,ans,t===ans,ok,data.length);if(tried===data.length)TR.finish(act,ok,data.length)}};o.appendChild(b)});
     apply[i]=rec=>{if(answered)return;answered=true;tried++;if(rec.ok)ok++;
       o.querySelectorAll(".opt").forEach(x=>{if(x.textContent===ans)x.classList.add("ok");else if(!rec.ok&&x.textContent===rec.a)x.classList.add("no")});
-      w.hidden=false;w.textContent=why;d.querySelector(".s u").innerHTML=`&nbsp;${ans}&nbsp;`};
+      w.hidden=false;w.textContent=why;(d.querySelector(".s u")||{}).innerHTML=`&nbsp;${ans}&nbsp;`};
     el.appendChild(d)});
   RESTORE.push(S=>{const a=S[act]&&S[act].answers;if(!a)return;Object.entries(a).forEach(([i,r])=>apply[i]&&apply[i](r));if(tried)upd()})}
 
