@@ -90,7 +90,7 @@ const ACT=window.PORTAL_ACTIVITIES||{};
 const isPartial=r=>!!(r.details&&r.details.partial);
 const db=Portal.client;
 const PORTAL_URL=new URL("../my/",location.href).href;
-let S=[],M=[],R=[];
+let S=[],M=[],R=[],DONE=[];
 const $=id=>document.getElementById(id);
 const when=d=>new Date(d).toLocaleString("en-GB",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});
 const actName=a=>{const [m,s]=a.split("/");return ACT[m]&&ACT[m][s]?`${m} · ${ACT[m][s]}`:a};
@@ -101,7 +101,7 @@ function rand(){const a="abcdefghjkmnpqrstuvwxyz23456789";let s="";for(let i=0;i
 async function load(){
   const [s,m,r]=await Promise.all([db.from("students").select("*").order("name"),db.from("materials").select("*").order("created_at",{ascending:false}),db.from("results").select("*").order("created_at",{ascending:false}).limit(1000)]);
   if(s.error||m.error||r.error){$("msg").hidden=false;$("msg").textContent="Couldn't load data: "+(s.error||m.error||r.error).message;return}
-  S=s.data;M=m.data;R=r.data;draw();
+  S=s.data;M=m.data;DONE=r.data.filter(z=>z.activity.startsWith("done:"));R=r.data.filter(z=>!z.activity.startsWith("done:"));draw();
 }
 function draw(){
   const st=$("students");st.innerHTML="";
@@ -127,7 +127,15 @@ function detail(x){
       const {error}=await db.from("materials").delete().eq("id",m.id);
       if(error){b.disabled=false;b.textContent="Error, try again";return}
       M=M.filter(z=>z.id!==m.id);draw();detail(x)};
-    tr.lastElementChild.appendChild(b);mt.appendChild(tr)});
+    const key="done:"+m.id;const isDone=DONE.some(z=>z.student_code===x.code&&z.activity===key);
+    const d=document.createElement("button");d.className="btn small "+(isDone?"":"ghost");d.style.marginRight="6px";d.textContent=isDone?"Done ✓":"Mark done";
+    d.title=isDone?"Click to undo: the material goes back to the student's To do":"Remove it from the student's To do";
+    d.onclick=async()=>{d.disabled=true;d.textContent="…";
+      const res=isDone?await db.from("results").delete().eq("student_code",x.code).eq("activity",key)
+                      :await db.from("results").insert({student_code:x.code,activity:key,score:1,total:1,details:{teacher:true}});
+      if(res.error){d.disabled=false;d.textContent="Error, try again";return}
+      await load();detail(S.find(z=>z.code===x.code)||x)};
+    tr.lastElementChild.appendChild(d);tr.lastElementChild.appendChild(b);mt.appendChild(tr)});
   const mine=R.filter(r=>r.student_code===x.code);const tb=$("dRes");tb.innerHTML="";
   M.filter(m=>m.student_code===x.code).forEach(m=>{
     const subs=m.activity&&ACT[m.activity]?Object.keys(ACT[m.activity]):[];
