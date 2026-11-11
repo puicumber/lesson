@@ -6,7 +6,7 @@
 <title>Adverbs at the Clinic</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
-<script src="../../assets/config.js?v=7"></script>
+<script src="../../assets/config.js?v=8"></script>
 <script src="../../assets/portal.js?v=3"></script>
 <script src="../../assets/track.js?v=2"></script>
 <style>
@@ -181,7 +181,7 @@ textarea:focus{outline:2px solid var(--sun);outline-offset:4px;border-radius:6px
     <span class="critters" aria-hidden="true">🦷🦇📋</span>
     <span class="eyebrow">Homework · Adjectives, adverbs and where to put them</span>
     <h1>Adverbs at the Clinic</h1>
-    <p class="lede">Dr Fang is back from his holiday, and his clinic is full of adverbs. Adjectives or adverbs, confusing pairs, comment adverbs and where to put them, then write about your own day.</p>
+    <p class="lede">Dr Fang is back from his holiday, and his clinic is full of adverbs. Adjectives or adverbs, confusing pairs, comment adverbs and where to put them. About 20–25 minutes.</p>
     <p class="tip" id="saveState"></p>
   </header>
 
@@ -258,17 +258,16 @@ textarea:focus{outline:2px solid var(--sun);outline-offset:4px;border-radius:6px
     <span class="score" id="s-place"></span>
   </section>
 
-  <section class="panel" id="p-write" role="tabpanel" hidden>
-    <div class="head"><span class="eyebrow">Step 7</span><h2>A day at your clinic</h2>
-      <p class="lede">Write 6–8 sentences about a typical (or a very strange) working day. Use at least one adverb of each type (manner, frequency, degree, time, comment, certainty, focus), two comment adverbs from Step 4 and two confusing adverbs from Step 3. Careful with the position! Polina will read it.</p></div>
-    <div class="note-box"><label for="story" class="eyebrow">Your text</label><textarea id="story" placeholder="I usually arrive at the clinic at 8. Unfortunately, …"></textarea></div>
-    <div class="row"><button class="btn" id="sendStory">Send to Polina</button><span class="score" id="storyMsg"></span></div>
-    <div class="checks" id="checks"></div>
+  <section class="panel" id="p-fix" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Step 7 · Final check</span><h2>Which one is correct?</h2>
+      <p class="lede">A quick final round with everything from today. Choose the correct sentence.</p></div>
+    <div class="qs" id="fix"></div>
+    <span class="score" id="s-fix"></span>
   </section>
 </div>
 
 <script>
-const TABS=[["adjadv","Adjective or adverb?"],["pairs","Tricky pairs"],["confusing","Confusing adverbs"],["comment","Comment adverbs"],["types","Types"],["place","Position"],["write","Your text"]];
+const TABS=[["adjadv","Adjective or adverb?"],["pairs","Tricky pairs"],["confusing","Confusing adverbs"],["comment","Comment adverbs"],["types","Types"],["place","Position"],["fix","Final check"]];
 const tabsEl=document.getElementById("tabs");
 TABS.forEach(([id,name])=>{const b=document.createElement("button");b.className="tab";b.setAttribute("role","tab");b.id="t-"+id;b.textContent=name;b.onclick=()=>show(id);tabsEl.appendChild(b)});
 function show(id){TABS.forEach(([t])=>{document.getElementById("p-"+t).hidden=t!==id;document.getElementById("t-"+t).setAttribute("aria-selected",t===id)});
@@ -416,15 +415,19 @@ const PL=[
     el.appendChild(d)});
   RESTORE.push(S=>{const a=S.place&&S.place.answers;if(!a)return;Object.entries(a).forEach(([i,r])=>apply[i]&&apply[i](r));if(tried)upd()})})();
 
-/* 5 write */
-const story=document.getElementById("story");let draftT=null,sent=false;
-story.addEventListener("input",()=>{clearTimeout(draftT);draftT=setTimeout(()=>{if(!story.value.trim())return;TR.answer("write",0,sent?"A day at the clinic":"A day at the clinic (draft)",story.value.trim(),"",true,sent?1:0,1);if(sent)TR.finish("write",1,1)},2000)});
-document.getElementById("sendStory").onclick=()=>{const t=story.value.trim();if(t.split(/\s+/).length<35){document.getElementById("storyMsg").textContent="A bit more, please: write at least 6 sentences.";return}
-  clearTimeout(draftT);sent=true;TR.answer("write",0,"A day at the clinic",t,"",true,1,1);TR.finish("write",1,1);mark("write");
-  document.getElementById("storyMsg").textContent=canSave?"Sent! Polina will read it.":"Saved on this device. Open the page from your portal link to send it to Polina."};
-RESTORE.push(S=>{const a=S.write&&S.write.answers;if(a&&a[0]&&a[0].a&&!story.value)story.value=a[0].a;if(S.write&&S.write.final){sent=true;mark("write")}});
-["manner","frequency","degree","time","comment","certainty","focus"].forEach(t=>{const b=document.createElement("button");b.className="check";b.textContent=t;b.setAttribute("aria-pressed","false");
-  b.onclick=()=>b.setAttribute("aria-pressed",b.getAttribute("aria-pressed")!=="true");document.getElementById("checks").appendChild(b)});
+/* 7 final check */
+choose("fix",[
+ ["Which is correct?",["The patient explained his symptoms clearly.","The patient explained clearly his symptoms."],"The patient explained his symptoms clearly.","Manner adverb after the object, not between the verb and the object."],
+ ["Which is correct?",["She probably won't come.","She won't probably come."],"She probably won't come.","probably goes before won't."],
+ ["Which is correct?",["I am always tired on Mondays.","I always am tired on Mondays."],"I am always tired on Mondays.","Frequency adverb after 'be'."],
+ ["Which is correct?",["She smiled in a friendly way.","She smiled friendly."],"She smiled in a friendly way.","'Friendly' is an adjective: in a friendly way."],
+ ["Which is correct?",["I've hardly slept this week.","I've hard slept this week."],"I've hardly slept this week.","hardly = almost not."],
+ ["Which is correct?",["Have you finished yet?","Have you finished still?"],"Have you finished yet?","yet in questions, at the end."],
+ ["Which is correct?",["This gel was specially made for children.","This gel was especially made for children."],"This gel was specially made for children.","specially = for a specific purpose."],
+ ["Which is correct?",["Actually, I'm a dental surgeon, not a dentist.","At the moment, I'm a dental surgeon, not a dentist."],"Actually, I'm a dental surgeon, not a dentist.","Actually = in fact (correcting someone)."],
+ ["Which is correct?",["The coffee smells wonderful.","The coffee smells wonderfully."],"The coffee smells wonderful.","'Smell' is a linking verb: adjective."],
+ ["Which is correct?",["Luckily, the X-ray was clear.","The X-ray luckily, was clear."],"Luckily, the X-ray was clear.","Comment adverbs usually go at the start."]
+]);
 
 TR.init("adv").then(S=>RESTORE.forEach(f=>{try{f(S)}catch(e){console.error(e)}}));
 </script>
