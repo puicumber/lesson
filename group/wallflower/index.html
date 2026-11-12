@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mixtape for a Wallflower</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Special+Elite&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+/* Layout: a 1991 bedroom desk. A cassette is the centrepiece; the J-card tracklist picks the activity; each track opens a handwritten/typed panel. Deliberately dark, single theme. */
+:root{
+  --desk:#1d1a2b; --desk2:#26223a; --ink:#f4efe6; --muted:#b9b1c9; --line:#3a3452;
+  --tape:#2b2b33; --label:#f6e7c8; --label-ink:#2a2230; --marker:#e2367a; --teal:#2fb7a8; --mustard:#f2b632; --paper:#fbf6ec; --paper-ink:#2a2230;
+  --hand:"Permanent Marker","Comic Sans MS",cursive; --type:"Special Elite","Courier New",monospace; --body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--desk);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55;
+  background-image:repeating-linear-gradient(90deg,#ffffff05 0 2px,transparent 2px 120px),radial-gradient(900px 500px at 50% -10%,#e2367a22,transparent 70%);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px 64px}
+.wrap{max-width:1000px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+h1,h2,h3{margin:0;font-weight:400;line-height:1.1}
+h1{font-family:var(--hand);font-size:clamp(36px,6.5vw,62px);color:var(--mustard);transform:rotate(-1.5deg)}
+h2{font-family:var(--hand);font-size:clamp(28px,4.4vw,40px);color:var(--marker)}
+h3{font-family:var(--type);font-size:20px;color:var(--teal)}
+p{margin:0}
+.eyebrow{font-family:var(--type);font-size:14px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.lede{color:var(--muted);max-width:66ch}
+.top{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:24px;align-items:center}
+@media (max-width:780px){.top{grid-template-columns:1fr}}
+
+/* cassette */
+.cassette{position:relative;width:100%;max-width:460px;aspect-ratio:1.6;margin-inline:auto;background:var(--tape);border-radius:18px;border:3px solid #111;box-shadow:0 18px 40px #0009,inset 0 0 0 10px #34343e}
+.cassette .lbl{position:absolute;left:7%;right:7%;top:9%;height:52%;background:var(--label);border-radius:8px;
+  background-image:linear-gradient(var(--marker) 0 0),linear-gradient(var(--teal) 0 0);background-size:100% 6px,100% 6px;background-position:0 22%,0 30%;background-repeat:no-repeat}
+.cassette .ttl{position:absolute;left:10%;right:10%;top:12%;font-family:var(--hand);font-size:clamp(14px,2.6vw,22px);color:var(--label-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cassette .side{position:absolute;left:9%;top:12%;font-family:var(--type);font-size:12px;color:var(--label-ink);transform:translateY(-130%)}
+.window{position:absolute;left:24%;right:24%;top:36%;height:20%;background:#121216;border-radius:30px;border:2px solid #000;display:flex;justify-content:space-between;align-items:center;padding:0 6%}
+.reel{width:26%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,#ddd 0 18%,#555 19% 24%,#2a2a2a 25%);position:relative}
+.reel::before,.reel::after{content:"";position:absolute;left:50%;top:50%;width:70%;height:8%;background:#ddd;transform:translate(-50%,-50%)}
+.reel::after{transform:translate(-50%,-50%) rotate(60deg)}
+.reel i{position:absolute;left:50%;top:50%;width:70%;height:8%;background:#ddd;transform:translate(-50%,-50%) rotate(120deg)}
+.playing .reel{animation:spin 2.2s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.cassette .screws span{position:absolute;width:10px;height:10px;border-radius:50%;background:#777}
+.cassette .bottom{position:absolute;left:18%;right:18%;bottom:0;height:22%;background:#3a3a44;clip-path:polygon(8% 0,92% 0,100% 100%,0 100%)}
+.now{font-family:var(--type);color:var(--teal);text-align:center;margin-top:12px;min-height:1.6em}
+
+/* j-card tracklist */
+.jcard{background:var(--label);color:var(--label-ink);border-radius:6px;padding:18px 20px;transform:rotate(1deg);box-shadow:0 10px 24px #0008;display:flex;flex-direction:column;gap:6px}
+.jcard .side-h{font-family:var(--type);font-size:13px;letter-spacing:.14em;margin-top:6px;color:#7a6a5a}
+.trk{appearance:none;cursor:pointer;font:inherit;background:none;border:none;text-align:left;color:var(--label-ink);display:grid;grid-template-columns:2.2em minmax(0,1fr) auto;gap:8px;align-items:center;width:100%;padding:4px 6px;border-radius:6px}
+.trk .no{font-family:var(--type);color:#7a6a5a}
+.trk .nm{font-family:var(--hand);font-size:19px;line-height:1.2}
+.trk .min{font-family:var(--type);font-size:13px;color:#7a6a5a}
+.trk:hover{background:#2a223014}
+.trk[aria-selected="true"]{background:var(--marker);color:#fff}
+.trk[aria-selected="true"] .no,.trk[aria-selected="true"] .min{color:#fff}
+.trk.done .nm{text-decoration:line-through;text-decoration-color:var(--teal);text-decoration-thickness:3px}
+.trk:focus-visible,.btn:focus-visible,.note:focus-visible,textarea:focus-visible,input:focus-visible,.chip:focus-visible{outline:3px solid var(--mustard);outline-offset:2px}
+
+/* panels */
+section.track{background:var(--desk2);border:1px solid var(--line);border-radius:18px;padding:clamp(20px,4vw,34px);display:flex;flex-direction:column;gap:20px;animation:in .45s ease-out}
+@keyframes in{from{opacity:.3;transform:translateY(8px)}}
+.btn{appearance:none;cursor:pointer;font:inherit;font-weight:700;font-size:16px;border-radius:999px;padding:10px 20px;border:2px solid var(--marker);background:var(--marker);color:#fff}
+.btn.ghost{background:transparent;color:var(--marker)}
+.btn.teal{background:var(--teal);border-color:var(--teal);color:#06231f}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.foot{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;border-top:1px dashed var(--line);padding-top:16px;align-items:center}
+.tip{font-size:14px;color:var(--muted);font-style:italic}
+
+/* torn notes */
+.notes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+@media (max-width:720px){.notes{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.note{appearance:none;cursor:pointer;font:inherit;border:none;color:var(--paper-ink);background:var(--paper);min-height:140px;padding:16px 14px 14px 30px;text-align:left;font-family:var(--type);font-size:15px;line-height:1.5;position:relative;
+  background-image:repeating-linear-gradient(var(--paper) 0 23px,#b9d3e8 23px 24px),linear-gradient(90deg,transparent 22px,#e9a0b0 22px 24px,transparent 24px);transform:rotate(-1.5deg);box-shadow:0 8px 18px #0007;clip-path:polygon(0 4%,6% 0,14% 3%,24% 0,36% 4%,50% 1%,62% 4%,76% 0,88% 3%,100% 1%,100% 100%,0 100%)}
+.note:nth-child(even){transform:rotate(1.8deg)}
+.note:not(.open){display:flex;align-items:center;justify-content:center;font-family:var(--hand);font-size:24px;color:var(--marker);padding-left:14px}
+.note.open{cursor:default}
+
+/* hot seat */
+.seat{display:grid;grid-template-columns:minmax(0,260px) minmax(0,1fr);gap:20px;align-items:stretch}
+@media (max-width:720px){.seat{grid-template-columns:1fr}}
+.role{background:var(--label);color:var(--label-ink);border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:8px;align-items:center;justify-content:center;text-align:center;box-shadow:0 10px 22px #0007}
+.role .who{font-family:var(--hand);font-size:34px;color:var(--marker);line-height:1}
+.role .desc{font-size:14px}
+.qcard{background:var(--paper);color:var(--paper-ink);border-radius:6px;padding:22px;font-family:var(--type);font-size:clamp(19px,2.4vw,24px);line-height:1.4;display:flex;align-items:center;min-height:150px;box-shadow:0 10px 22px #0007}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{appearance:none;cursor:pointer;font:inherit;font-size:14px;border-radius:999px;padding:5px 12px;border:1px solid var(--line);background:transparent;color:var(--ink)}
+.chip[aria-pressed="true"]{background:var(--teal);border-color:var(--teal);color:#06231f}
+
+/* envelope */
+.env{position:relative;background:#d9c7a3;border-radius:6px;padding:22px;color:var(--paper-ink);box-shadow:0 12px 26px #0008}
+.env textarea{width:100%;min-height:150px;font-family:var(--type);font-size:17px;line-height:1.6;color:var(--paper-ink);background:var(--paper);border:none;border-radius:4px;padding:12px;resize:vertical}
+.env.sealed textarea{display:none}
+.seal{display:none;align-items:center;justify-content:center;flex-direction:column;gap:8px;min-height:150px;text-align:center}
+.env.sealed .seal{display:flex}
+.wax{width:74px;height:74px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#ff6b9b,#b0124f);box-shadow:0 4px 10px #0006;display:flex;align-items:center;justify-content:center;color:#fff;font-family:var(--hand);font-size:28px;animation:stamp .5s ease-out}
+@keyframes stamp{0%{transform:scale(2.2);opacity:0}70%{transform:scale(.9)}100%{transform:scale(1)}}
+.starters{display:flex;flex-direction:column;gap:6px}
+.starters span{font-family:var(--type);font-size:15px;color:var(--muted)}
+.starters b{color:var(--mustard);font-weight:400}
+
+/* mixtape maker */
+.makers{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+@media (max-width:760px){.makers{grid-template-columns:1fr}}
+.maker{display:flex;flex-direction:column;gap:12px}
+.maker .for{font-family:var(--hand);font-size:22px;color:var(--mustard)}
+.pick{display:flex;gap:6px;flex-wrap:wrap}
+.jc{background:var(--label);color:var(--label-ink);border-radius:6px;padding:14px 16px;box-shadow:0 8px 18px #0007;display:flex;flex-direction:column;gap:6px;border-top:10px solid var(--c,#e2367a)}
+.jc .t{font-family:var(--hand);font-size:22px;line-height:1.1}
+.jc ol{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:6px}
+.jc li{font-family:var(--hand);font-size:17px}
+.jc li input{width:100%;font-family:var(--hand);font-size:17px;border:none;border-bottom:1px dashed #9b8a78;background:transparent;color:var(--label-ink);padding:2px 0}
+.jc li input.why{font-family:var(--type);font-size:13px;color:#5b4c40}
+.jc li input:focus{outline:none;border-bottom-color:var(--marker)}
+
+/* infinite */
+.infinite{background:linear-gradient(120deg,#e2367a33,#2fb7a833);border:1px solid var(--line);border-radius:16px;padding:22px;display:flex;flex-direction:column;gap:12px}
+.big{font-family:var(--hand);font-size:clamp(24px,4vw,36px);color:var(--ink);line-height:1.2}
+
+/* sport */
+.slots{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+@media (max-width:720px){.slots{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.slot{background:var(--label);color:var(--label-ink);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:6px;min-height:110px;box-shadow:0 8px 18px #0007}
+.slot .k{font-family:var(--type);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#7a6a5a}
+.slot .v{font-family:var(--hand);font-size:20px;line-height:1.15}
+.slot.roll .v{animation:roll .35s ease-out}
+@keyframes roll{0%{transform:translateY(-14px);opacity:0}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <span class="eyebrow">Victoria & Diana · Book club · up to the 12 November letter</span>
+      <h1>Mixtape for a Wallflower</h1>
+      <p class="lede">It's 1991, and Charlie makes tapes for the people he loves. Today's lesson is a tape too. Pick a track from the J-card, press play, and talk.</p>
+    </div>
+    <div>
+      <div class="cassette" id="cassette" aria-hidden="true">
+        <div class="screws"><span style="left:4%;top:6%"></span><span style="right:4%;top:6%"></span><span style="left:4%;bottom:6%"></span><span style="right:4%;bottom:6%"></span></div>
+        <div class="lbl"></div><span class="side" id="sideLbl">SIDE A</span><span class="ttl" id="tapeTitle">for V & D ♥</span>
+        <div class="window"><span class="reel"><i></i></span><span class="reel"><i></i></span></div>
+        <div class="bottom"></div>
+      </div>
+      <p class="now" id="now">▶ choose a track</p>
+    </div>
+  </header>
+
+  <div class="jcard" role="tablist" id="jcard" aria-label="Tracklist"></div>
+
+  <!-- 1 -->
+  <section class="track" id="tr-friend" role="tabpanel" hidden>
+    <div><span class="eyebrow">Side A · Track 1</span><h2>Dear Friend</h2></div>
+    <p class="lede">Warm-up. Open a note and answer it. Then ask your partner what she thinks.</p>
+    <div class="notes" id="friendNotes"></div>
+  </section>
+
+  <!-- 2 -->
+  <section class="track" id="tr-seat" role="tabpanel" hidden>
+    <div><span class="eyebrow">Side A · Track 2</span><h2>The Hot Seat</h2></div>
+    <p class="lede">One of you becomes a character. The other is the interviewer and asks the questions, plus one follow-up question each time. Answer in character! Then swap.</p>
+    <div class="seat">
+      <div class="role"><span class="eyebrow" style="color:#7a6a5a">In the hot seat</span><span class="who" id="roleWho">?</span><span class="desc" id="roleDesc">Draw a character</span><button class="btn" id="drawRole">Draw a character</button></div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div class="qcard" id="seatQ">Press "Next question" to start the interview.</div>
+        <div class="row"><button class="btn teal" id="nextQ">Next question</button><span class="tip" id="seatN"></span></div>
+        <div><span class="eyebrow">Tick what the interviewer used</span><div class="chips" id="seatChips"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section class="track" id="tr-next" role="tabpanel" hidden>
+    <div><span class="eyebrow">Side A · Track 3</span><h2>What Happens Next?</h2></div>
+    <p class="lede">You haven't finished the book yet. Make your predictions, write them down and seal the envelope. Open it when you've read the last letter. Who was right?</p>
+    <div class="starters">
+      <span><b>…must…</b> (I'm sure): Sam must know more about Charlie than he thinks.</span>
+      <span><b>…might / could…</b> (maybe): Patrick might…</span>
+      <span><b>…can't…</b> (impossible): Charlie can't…</span>
+      <span><b>If…, … will…</b> : If Charlie tells Sam the truth, she will…</span>
+    </div>
+    <div class="row chips" id="predPrompts"></div>
+    <div class="env" id="env">
+      <textarea id="pred" aria-label="Your predictions">Victoria:
+1.
+2.
+
+Diana:
+1.
+2.</textarea>
+      <div class="seal"><span class="wax">W</span><span style="font-family:var(--type)">Sealed. Open after the last letter!</span></div>
+    </div>
+    <div class="row"><button class="btn" id="sealBtn">Seal the envelope</button><button class="btn ghost" id="openBtn" hidden>Open it</button><span class="tip">Saved in this browser, so it'll be here next time.</span></div>
+  </section>
+
+  <!-- 4 -->
+  <section class="track" id="tr-tape" role="tabpanel" hidden>
+    <div><span class="eyebrow">Side A · Track 4</span><h2>Make a Mixtape</h2></div>
+    <p class="lede">Each of you makes a tape for one character. Choose three to five real songs (any language, any decade) and explain each choice in one sentence. Then present your tape: <i>"I chose this song because Sam has always… If Charlie heard it, he would…"</i></p>
+    <div class="makers" id="makers"></div>
+  </section>
+
+  <!-- 5 -->
+  <section class="track" id="tr-infinite" role="tabpanel" hidden>
+    <div><span class="eyebrow">Side A · Track 5</span><h2>Infinite</h2></div>
+    <div class="infinite">
+      <p class="big" id="infQ">In the book, Charlie talks about feeling "infinite". What do you think he means?</p>
+      <div class="row"><button class="btn teal" id="infNext">Next question</button><span class="tip" id="infN"></span></div>
+    </div>
+    <p class="tip">Take your time. Tell a real story: when, where, who was there, what happened.</p>
+  </section>
+
+  <!-- B -->
+  <section class="track" id="tr-sport" role="tabpanel" hidden>
+    <div><span class="eyebrow">Side B · Bonus track</span><h2>Invent a Sport</h2></div>
+    <p class="lede">Roll the machine, then invent a new sport together. Explain the rules: what you <b>must</b> / <b>mustn't</b> / <b>don't have to</b> do, and where the ball and players go (<i>across, over, through, into, round…</i>). Give your sport a name!</p>
+    <div class="slots" id="slots"></div>
+    <div class="row"><button class="btn" id="rollBtn">Roll</button></div>
+    <div><span class="eyebrow">Tick what you used</span><div class="chips" id="sportChips"></div></div>
+  </section>
+</div>
+
+<script>
+const TRACKS=[["friend","Dear Friend","10'","A"],["seat","The Hot Seat","15'","A"],["next","What Happens Next?","10'","A"],["tape","Make a Mixtape","15'","A"],["infinite","Infinite","5'","A"],["sport","Invent a Sport","10'","B"]];
+const jc=document.getElementById("jcard"),cas=document.getElementById("cassette");
+const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+let audio=null;function click(){try{audio=audio||new (window.AudioContext||window.webkitAudioContext)();const t=audio.currentTime,o=audio.createOscillator(),g=audio.createGain();o.type="square";o.frequency.setValueAtTime(140,t);o.frequency.exponentialRampToValueAtTime(60,t+.06);g.gain.setValueAtTime(.08,t);g.gain.exponentialRampToValueAtTime(.001,t+.08);o.connect(g).connect(audio.destination);o.start(t);o.stop(t+.09)}catch(e){}}
+let side="";
+TRACKS.forEach(([id,name,min,s],i)=>{if(s!==side){side=s;jc.insertAdjacentHTML("beforeend",`<span class="side-h">SIDE ${s}${s==="B"?" · bonus":""}</span>`)}
+  const b=document.createElement("button");b.className="trk";b.setAttribute("role","tab");b.id="k-"+id;b.innerHTML=`<span class="no">${String(i+1).padStart(2,"0")}</span><span class="nm">${name}</span><span class="min">${min}</span>`;
+  b.onclick=()=>play(id);jc.appendChild(b)});
+function play(id,quiet){const t=TRACKS.find(x=>x[0]===id);if(!quiet)click();
+  TRACKS.forEach(([r])=>{document.getElementById("tr-"+r).hidden=r!==id;document.getElementById("k-"+r).setAttribute("aria-selected",r===id);if(r!==id&&document.getElementById("k-"+r).getAttribute("data-played"))document.getElementById("k-"+r).classList.add("done")});
+  document.getElementById("k-"+id).setAttribute("data-played","1");
+  cas.classList.add("playing");document.getElementById("now").textContent=`▶ now playing: ${t[1]}`;document.getElementById("tapeTitle").textContent=t[1];document.getElementById("sideLbl").textContent="SIDE "+t[3];
+  try{if(location.hash!=="#"+id)history.replaceState(null,"","#"+id)}catch(e){}
+  if(!quiet)document.getElementById("tr-"+id).scrollIntoView({behavior:"smooth",block:"start"})}
+const h0=location.hash.slice(1);if(TRACKS.some(t=>t[0]===h0))play(h0,true);else{play("friend",true);cas.classList.remove("playing");document.getElementById("now").textContent="▶ choose a track"}
+
+/* 1 */
+(function(){const Q=["So far, which character would you most like as a friend? Why?","Charlie writes letters to someone he has never met. Have you ever written to a stranger, or kept a diary?","Describe Charlie in three adjectives. Has he changed since the first letter?","What does 'wallflower' mean? Have you ever felt like one?","What has surprised you most in the book so far?","Which scene would make the best film moment? Describe it."];
+  const el=document.getElementById("friendNotes");Q.forEach((q,i)=>{const b=document.createElement("button");b.className="note";b.textContent="Dear friend…";b.setAttribute("aria-label","Open note "+(i+1));b.onclick=()=>{click();b.classList.add("open");b.textContent=q};el.appendChild(b)})})();
+
+/* 2 */
+(function(){const R=[["Charlie","the quiet freshman who writes the letters"],["Sam","the senior who takes Charlie into her group"],["Patrick","Sam's funny stepbrother"],["Bill","the English teacher who gives Charlie extra books"]];
+  const Q=["Have you ever felt like an outsider? When?","When did you first meet Charlie? What did you think of him?","What's the best party you've ever been to? What happened there?","Have you ever kept a big secret for a friend?","What have you learned since the school year started?","What's the best book or song someone has ever given you?","If you could change one thing about your life right now, what would you change?","What did you do last Friday night?","Who has been the most important person in your life this year? Why?","What are you afraid of at the moment?"];
+  let order=shuffle(Q),qi=0;
+  document.getElementById("drawRole").onclick=()=>{click();const r=R[Math.floor(Math.random()*R.length)];document.getElementById("roleWho").textContent=r[0];document.getElementById("roleDesc").textContent=r[1]};
+  document.getElementById("nextQ").onclick=()=>{click();if(qi>=order.length){order=shuffle(Q);qi=0}document.getElementById("seatQ").textContent=order[qi++];document.getElementById("seatN").textContent=`${qi} / ${order.length}`};
+  ["Have you ever…?","When did you…?","a follow-up question","If you could…, would…?"].forEach(t=>{const b=document.createElement("button");b.className="chip";b.textContent=t;b.setAttribute("aria-pressed","false");b.onclick=()=>b.setAttribute("aria-pressed",b.getAttribute("aria-pressed")!=="true");document.getElementById("seatChips").appendChild(b)})})();
+
+/* 3 */
+(function(){const P=["Charlie and Sam","Patrick","Charlie's sister","Bill and Charlie","the next party","the end of the book"];
+  const pp=document.getElementById("predPrompts");P.forEach(t=>{const b=document.createElement("span");b.className="chip";b.style.cursor="default";b.textContent="💭 "+t;pp.appendChild(b)});
+  const env=document.getElementById("env"),ta=document.getElementById("pred"),sb=document.getElementById("sealBtn"),ob=document.getElementById("openBtn");
+  const saved=store.get("wf-pred",null);if(saved){ta.value=saved.text;if(saved.sealed){env.classList.add("sealed");sb.hidden=true;ob.hidden=false}}
+  ta.addEventListener("input",()=>store.set("wf-pred",{text:ta.value,sealed:false}));
+  sb.onclick=()=>{click();env.classList.add("sealed");sb.hidden=true;ob.hidden=false;store.set("wf-pred",{text:ta.value,sealed:true})};
+  ob.onclick=()=>{click();env.classList.remove("sealed");sb.hidden=false;ob.hidden=true;store.set("wf-pred",{text:ta.value,sealed:false})}})();
+
+/* 4 */
+(function(){const CH=["Charlie","Sam","Patrick","Bill"],COL=["#e2367a","#2fb7a8","#f2b632","#8b6fd6"];
+  const el=document.getElementById("makers");["Victoria","Diana"].forEach((who,w)=>{const st=store.get("wf-tape-"+who,{ch:CH[w],songs:Array(5).fill(["",""])});
+    const box=document.createElement("div");box.className="maker";
+    box.innerHTML=`<span class="for">${who}'s tape</span><div class="pick"></div><div class="jc"><span class="t"></span><ol></ol></div>`;
+    const pick=box.querySelector(".pick"),jcEl=box.querySelector(".jc"),t=box.querySelector(".t"),ol=box.querySelector("ol");
+    function paint(){t.textContent=`for ${st.ch}, love ${who}`;jcEl.style.setProperty("--c",COL[CH.indexOf(st.ch)]);pick.querySelectorAll(".chip").forEach(c=>c.setAttribute("aria-pressed",c.textContent===st.ch))}
+    CH.forEach(c=>{const b=document.createElement("button");b.className="chip";b.textContent=c;b.onclick=()=>{click();st.ch=c;store.set("wf-tape-"+who,st);paint()};pick.appendChild(b)});
+    st.songs.forEach(([s,r],k)=>{const li=document.createElement("li");li.innerHTML=`<input id="s-${w}-${k}" placeholder="song – artist" aria-label="${who}, song ${k+1}"><input class="why" id="r-${w}-${k}" placeholder="because…" aria-label="${who}, reason ${k+1}">`;
+      const [a,b]=li.querySelectorAll("input");a.value=s;b.value=r;
+      const save=()=>{st.songs[k]=[a.value,b.value];store.set("wf-tape-"+who,st)};a.addEventListener("input",save);b.addEventListener("input",save);ol.appendChild(li)});
+    paint();el.appendChild(box)})})();
+
+/* 5 */
+(function(){const Q=["In the book, Charlie talks about feeling \"infinite\". What do you think he means?","Describe a moment in your life when you felt infinite. Where were you? Who was with you?","Which song makes you feel that way? Why?","Do you think this feeling is easier to have when you're young? Why or why not?","If you could relive one night of your life, which would it be?"];
+  let i=0;document.getElementById("infNext").onclick=()=>{click();i=(i+1)%Q.length;document.getElementById("infQ").textContent=Q[i];document.getElementById("infN").textContent=`${i+1} / ${Q.length}`}})();
+
+/* B */
+(function(){const S={"The ball":["a watermelon","a tennis ball","a pillow","a rubber duck","a beach ball","an orange"],"The place":["a swimming pool","a library","a snowy hill","a school corridor","a trampoline park","a forest"],"Equipment":["umbrellas","frying pans","roller skates","shopping trolleys","hula hoops","oven gloves"],"To score":["throw it into a bucket","kick it through a hoop","carry it across a line","hit it over a fence","roll it round a tree","get it past a sleeping goalkeeper"]};
+  const el=document.getElementById("slots");
+  function roll(){el.innerHTML="";Object.entries(S).forEach(([k,v])=>{const d=document.createElement("div");d.className="slot roll";d.innerHTML=`<span class="k">${k}</span><span class="v">${v[Math.floor(Math.random()*v.length)]}</span>`;el.appendChild(d)})}
+  roll();document.getElementById("rollBtn").onclick=()=>{click();roll()};
+  ["must","mustn't","don't have to","across / through","over / into","round / past","play, go or do?"].forEach(t=>{const b=document.createElement("button");b.className="chip";b.textContent=t;b.setAttribute("aria-pressed","false");b.onclick=()=>b.setAttribute("aria-pressed",b.getAttribute("aria-pressed")!=="true");document.getElementById("sportChips").appendChild(b)})})();
+</script>
+</body>
+</html>
