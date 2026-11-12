@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Been There, Done That</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<script src="../../assets/config.js?v=10"></script>
+<script src="../../assets/portal.js?v=3"></script>
+<script src="../../assets/track.js?v=2"></script>
+<style>
+body{margin:0}
+
+body{margin:0}
+
+body{margin:0}
+
+/* Layout: a travel diary. Header card, pill tabs per exercise, one panel at a time. */
+:root{
+  --bg:#eef2f9; --card:#fdfeff; --ink:#18213a; --muted:#596582; --line:#d3dbec;
+  --leaf:#2557b8; --leaf-soft:#2557b818; --sun:#e5603c; --sun-soft:#e5603c22; --sky:#2f7fa8;
+  --ok:#1f8a5b; --ok-soft:#1f8a5b1f; --bad:#c2453d; --bad-soft:#c2453d1c;
+  --display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;
+  --body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#11151f; --card:#181e2c; --ink:#e6ebf5; --muted:#a2acc2; --line:#2e3750;
+  --leaf:#8fb0f5; --leaf-soft:#8fb0f51f; --sun:#f5946f; --sun-soft:#f5946f24; --sky:#6db7dd;
+  --ok:#86c46c; --ok-soft:#86c46c22; --bad:#ef7d74; --bad-soft:#ef7d7422; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#11151f; --card:#181e2c; --ink:#e6ebf5; --muted:#a2acc2; --line:#2e3750;
+  --leaf:#8fb0f5; --leaf-soft:#8fb0f51f; --sun:#f5946f; --sun-soft:#f5946f24; --sky:#6db7dd;
+  --ok:#86c46c; --ok-soft:#86c46c22; --bad:#ef7d74; --bad-soft:#ef7d7422; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 64px}
+.wrap{max-width:940px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+h1,h2,h3{font-family:var(--display);margin:0;line-height:1.05;text-wrap:balance}
+h1{font-size:clamp(40px,7vw,64px);font-weight:800;letter-spacing:-.02em;color:var(--leaf)}
+h2{font-size:clamp(28px,4vw,36px);font-weight:800}
+h3{font-size:21px;font-weight:600}
+p{margin:0}
+.eyebrow{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.lede{color:var(--muted);max-width:64ch}
+.tip{font-size:14px;color:var(--muted);font-style:italic}
+
+.guide{position:relative;border:2px solid var(--leaf);border-radius:20px;padding:26px clamp(20px,4vw,36px);background:var(--card);display:flex;flex-direction:column;gap:10px;overflow:hidden}
+.guide::before{content:"";position:absolute;right:-40px;top:-40px;width:200px;height:200px;border-radius:50%;background:var(--sun-soft)}
+.guide .critters{position:absolute;right:clamp(16px,4vw,34px);top:20px;font-size:clamp(30px,5vw,44px);letter-spacing:.1em}
+@media (max-width:560px){.guide .critters{position:static}}
+
+nav.tabs{display:flex;flex-wrap:wrap;gap:8px}
+.tab{appearance:none;cursor:pointer;font:inherit;font-weight:700;font-size:15px;border-radius:999px;padding:8px 16px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+.tab:hover{border-color:var(--leaf)}
+.tab[aria-selected="true"]{background:var(--leaf);border-color:var(--leaf);color:var(--card)}
+.tab.done::after{content:" ✓"}
+.tab:focus-visible,.btn:focus-visible,.opt:focus-visible,.flash:focus-visible,input:focus-visible,.cat:focus-visible{outline:2px solid var(--sun);outline-offset:2px}
+
+section.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:clamp(20px,4vw,34px);display:flex;flex-direction:column;gap:22px}
+.head{display:flex;flex-direction:column;gap:8px}
+.btn{appearance:none;cursor:pointer;font:inherit;font-weight:700;font-size:16px;border-radius:999px;padding:10px 20px;border:1px solid var(--leaf);background:var(--leaf);color:var(--card)}
+.btn.ghost{background:transparent;color:var(--leaf)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.score{font-weight:700;color:var(--leaf);font-variant-numeric:tabular-nums}
+.bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden}
+.bar span{display:block;height:100%;background:var(--sun);transition:width .3s}
+
+/* flashcards */
+.filters{display:flex;gap:6px;flex-wrap:wrap}
+.filter{appearance:none;cursor:pointer;font:inherit;font-size:14px;border-radius:8px;padding:5px 12px;border:1px solid var(--line);background:transparent;color:var(--muted)}
+.filter[aria-pressed="true"]{border-color:var(--sun);background:var(--sun-soft);color:var(--ink)}
+.flash{appearance:none;cursor:pointer;font:inherit;color:var(--ink);width:100%;min-height:250px;border-radius:18px;border:2px solid var(--line);background:var(--bg);padding:24px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center}
+.flash .em{font-size:clamp(70px,14vw,110px);line-height:1}
+.flash .w{font-family:var(--display);font-size:clamp(32px,6vw,48px);font-weight:800;color:var(--leaf);line-height:1.05}
+.flash .t{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.flash .d{font-size:18px;max-width:44ch}
+.flash.back{border-color:var(--sun)}
+
+/* sort */
+.sort-card{background:var(--bg);border:2px solid var(--line);border-radius:18px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center}
+.sort-card .word{font-family:var(--display);font-size:clamp(34px,6vw,50px);font-weight:800}
+.cats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;width:100%}
+@media (max-width:560px){.cats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.cat{appearance:none;cursor:pointer;font:inherit;font-weight:700;border-radius:14px;padding:14px 8px;border:2px solid var(--line);background:var(--card);color:var(--ink);display:flex;flex-direction:column;gap:4px;align-items:center}
+.cat .ic{font-size:30px}
+.cat:hover{border-color:var(--leaf)}
+.cat.ok{border-color:var(--ok);background:var(--ok-soft)}
+.cat.no{border-color:var(--bad);background:var(--bad-soft);animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.feedback{min-height:1.5em;font-weight:700}
+.feedback.ok{color:var(--ok)}.feedback.no{color:var(--bad)}
+
+/* choose */
+.qs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:700px){.qs{grid-template-columns:1fr}}
+.q{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.q .n{font-size:12px;color:var(--muted);letter-spacing:.1em}
+.q .s{font-weight:700}
+.opts{display:flex;gap:6px;flex-wrap:wrap}
+.opt{appearance:none;cursor:pointer;font:inherit;font-size:15px;border-radius:8px;padding:6px 12px;background:var(--card);color:var(--ink);border:1px solid var(--line)}
+.opt:hover{border-color:var(--leaf)}
+.opt.ok{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.opt.no{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.why{font-size:14px;color:var(--muted)}
+
+/* rules */
+.rule{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.rule div{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:4px}
+.rule strong{font-family:var(--display);font-size:22px;color:var(--leaf)}
+.rule span{font-size:15px}
+.timeline{display:flex;align-items:center;gap:0;margin:4px 0}
+.timeline .pt{font-weight:700;font-size:14px;white-space:nowrap}
+.timeline .ln{flex:1;height:4px;background:linear-gradient(90deg,var(--sun),var(--leaf));border-radius:2px;margin:0 10px;position:relative}
+.timeline .ln::after{content:"";position:absolute;right:-6px;top:-5px;border:7px solid transparent;border-left-color:var(--leaf)}
+
+/* spelling */
+.spell{padding:0;margin:0;display:flex;flex-direction:column;gap:8px}
+.spell li{list-style:none;display:grid;grid-template-columns:56px minmax(0,1fr) 200px auto;gap:10px;align-items:center;padding:10px 14px;border-radius:12px;background:var(--bg);border:1px solid transparent}
+@media (max-width:600px){.spell li{grid-template-columns:44px minmax(0,1fr)}.spell li input{grid-column:1/-1}}
+.spell li.ok{border-color:var(--ok)}.spell li.no{border-color:var(--bad)}
+.spell .em{font-size:34px;text-align:center}
+.hint{font-family:var(--display);font-weight:600;color:var(--sun)}
+input[type=text]{font:inherit;font-size:16px;color:var(--ink);background:var(--card);border:1px solid var(--leaf);border-radius:8px;padding:6px 10px;width:100%}
+.mark{font-size:14px}.mark.ok{color:var(--ok)}.mark.no{color:var(--bad)}
+
+/* talk */
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:700px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.paw{appearance:none;cursor:pointer;font:inherit;color:var(--ink);background:var(--bg);border:2px dashed var(--sun);border-radius:14px;min-height:118px;padding:14px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:15px}
+.paw:not(.open){font-size:36px}
+.paw.open{border-style:solid;border-color:var(--line)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+.col{display:flex;flex-direction:column;gap:8px}
+.chip{appearance:none;cursor:pointer;font:inherit;text-align:left;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+.chip:hover{border-color:var(--leaf)}
+.chip.ok{border-color:var(--ok);background:var(--ok-soft);color:var(--ok);cursor:default}
+.chip.no{animation:shake .35s;border-color:var(--bad)}
+.chip .ord{font-weight:700}
+.fill{display:flex;flex-direction:column;gap:8px;padding:0;margin:0}
+.fill li{list-style:none;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;padding:10px 14px;border-radius:12px;background:var(--bg);border:1px solid transparent}
+.fill li.ok{border-color:var(--ok)}.fill li.no{border-color:var(--bad)}
+.fill .mark{margin-left:auto}
+select{font:inherit;font-size:16px;color:var(--ink);background:var(--card);border:1px solid var(--leaf);border-radius:8px;padding:4px 8px;max-width:100%}
+.note-box{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+textarea{width:100%;min-height:220px;font:inherit;font-size:17px;line-height:1.6;color:var(--ink);background:transparent;border:none;resize:vertical}
+textarea:focus{outline:2px solid var(--sun);outline-offset:4px;border-radius:6px}
+.checks{display:flex;flex-wrap:wrap;gap:8px}
+.check{appearance:none;cursor:pointer;font:inherit;font-size:15px;border-radius:999px;padding:6px 14px;border:1px solid var(--line);background:transparent;color:var(--ink)}
+.check[aria-pressed="true"]{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.check[aria-pressed="true"]::before{content:"✓ "}
+
+.convo{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.convo p{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:baseline}
+.convo .who{font-weight:700;color:var(--muted);min-width:4em}
+.convo b{color:var(--leaf)}
+.tag-pp,.tag-ps{font-size:12px;font-weight:700;border-radius:999px;padding:2px 10px}
+.tag-pp{background:var(--leaf-soft);color:var(--leaf)}
+.tag-ps{background:var(--sun-soft);color:var(--sun)}
+.rule div span+span{margin-top:2px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="guide">
+    <span class="critters" aria-hidden="true">✈️🎟️📸</span>
+    <span class="eyebrow">Homework · Present perfect or past simple?</span>
+    <h1>Been There, Done That</h1>
+    <p class="lede">Two tenses, one simple question: do we say <b>when</b>? Learn the rule, then practise it seven different ways until it feels automatic.</p>
+    <p class="tip" id="saveState"></p>
+  </header>
+
+  <nav class="tabs" role="tablist" id="tabs"></nav>
+
+  <section class="panel" id="p-rule" role="tabpanel">
+    <div class="head"><span class="eyebrow">Step 1</span><h2>The rule</h2>
+      <p class="lede">Read this first. Everything else in this homework comes back to it.</p></div>
+    <div class="rule">
+      <div><strong>present perfect</strong><span>have / has + past participle</span><span class="tip">I've seen · She's bought · They haven't finished</span>
+        <span>We <b>don't say when</b>. What matters is the experience or the result now.</span>
+        <span class="tip">I've been to Italy twice. (in my life) · I've lost my keys! (I can't open the door now)</span></div>
+      <div><strong>past simple</strong><span>worked, went, saw, bought…</span><span class="tip">I saw · She bought · They didn't finish</span>
+        <span>We <b>say or know when</b>. It's finished, in the past.</span>
+        <span class="tip">I went to Italy in 2019. · I lost my keys last week.</span></div>
+    </div>
+    <div class="convo">
+      <p><span class="who">Masha</span><span>Have you <b>ever been</b> to a concert abroad?</span><span class="tag-pp">PP: experience, no time</span></p>
+      <p><span class="who">Vlada</span><span>Yes, I <b>have</b>. I <b>went</b> to Riga last summer.</span><span class="tag-ps">PS: now we say when</span></p>
+      <p><span class="who">Masha</span><span>Who <b>did</b> you <b>see</b>?</span><span class="tag-ps">PS: we're talking about that concert</span></p>
+    </div>
+    <p class="tip">Typical pattern: start with the present perfect (Have you ever…?), then continue with the past simple for the details (When? Where? Who?).</p>
+    <div class="row"><button class="btn" id="ruleOk">I've read it</button><span class="score" id="s-rule"></span></div>
+  </section>
+
+  <section class="panel" id="p-signals" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Step 2</span><h2>Signal words</h2>
+      <p class="lede">Which tense usually goes with each time expression?</p></div>
+    <div class="sort-card">
+      <span class="eyebrow" id="sgNum"></span>
+      <span class="word" id="sgWord"></span>
+      <div class="cats" id="sgCats" style="grid-template-columns:repeat(2,minmax(0,1fr))"></div>
+      <p class="feedback" id="sgFb"></p>
+      <button class="btn" id="sgNext" hidden>Next</button>
+    </div>
+    <span class="score" id="s-signals"></span>
+  </section>
+
+  <section class="panel" id="p-forms" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Step 3</span><h2>Past participles</h2>
+      <p class="lede">The present perfect needs the <b>third form</b> of the verb. Type it, then press Enter or "Check all".</p></div>
+    <ol class="spell" id="forms"></ol>
+    <div class="row"><button class="btn" id="fCheck">Check all</button><span class="score" id="s-forms"></span></div>
+  </section>
+
+  <section class="panel" id="p-choose" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Step 4</span><h2>Which tense?</h2>
+      <p class="lede">Ask yourself: do we know <b>when</b>? Then choose.</p></div>
+    <div class="qs" id="choose"></div>
+    <span class="score" id="s-choose"></span>
+  </section>
+
+  <section class="panel" id="p-words" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Step 5</span><h2>ever, never, just, already, yet</h2></div>
+    <div class="rule">
+      <div><strong>ever / never</strong><span>experiences, before the main verb</span><span class="tip">Have you ever tried…? I've never tried…</span></div>
+      <div><strong>just</strong><span>a very short time ago, before the main verb</span><span class="tip">I've just finished.</span></div>
+      <div><strong>already</strong><span>+ sentences, sooner than expected, before the main verb</span><span class="tip">I've already done it.</span></div>
+      <div><strong>yet</strong><span>– sentences and ?, at the end</span><span class="tip">I haven't done it yet. Have you done it yet?</span></div>
+    </div>
+    <div class="qs" id="words"></div>
+    <span class="score" id="s-words"></span>
+  </section>
+
+  <section class="panel" id="p-dialogue" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Step 6</span><h2>A conversation</h2>
+      <p class="lede">Masha and Vlada are talking about concerts. Complete it, then press "Check". Remember: the present perfect starts, the past simple gives the details.</p></div>
+    <ol class="fill" id="dialogue"></ol>
+    <div class="row"><button class="btn" id="dCheck">Check</button><span class="score" id="s-dialogue"></span></div>
+  </section>
+
+  <section class="panel" id="p-rw" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Step 7</span><h2>Right or wrong?</h2>
+      <p class="lede">Is the sentence correct? If it's wrong, the explanation will show the correct version.</p></div>
+    <div class="qs" id="rw"></div>
+    <span class="score" id="s-rw"></span>
+  </section>
+
+  <section class="panel" id="p-talk" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">For the lesson</span><h2>Have you ever…?</h2>
+      <p class="lede">Open a card. Answer with the present perfect, then give two details with the past simple: when, where, what happened?</p></div>
+    <div class="cards" id="talk"></div>
+  </section>
+</div>
+
+<script>
+const TABS=[["rule","The rule"],["signals","Signal words"],["forms","Participles"],["choose","Which tense?"],["words","ever, just, yet…"],["dialogue","Conversation"],["rw","Right or wrong?"],["talk","Talk"]];
+const tabsEl=document.getElementById("tabs");
+TABS.forEach(([id,name])=>{const b=document.createElement("button");b.className="tab";b.setAttribute("role","tab");b.id="t-"+id;b.textContent=name;b.onclick=()=>show(id);tabsEl.appendChild(b)});
+function show(id){TABS.forEach(([t])=>{document.getElementById("p-"+t).hidden=t!==id;document.getElementById("t-"+t).setAttribute("aria-selected",t===id)});
+  try{if(location.hash!=="#"+id)history.replaceState(null,"","#"+id)}catch(e){}}
+const h0=location.hash.slice(1);show(TABS.some(t=>t[0]===h0)?h0:"rule");
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const mark=id=>{const t=document.getElementById("t-"+id);if(t)t.classList.add("done")};
+const TR=window.Track;const canSave=TR.online;const RESTORE=[];
+TR.onStatus(st=>{document.getElementById("saveState").textContent=!canSave?"Tip: open this page from your personal portal link to save your progress.":st==="saving"?"Saving…":st==="offline"?"No connection right now: your answers are kept on this device and will be sent later.":"Your progress saves automatically after every answer."});
+
+/* 1 rule */
+document.getElementById("ruleOk").onclick=()=>{mark("rule");document.getElementById("s-rule").textContent="Great! Now Step 2.";setTimeout(()=>{show("signals");scrollTo({top:0,behavior:"smooth"})},600)};
+
+/* 2 signals */
+(function(){const C={pp:["present perfect","🌍"],ps:["past simple","📅"]};
+  const W=[["ever","pp"],["never","pp"],["just","pp"],["already","pp"],["yet","pp"],["recently","pp"],["so far","pp"],["yesterday","ps"],["last summer","ps"],["in 2019","ps"],["two days ago","ps"],["when I was a child","ps"],["on Saturday","ps"],["at 8 o'clock","ps"]];
+  let list=shuffle(W),i=0,ok=0,first=true,pick=null;const cats=document.getElementById("sgCats"),fb=document.getElementById("sgFb"),nx=document.getElementById("sgNext");
+  Object.entries(C).forEach(([k,[l,ic]])=>{const b=document.createElement("button");b.className="cat";b.innerHTML=`<span class="ic">${ic}</span>${l}`;
+    b.onclick=()=>{if(!nx.hidden)return;const a=list[i];
+      if(k===a[1]){b.classList.add("ok");if(first)ok++;TR.answer("signals",a[0],a[0],first?C[k][0]:C[pick][0],C[a[1]][0],first,ok,list.length);
+        fb.className="feedback ok";fb.textContent=a[1]==="ps"?`Yes! "${a[0]}" tells us WHEN: past simple.`:`Yes! "${a[0]}" doesn't give a finished time: present perfect.`;nx.hidden=false;
+        document.getElementById("s-signals").textContent=`First-try answers: ${ok} / ${i+1}`;if(i===list.length-1){nx.textContent="Finished!";TR.finish("signals",ok,list.length);mark("signals")}}
+      else{if(first){first=false;pick=k}b.classList.add("no");fb.className="feedback no";fb.textContent="Not quite. Does it say WHEN? Try again!";setTimeout(()=>b.classList.remove("no"),500)}};cats.appendChild(b)});
+  function draw(){const a=list[i];first=true;document.getElementById("sgNum").textContent=`${i+1} / ${list.length}`;document.getElementById("sgWord").textContent=a[0];fb.textContent="";nx.hidden=true;cats.querySelectorAll(".cat").forEach(c=>c.classList.remove("ok","no"))}
+  nx.onclick=()=>{if(i<list.length-1){i++;draw()}};draw();
+  RESTORE.push(S=>{const a=S.signals&&S.signals.answers;if(!a)return;const d=Object.keys(a);if(!d.length)return;
+    list=[...list.filter(x=>d.includes(x[0])),...list.filter(x=>!d.includes(x[0]))];ok=Object.values(a).filter(r=>r.ok).length;i=Math.min(d.length,list.length-1);
+    document.getElementById("s-signals").textContent=`First-try answers: ${ok} / ${d.length}`;draw();if(d.length>=list.length){nx.hidden=false;nx.textContent="Finished!";fb.className="feedback ok";fb.textContent="All done.";mark("signals")}})})();
+
+/* 3 participles */
+const PART=[["go","gone","been"],["see","seen"],["buy","bought"],["eat","eaten"],["write","written"],["lose","lost"],["take","taken"],["break","broken"],["meet","met"],["do","done"],["find","found"],["be","been"],["fly","flown"],["forget","forgotten"]];
+const fEl=document.getElementById("forms");
+const fOk=(i,v)=>PART[i].slice(1).includes(v);
+const fScore=()=>PART.filter((x,j)=>fOk(j,fEl.children[j].querySelector("input").value.trim().toLowerCase())).length;
+function fChk(i){const li=fEl.children[i],v=li.querySelector("input").value.trim().toLowerCase(),m=li.querySelector(".mark"),g=fOk(i,v);
+  li.className=v?(g?"ok":"no"):"";m.className="mark "+(g?"ok":"no");m.textContent=!v?"":g?"✓":"try again";return g}
+PART.forEach(([v,p],i)=>{const li=document.createElement("li");
+  li.innerHTML=`<span class="em" style="font-size:16px;font-weight:700">${v}</span><span class="hint">I've ${p[0]}${"_".repeat(p.length-1).split("").join(" ")}</span><input type="text" id="pf-${i}" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Past participle of ${v}"><span class="mark"></span>`;
+  const inp=li.querySelector("input");inp.addEventListener("keydown",e=>{if(e.key==="Enter"){fChk(i);const n=document.getElementById("pf-"+(i+1));if(n)n.focus()}});
+  inp.addEventListener("change",()=>{const x=inp.value.trim().toLowerCase();if(x)TR.answer("forms",i,`${v} → I've ___`,x,PART[i].slice(1).join(" / "),fOk(i,x),fScore(),PART.length)});fEl.appendChild(li)});
+document.getElementById("fCheck").onclick=()=>{let n=0;PART.forEach((_,i)=>{if(fChk(i))n++});document.getElementById("s-forms").textContent=`${n} / ${PART.length}`;TR.finish("forms",n,PART.length);if(n===PART.length)mark("forms")};
+RESTORE.push(S=>{const a=S.forms&&S.forms.answers;if(a)Object.entries(a).forEach(([i,r])=>{const inp=fEl.children[i]&&fEl.children[i].querySelector("input");if(inp&&r.a)inp.value=r.a})});
+
+/* choose helper */
+function choose(act,data){let ok=0,tried=0;const el=document.getElementById(act),apply=[];
+  const upd=()=>{document.getElementById("s-"+act).textContent=`First-try answers: ${ok} / ${tried}`;if(tried===data.length)mark(act)};
+  data.forEach(([s,opts,ans,why],i)=>{const d=document.createElement("div");d.className="q";
+    d.innerHTML=`<span class="n">${i+1}</span><p class="s">${s.replace("___","<u>&nbsp;?&nbsp;</u>")}</p><div class="opts"></div><p class="why" hidden></p>`;
+    const o=d.querySelector(".opts"),w=d.querySelector(".why");let answered=false;
+    (act==="rw"?opts:shuffle(opts)).forEach(t=>{const b=document.createElement("button");b.className="opt";b.textContent=t;
+      b.onclick=()=>{o.querySelectorAll(".opt").forEach(x=>x.classList.remove("no"));const first=!answered;
+        if(t===ans){b.classList.add("ok");w.hidden=false;w.textContent=why;(d.querySelector(".s u")||{}).innerHTML=`&nbsp;${ans}&nbsp;`;if(!answered){answered=true;tried++;ok++}}
+        else{b.classList.add("no");if(!answered){answered=true;tried++}}
+        upd();if(first){TR.answer(act,i,s,t,ans,t===ans,ok,data.length);if(tried===data.length)TR.finish(act,ok,data.length)}};o.appendChild(b)});
+    apply[i]=rec=>{if(answered)return;answered=true;tried++;if(rec.ok)ok++;
+      o.querySelectorAll(".opt").forEach(x=>{if(x.textContent===ans)x.classList.add("ok");else if(!rec.ok&&x.textContent===rec.a)x.classList.add("no")});
+      w.hidden=false;w.textContent=why;(d.querySelector(".s u")||{}).innerHTML=`&nbsp;${ans}&nbsp;`};
+    el.appendChild(d)});
+  RESTORE.push(S=>{const a=S[act]&&S[act].answers;if(!a)return;Object.entries(a).forEach(([i,r])=>apply[i]&&apply[i](r));if(tried)upd()})}
+
+/* 4 which tense */
+choose("choose",[
+ ["I ___ to Italy twice. I love it there!",["'ve been","went"],"'ve been","Life experience, no time: present perfect."],
+ ["I ___ to Italy in 2019 with my sister.",["went","'ve been"],"went","'In 2019' tells us when: past simple."],
+ ["___ sushi? — Yes, lots of times!",["Have you ever eaten","Did you ever eat"],"Have you ever eaten","Asking about experience in your life: Have you ever + past participle."],
+ ["Oh no! I ___ my keys, and now I can't open the door!",["'ve lost","lost"],"'ve lost","The result is important now (I can't open the door): present perfect."],
+ ["I ___ my keys last week, but I found them in my bag.",["lost","'ve lost"],"lost","'Last week' + a finished story: past simple."],
+ ["Hurry up! The film ___ .",["has just started","just started"],"has just started","A very recent action: has just + past participle."],
+ ["When ___ your new job?",["did you start","have you started"],"did you start","Questions with 'when' ask about a finished time: past simple."],
+ ["We ___ the new Marvel film yet.",["haven't seen","didn't see"],"haven't seen","'Yet' goes with the present perfect."],
+ ["I ___ Anna at the gym yesterday.",["saw","'ve seen"],"saw","'Yesterday': past simple."],
+ ["My grandparents ___ abroad. They want to go next year.",["have never been","never were"],"have never been","Experience in their whole life: have never been."],
+ ["What time ___ up this morning?",["did you get","have you got"],"did you get","This morning is finished, and we ask about a specific time: past simple."],
+ ["I ___ all my homework. Can I go out now?",["'ve done","did"],"'ve done","The result now (it's finished, so I can go out): present perfect."]
+]);
+
+/* 5 words */
+choose("words",[
+ ["Have you ___ been to St Petersburg?",["ever","yet","already"],"ever","ever: questions about experiences."],
+ ["I've ___ eaten oysters, and I don't want to try them!",["never","ever","yet"],"never","never = not at any time in my life."],
+ ["I've ___ finished my dinner. Look, the plate is empty!",["just","yet","ever"],"just","just = a moment ago."],
+ ["Don't tell me the end! I haven't watched it ___.",["yet","already","just"],"yet","yet: negatives, at the end."],
+ ["We've ___ bought the tickets, so we don't need to queue.",["already","yet","ever"],"already","already: sooner than expected, in + sentences."],
+ ["Has the bus left ___?",["yet","already","never"],"yet","yet: questions, at the end."],
+ ["Have you ___ met a famous person?",["ever","just","yet"],"ever","Have you ever…? = in your life."],
+ ["Don't make coffee for me, I've ___ had two cups this morning.",["already","yet","ever"],"already","already: it has happened before now."]
+]);
+
+/* 6 dialogue */
+const DL=[["Masha:","to a concert abroad?",["Have you ever been","Did you ever go"],"Have you ever been"],["Vlada: Yes, I","!",["have","did"],"have"],["Masha: Really? Where","?",["did you go","have you gone"],"did you go"],["Vlada: I","to Riga last summer.",["went","have gone"],"went"],["Masha: Who","there?",["did you see","have you seen"],"did you see"],["Vlada: My favourite band. It","amazing!",["was","has been"],"was"],["Masha: Wow. I","to a concert abroad.",["have never been","never was"],"have never been"],["Vlada: You should go!","tickets for anything this year?",["Have you bought","Did you buy"],"Have you bought"],["Masha: No, not","!",["yet","already"],"yet"]];
+const dEl=document.getElementById("dialogue");
+const dScore=()=>DL.filter((x,j)=>dEl.children[j].querySelector("select").value===x[3]).length;
+DL.forEach(([a,b,opts,ans],i)=>{const li=document.createElement("li");
+  li.innerHTML=`<span>${a}</span><select id="dl-${i}" aria-label="Gap ${i+1}"><option value="">…</option>${shuffle(opts).map(x=>`<option>${x}</option>`).join("")}</select><span>${b}</span><span class="mark"></span>`;dEl.appendChild(li);
+  li.querySelector("select").addEventListener("change",e=>{const v=e.target.value;if(v)TR.answer("dialogue",i,`${a} ___ ${b}`,v,ans,v===ans,dScore(),DL.length)})});
+document.getElementById("dCheck").onclick=()=>{let n=0;DL.forEach(([,,,ans],i)=>{const li=dEl.children[i],v=li.querySelector("select").value,m=li.querySelector(".mark"),g=v===ans;
+  li.className=v?(g?"ok":"no"):"";m.className="mark "+(g?"ok":"no");m.textContent=!v?"":g?"✓":"try again";if(g)n++});
+  document.getElementById("s-dialogue").textContent=`${n} / ${DL.length}`;TR.finish("dialogue",n,DL.length);if(n===DL.length)mark("dialogue")};
+RESTORE.push(S=>{const a=S.dialogue&&S.dialogue.answers;if(a)Object.entries(a).forEach(([i,r])=>{const s=dEl.children[i]&&dEl.children[i].querySelector("select");if(s&&r.a)s.value=r.a})});
+
+/* 7 right or wrong */
+choose("rw",[
+ ["I have seen him yesterday.",["Right","Wrong"],"Wrong","'Yesterday' tells us when: I saw him yesterday."],
+ ["Have you ever been to London?",["Right","Wrong"],"Right","Experience, no time: present perfect."],
+ ["I didn't finish my homework yet.",["Right","Wrong"],"Wrong","With 'yet' we use the present perfect: I haven't finished my homework yet."],
+ ["She went to the cinema last night.",["Right","Wrong"],"Right","'Last night': past simple."],
+ ["When have you arrived?",["Right","Wrong"],"Wrong","Questions with 'when' use the past simple: When did you arrive?"],
+ ["I've just had lunch, so I'm not hungry.",["Right","Wrong"],"Right","A very recent action with a result now: present perfect + just."],
+ ["My grandfather has died in 2010.",["Right","Wrong"],"Wrong","'In 2010' is a finished time: My grandfather died in 2010."],
+ ["We've already booked the hotel.",["Right","Wrong"],"Right","already + present perfect."],
+ ["Did you ever eat snails?",["Right","Wrong"],"Wrong","For life experiences we say: Have you ever eaten snails?"],
+ ["I lived in Kazan for five years, and then I moved to Moscow.",["Right","Wrong"],"Right","A finished period in the past: past simple."]
+]);
+
+/* talk */
+(function(){const T=["Have you ever met a famous person? (When? Where? What did you say?)","Have you ever lost your phone? (What happened? Did you find it?)","Have you ever been on a plane? (Where did you fly? How was it?)","Have you ever cooked for more than ten people? (What did you cook?)","Have you ever broken a bone? (How did it happen?)","What's the best concert you've ever been to? (When did you go?)","Have you ever stayed up all night? (Why?)","What's something you've never done but want to do?"];
+  const el=document.getElementById("talk");T.forEach((t,i)=>{const b=document.createElement("button");b.className="paw";b.textContent="🎟️";b.setAttribute("aria-label","Open question "+(i+1));b.onclick=()=>{b.classList.add("open");b.textContent=t};el.appendChild(b)})})();
+
+TR.init("ppps").then(S=>RESTORE.forEach(f=>{try{f(S)}catch(e){console.error(e)}}));
+</script>
+</body>
+</html>

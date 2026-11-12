@@ -12,5 +12,6 @@ window.PORTAL_ACTIVITIES = {
   animals: { cards: "Flashcards", sort: "Sort", spell: "Spelling", bite: "Bite & sting", forsince: "for / since", pp: "Present perfect" },
   lives: { cards: "Life events", order: "Order", words: "Which word?", sound: "Horse or bird?", tense: "Finished or not?", bio: "Rosa & Mia", write: "Your story" },
   adv: { adjadv: "Adjective or adverb?", pairs: "Tricky pairs", confusing: "Confusing adverbs", cmatch: "Comment adverbs: meanings", comment: "Comment adverbs: use", types: "Types", place: "Position", fix: "Final check" },
-  move: { walk: "The walk", tricky: "Tricky pairs", sports: "Play, go, do", stress: "Stress", match: "The big match", verbs: "Which verb?" }
+  move: { walk: "The walk", tricky: "Tricky pairs", sports: "Play, go, do", stress: "Stress", match: "The big match", verbs: "Which verb?" },
+  ppps: { signals: "Signal words", forms: "Participles", choose: "Which tense?", words: "ever, just, yet…", dialogue: "Conversation", rw: "Right or wrong?" }
 };
