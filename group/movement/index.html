@@ -1,0 +1,429 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Out and About</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<script src="../../assets/config.js?v=9"></script>
+<script src="../../assets/portal.js?v=3"></script>
+<script src="../../assets/track.js?v=2"></script>
+<style>
+body{margin:0}
+
+body{margin:0}
+
+body{margin:0}
+
+/* Layout: a town walk. Header card, pill tabs per exercise, an animated map as the centrepiece. */
+:root{
+  --bg:#f1f5ec; --card:#fdfefb; --ink:#1c2a1e; --muted:#5b6b5d; --line:#d2dfcf;
+  --leaf:#2f7d3a; --leaf-soft:#2f7d3a18; --sun:#e8772e; --sun-soft:#e8772e22; --sky:#2f7fa8;
+  --ok:#1f8a5b; --ok-soft:#1f8a5b1f; --bad:#c2453d; --bad-soft:#c2453d1c;
+  --display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;
+  --body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#121a13; --card:#1a241b; --ink:#e6efe6; --muted:#a2b3a3; --line:#304230;
+  --leaf:#7fcf87; --leaf-soft:#7fcf871f; --sun:#f5a066; --sun-soft:#f5a06624; --sky:#6db7dd;
+  --ok:#86c46c; --ok-soft:#86c46c22; --bad:#ef7d74; --bad-soft:#ef7d7422; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121a13; --card:#1a241b; --ink:#e6efe6; --muted:#a2b3a3; --line:#304230;
+  --leaf:#7fcf87; --leaf-soft:#7fcf871f; --sun:#f5a066; --sun-soft:#f5a06624; --sky:#6db7dd;
+  --ok:#86c46c; --ok-soft:#86c46c22; --bad:#ef7d74; --bad-soft:#ef7d7422; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 64px}
+.wrap{max-width:940px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+h1,h2,h3{font-family:var(--display);margin:0;line-height:1.05;text-wrap:balance}
+h1{font-size:clamp(40px,7vw,64px);font-weight:800;letter-spacing:-.02em;color:var(--leaf)}
+h2{font-size:clamp(28px,4vw,36px);font-weight:800}
+h3{font-size:21px;font-weight:600}
+p{margin:0}
+.eyebrow{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.lede{color:var(--muted);max-width:64ch}
+.tip{font-size:14px;color:var(--muted);font-style:italic}
+
+.guide{position:relative;border:2px solid var(--leaf);border-radius:20px;padding:26px clamp(20px,4vw,36px);background:var(--card);display:flex;flex-direction:column;gap:10px;overflow:hidden}
+.guide::before{content:"";position:absolute;right:-40px;top:-40px;width:200px;height:200px;border-radius:50%;background:var(--sun-soft)}
+.guide .critters{position:absolute;right:clamp(16px,4vw,34px);top:20px;font-size:clamp(30px,5vw,44px);letter-spacing:.1em}
+@media (max-width:560px){.guide .critters{position:static}}
+
+nav.tabs{display:flex;flex-wrap:wrap;gap:8px}
+.tab{appearance:none;cursor:pointer;font:inherit;font-weight:700;font-size:15px;border-radius:999px;padding:8px 16px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+.tab:hover{border-color:var(--leaf)}
+.tab[aria-selected="true"]{background:var(--leaf);border-color:var(--leaf);color:var(--card)}
+.tab.done::after{content:" ✓"}
+.tab:focus-visible,.btn:focus-visible,.opt:focus-visible,.flash:focus-visible,input:focus-visible,.cat:focus-visible{outline:2px solid var(--sun);outline-offset:2px}
+
+section.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:clamp(20px,4vw,34px);display:flex;flex-direction:column;gap:22px}
+.head{display:flex;flex-direction:column;gap:8px}
+.btn{appearance:none;cursor:pointer;font:inherit;font-weight:700;font-size:16px;border-radius:999px;padding:10px 20px;border:1px solid var(--leaf);background:var(--leaf);color:var(--card)}
+.btn.ghost{background:transparent;color:var(--leaf)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.score{font-weight:700;color:var(--leaf);font-variant-numeric:tabular-nums}
+.bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden}
+.bar span{display:block;height:100%;background:var(--sun);transition:width .3s}
+
+/* flashcards */
+.filters{display:flex;gap:6px;flex-wrap:wrap}
+.filter{appearance:none;cursor:pointer;font:inherit;font-size:14px;border-radius:8px;padding:5px 12px;border:1px solid var(--line);background:transparent;color:var(--muted)}
+.filter[aria-pressed="true"]{border-color:var(--sun);background:var(--sun-soft);color:var(--ink)}
+.flash{appearance:none;cursor:pointer;font:inherit;color:var(--ink);width:100%;min-height:250px;border-radius:18px;border:2px solid var(--line);background:var(--bg);padding:24px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center}
+.flash .em{font-size:clamp(70px,14vw,110px);line-height:1}
+.flash .w{font-family:var(--display);font-size:clamp(32px,6vw,48px);font-weight:800;color:var(--leaf);line-height:1.05}
+.flash .t{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.flash .d{font-size:18px;max-width:44ch}
+.flash.back{border-color:var(--sun)}
+
+/* sort */
+.sort-card{background:var(--bg);border:2px solid var(--line);border-radius:18px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center}
+.sort-card .word{font-family:var(--display);font-size:clamp(34px,6vw,50px);font-weight:800}
+.cats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;width:100%}
+@media (max-width:560px){.cats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.cat{appearance:none;cursor:pointer;font:inherit;font-weight:700;border-radius:14px;padding:14px 8px;border:2px solid var(--line);background:var(--card);color:var(--ink);display:flex;flex-direction:column;gap:4px;align-items:center}
+.cat .ic{font-size:30px}
+.cat:hover{border-color:var(--leaf)}
+.cat.ok{border-color:var(--ok);background:var(--ok-soft)}
+.cat.no{border-color:var(--bad);background:var(--bad-soft);animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.feedback{min-height:1.5em;font-weight:700}
+.feedback.ok{color:var(--ok)}.feedback.no{color:var(--bad)}
+
+/* choose */
+.qs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:700px){.qs{grid-template-columns:1fr}}
+.q{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.q .n{font-size:12px;color:var(--muted);letter-spacing:.1em}
+.q .s{font-weight:700}
+.opts{display:flex;gap:6px;flex-wrap:wrap}
+.opt{appearance:none;cursor:pointer;font:inherit;font-size:15px;border-radius:8px;padding:6px 12px;background:var(--card);color:var(--ink);border:1px solid var(--line)}
+.opt:hover{border-color:var(--leaf)}
+.opt.ok{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.opt.no{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.why{font-size:14px;color:var(--muted)}
+
+/* rules */
+.rule{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.rule div{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:4px}
+.rule strong{font-family:var(--display);font-size:22px;color:var(--leaf)}
+.rule span{font-size:15px}
+.timeline{display:flex;align-items:center;gap:0;margin:4px 0}
+.timeline .pt{font-weight:700;font-size:14px;white-space:nowrap}
+.timeline .ln{flex:1;height:4px;background:linear-gradient(90deg,var(--sun),var(--leaf));border-radius:2px;margin:0 10px;position:relative}
+.timeline .ln::after{content:"";position:absolute;right:-6px;top:-5px;border:7px solid transparent;border-left-color:var(--leaf)}
+
+/* spelling */
+.spell{padding:0;margin:0;display:flex;flex-direction:column;gap:8px}
+.spell li{list-style:none;display:grid;grid-template-columns:56px minmax(0,1fr) 200px auto;gap:10px;align-items:center;padding:10px 14px;border-radius:12px;background:var(--bg);border:1px solid transparent}
+@media (max-width:600px){.spell li{grid-template-columns:44px minmax(0,1fr)}.spell li input{grid-column:1/-1}}
+.spell li.ok{border-color:var(--ok)}.spell li.no{border-color:var(--bad)}
+.spell .em{font-size:34px;text-align:center}
+.hint{font-family:var(--display);font-weight:600;color:var(--sun)}
+input[type=text]{font:inherit;font-size:16px;color:var(--ink);background:var(--card);border:1px solid var(--leaf);border-radius:8px;padding:6px 10px;width:100%}
+.mark{font-size:14px}.mark.ok{color:var(--ok)}.mark.no{color:var(--bad)}
+
+/* talk */
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:700px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.paw{appearance:none;cursor:pointer;font:inherit;color:var(--ink);background:var(--bg);border:2px dashed var(--sun);border-radius:14px;min-height:118px;padding:14px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:15px}
+.paw:not(.open){font-size:36px}
+.paw.open{border-style:solid;border-color:var(--line)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+.col{display:flex;flex-direction:column;gap:8px}
+.chip{appearance:none;cursor:pointer;font:inherit;text-align:left;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+.chip:hover{border-color:var(--leaf)}
+.chip.ok{border-color:var(--ok);background:var(--ok-soft);color:var(--ok);cursor:default}
+.chip.no{animation:shake .35s;border-color:var(--bad)}
+.chip .ord{font-weight:700}
+.fill{display:flex;flex-direction:column;gap:8px;padding:0;margin:0}
+.fill li{list-style:none;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;padding:10px 14px;border-radius:12px;background:var(--bg);border:1px solid transparent}
+.fill li.ok{border-color:var(--ok)}.fill li.no{border-color:var(--bad)}
+.fill .mark{margin-left:auto}
+select{font:inherit;font-size:16px;color:var(--ink);background:var(--card);border:1px solid var(--leaf);border-radius:8px;padding:4px 8px;max-width:100%}
+.note-box{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+textarea{width:100%;min-height:220px;font:inherit;font-size:17px;line-height:1.6;color:var(--ink);background:transparent;border:none;resize:vertical}
+textarea:focus{outline:2px solid var(--sun);outline-offset:4px;border-radius:6px}
+.checks{display:flex;flex-wrap:wrap;gap:8px}
+.check{appearance:none;cursor:pointer;font:inherit;font-size:15px;border-radius:999px;padding:6px 14px;border:1px solid var(--line);background:transparent;color:var(--ink)}
+.check[aria-pressed="true"]{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.check[aria-pressed="true"]::before{content:"✓ "}
+
+.scene-wrap{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:#cfe8b8}
+.scene-wrap svg{display:block;width:100%;height:auto}
+.walk-q{display:flex;flex-direction:column;gap:10px;align-items:center;text-align:center;background:var(--bg);border:1px solid var(--line);border-radius:16px;padding:18px}
+.wq{font-size:clamp(19px,2.6vw,24px);font-weight:700;line-height:1.35}
+.opts.big .opt{font-size:18px;padding:10px 18px}
+.opts.big{justify-content:center}
+.story{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:4px;color:var(--muted)}
+.story b{color:var(--leaf)}
+.stress{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media (max-width:600px){.stress{grid-template-columns:1fr}}
+.srow{display:flex;gap:4px;padding:10px 12px;border-radius:12px;background:var(--bg);border:1px solid var(--line)}
+.srow.solved{border-color:var(--ok)}
+.syl{appearance:none;cursor:pointer;font:inherit;font-size:18px;border-radius:8px;padding:6px 10px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+.syl:hover{border-color:var(--leaf)}
+.syl.ok{background:var(--ok-soft);border-color:var(--ok);color:var(--ok);font-weight:800;text-transform:uppercase}
+.syl.no{background:var(--bad-soft);border-color:var(--bad);animation:shake .35s}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="guide">
+    <span class="critters" aria-hidden="true">🏃‍♀️🐕⚽</span>
+    <span class="eyebrow">Homework · Expressing movement + sports</span>
+    <h1>Out and About</h1>
+    <p class="lede">Take Mia and her dog Biscuit for a walk around town, and they'll go exactly where you send them. Then practise the tricky pairs, sports and a football commentary.</p>
+    <p class="tip" id="saveState"></p>
+  </header>
+
+  <nav class="tabs" role="tablist" id="tabs"></nav>
+
+  <section class="panel" id="p-walk" role="tabpanel">
+    <div class="head"><span class="eyebrow">Step 1</span><h2>The walk</h2>
+      <p class="lede">Choose the right word, and watch Mia and Biscuit move. Wrong word? They'll stay where they are.</p></div>
+    <div class="scene-wrap"><svg id="scene" viewBox="0 0 900 520" role="img" aria-label="A map of a small town with a house, a road, a shop, a church, a railway bridge, a river with a footbridge, a hill with a tunnel and a lake"></svg></div>
+    <div class="walk-q">
+      <span class="eyebrow" id="wNum"></span>
+      <p class="wq" id="wq"></p>
+      <div class="opts big" id="wOpts"></div>
+      <p class="why" id="wWhy"></p>
+    </div>
+    <ol class="story" id="story"></ol>
+    <div class="row"><button class="btn ghost" id="replay" hidden>Replay the whole walk</button><span class="score" id="s-walk"></span></div>
+  </section>
+
+  <section class="panel" id="p-tricky" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Step 2</span><h2>Tricky pairs</h2></div>
+    <div class="rule">
+      <div><strong>into / out of + noun</strong><span>Come into the kitchen. He went out of the house.</span><span class="tip">No noun? in / out: Come in! He went out.</span></div>
+      <div><strong>across / through</strong><span>across: from one side to the other of something flat (a road, a river, a square).</span><span class="tip">through: inside something (a tunnel, a forest, a crowd).</span></div>
+      <div><strong>come / go</strong><span>come: towards the speaker. go: away from the speaker.</span><span class="tip">Come here! Go away!</span></div>
+      <div><strong>away / back</strong><span>away: to another place. back: to the place where you were before.</span><span class="tip">The dog ran away and never came back.</span></div>
+    </div>
+    <div class="qs" id="tricky"></div>
+    <span class="score" id="s-tricky"></span>
+  </section>
+
+  <section class="panel" id="p-sports" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Step 3</span><h2>Play, go or do?</h2></div>
+    <div class="rule">
+      <div><strong>play</strong><span>sports with a ball: play tennis, play football</span></div>
+      <div><strong>go</strong><span>sports ending in -ing: go cycling, go skiing</span></div>
+      <div><strong>do</strong><span>other sports and exercise: do yoga, do karate</span></div>
+    </div>
+    <div class="sort-card">
+      <span class="eyebrow" id="spNum"></span>
+      <span class="word" id="spWord"></span>
+      <div class="cats" id="spCats" style="grid-template-columns:repeat(3,minmax(0,1fr))"></div>
+      <p class="feedback" id="spFb"></p>
+      <button class="btn" id="spNext" hidden>Next sport</button>
+    </div>
+    <span class="score" id="s-sports"></span>
+  </section>
+
+  <section class="panel" id="p-stress" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Step 4</span><h2>Where's the stress?</h2>
+      <p class="lede">Say the word out loud and click the stressed syllable.</p></div>
+    <div class="stress" id="stress"></div>
+    <span class="score" id="s-stress"></span>
+  </section>
+
+  <section class="panel" id="p-match" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Step 5</span><h2>The big match</h2>
+      <p class="lede">You're the TV commentator! Complete the commentary of the women's football final. Then press "Check".</p></div>
+    <ol class="fill" id="match"></ol>
+    <div class="row"><button class="btn" id="mCheck">Check</button><span class="score" id="s-match"></span></div>
+    <h3>Which verb?</h3>
+    <div class="qs" id="verbs"></div>
+    <span class="score" id="s-verbs"></span>
+  </section>
+
+  <section class="panel" id="p-talk" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">For the lesson</span><h2>Talk about it</h2>
+      <p class="lede">Open a card and answer. Use a verb of movement + a preposition where you can.</p></div>
+    <div class="cards" id="talk"></div>
+  </section>
+</div>
+
+<script>
+const TABS=[["walk","The walk"],["tricky","Tricky pairs"],["sports","Play, go, do"],["stress","Stress"],["match","The big match"],["talk","Talk"]];
+const tabsEl=document.getElementById("tabs");
+TABS.forEach(([id,name])=>{const b=document.createElement("button");b.className="tab";b.setAttribute("role","tab");b.id="t-"+id;b.textContent=name;b.onclick=()=>show(id);tabsEl.appendChild(b)});
+function show(id){TABS.forEach(([t])=>{document.getElementById("p-"+t).hidden=t!==id;document.getElementById("t-"+t).setAttribute("aria-selected",t===id)});
+  try{if(location.hash!=="#"+id)history.replaceState(null,"","#"+id)}catch(e){}}
+const h0=location.hash.slice(1);show(TABS.some(t=>t[0]===h0)?h0:"walk");
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const mark=id=>{const t=document.getElementById("t-"+id);if(t)t.classList.add("done")};
+const TR=window.Track;const canSave=TR.online;const RESTORE=[];
+TR.onStatus(st=>{document.getElementById("saveState").textContent=!canSave?"Tip: open this page from your personal portal link to save your progress.":st==="saving"?"Saving…":st==="offline"?"No connection right now: your answers are kept on this device and will be sent later.":"Your progress saves automatically after every answer."});
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* 1 the walk: scene */
+const svg=document.getElementById("scene");
+const base=`
+<rect x="0" y="0" width="900" height="520" fill="#cfe8b8"/>
+<rect x="330" y="0" width="60" height="520" fill="#8f97a3"/>
+<g fill="#fff">${[0,1,2,3,4].map(i=>`<rect x="${334+i*11}" y="176" width="7" height="30"/>`).join("")}</g>
+<g fill="#fff">${[0,1,2,3,4].map(i=>`<rect x="${334+i*11}" y="416" width="7" height="30"/>`).join("")}</g>
+<rect x="60" y="180" width="270" height="20" fill="#e9dfc9"/><rect x="390" y="180" width="390" height="20" fill="#e9dfc9"/>
+<rect x="728" y="200" width="24" height="230" fill="#e9dfc9"/><rect x="410" y="420" width="340" height="20" fill="#e9dfc9"/>
+<path d="M430 320 C560 300 700 340 900 318 L900 372 C700 392 560 352 430 372 Z" fill="#7cc3e6"/>
+<rect x="712" y="308" width="56" height="76" rx="4" fill="#b98a5a" stroke="#6e4e2e" stroke-width="3"/>
+<g stroke="#6e4e2e" stroke-width="2">${[0,1,2,3,4,5].map(i=>`<line x1="714" y1="${318+i*11}" x2="766" y2="${318+i*11}"/>`).join("")}</g>
+<ellipse cx="200" cy="420" rx="95" ry="50" fill="#7cc3e6" stroke="#5aa7cc" stroke-width="3"/>
+<text x="175" y="428" font-size="22">🦆</text><text x="215" y="410" font-size="18">🦆</text>
+<rect x="40" y="30" width="130" height="90" fill="#f2b8a0" stroke="#7a3d2a" stroke-width="3"/><path d="M30 34 L105 -6 L180 34 Z" fill="#b0503a"/>
+<rect x="92" y="78" width="26" height="42" fill="#7a3d2a"/>
+<g fill="#cfc6b8" stroke="#8a8172" stroke-width="2">${[0,1,2,3].map(i=>`<rect x="${86-i*3}" y="${120+i*11}" width="${38+i*6}" height="11"/>`).join("")}</g>
+<rect x="590" y="70" width="70" height="90" fill="#efe7d6" stroke="#8a8172" stroke-width="3"/><path d="M590 70 L625 22 L660 70 Z" fill="#9b8f7c"/><rect x="621" y="6" width="8" height="22" fill="#6e6457"/><rect x="616" y="12" width="18" height="6" fill="#6e6457"/>
+<path d="M612 160 L612 128 Q625 112 638 128 L638 160 Z" fill="#6e6457"/>
+<text x="600" y="190" font-size="13" fill="#3a3a3a" font-family="sans-serif">church</text>
+<text x="24" y="150" font-size="13" fill="#3a3a3a" font-family="sans-serif">home</text>
+<text x="150" y="490" font-size="13" fill="#2f6f8e" font-family="sans-serif">lake</text>
+<text x="800" y="350" font-size="13" fill="#2f6f8e" font-family="sans-serif">river</text>`;
+const over=`
+<rect x="430" y="95" width="110" height="65" fill="#ffd36e" stroke="#9a6b00" stroke-width="3"/><rect x="430" y="80" width="110" height="18" fill="#e07a3a"/>
+<text x="452" y="94" font-size="13" fill="#fff" font-family="sans-serif" font-weight="700">SHOP</text>
+<rect x="473" y="122" width="24" height="38" fill="#9a6b00"/>
+<rect x="680" y="232" width="220" height="26" fill="#6b5a4a"/><g stroke="#3f3328" stroke-width="3"><line x1="680" y1="238" x2="900" y2="238"/><line x1="680" y1="252" x2="900" y2="252"/></g>
+<rect x="700" y="258" width="10" height="20" fill="#6b5a4a"/><rect x="770" y="258" width="10" height="20" fill="#6b5a4a"/>
+<text x="800" y="228" font-size="12" fill="#3a3a3a" font-family="sans-serif">railway</text>
+<path d="M465 470 C470 400 520 385 565 385 C610 385 660 400 665 470 Z" fill="#8bbf6a" stroke="#5f8f45" stroke-width="3"/>
+<ellipse cx="470" cy="432" rx="10" ry="16" fill="#2c2c2c"/><ellipse cx="660" cy="432" rx="10" ry="16" fill="#2c2c2c"/>
+<text x="540" y="460" font-size="12" fill="#2f5a1e" font-family="sans-serif">tunnel</text>`;
+svg.innerHTML=`<g>${base}</g><g id="walker"><text x="-14" y="6" font-size="30">🚶‍♀️</text><text x="10" y="12" font-size="20">🐕</text></g><g>${over}</g>`;
+const walker=document.getElementById("walker");
+const lake=[];for(let k=0;k<=36;k++){const t=k/36*2*Math.PI;lake.push([200+122*Math.cos(t),420+74*Math.sin(t)])}
+const WALK=[
+ ["Mia and Biscuit went ___ the steps.",["down","up","under"],"down",[[105,118],[105,165],[105,190]],"down: from a higher place to a lower one."],
+ ["They walked ___ the street.",["along","across","through"],"along",[[105,190],[312,190]],"along: following a line (a street, a river)."],
+ ["They went ___ the road at the zebra crossing.",["across","through","over"],"across",[[312,190],[410,190]],"across: from one side of something flat to the other."],
+ ["Mia went ___ the shop to buy dog biscuits.",["into","in","inside"],"into",[[410,190],[485,190],[485,140]],"into + noun: into the shop."],
+ ["A minute later, they came ___ the shop.",["out of","out","from"],"out of",[[485,140],[485,190],[560,190]],"out of + noun: out of the shop."],
+ ["They walked ___ the old church.",["past","through","into"],"past",[[560,190],[740,190]],"past: go next to something and continue."],
+ ["They went ___ the railway bridge.",["under","over","through"],"under",[[740,190],[740,300]],"under: below something."],
+ ["Then they crossed the river: they went ___ the footbridge.",["over","under","through"],"over",[[740,300],[740,400]],"over: from one side to the other, above something."],
+ ["They walked ___ the tunnel in the hill.",["through","across","along"],"through",[[740,400],[740,430],[420,430]],"through: inside something, from one end to the other."],
+ ["Biscuit saw the ducks and ran ___ the lake.",["towards","into","past"],"towards",[[420,430],[322,420]],"towards: in the direction of."],
+ ["They walked all the way ___ the lake.",["round","through","across"],"round",lake,"round (around): in a circle."],
+ ["Then they went back home and ran ___ the steps to the front door.",["up","down","over"],"up",[[322,420],[250,300],[105,240],[105,165],[105,118]],"up: from a lower place to a higher one."]
+];
+let pos=[105,118];function put(p){pos=p;walker.setAttribute("transform",`translate(${p[0]},${p[1]})`)}put(pos);
+function animate(pts,done){if(reduce){put(pts[pts.length-1]);done&&done();return}
+  const segs=[];let total=0;for(let k=1;k<pts.length;k++){const d=Math.hypot(pts[k][0]-pts[k-1][0],pts[k][1]-pts[k-1][1]);segs.push(d);total+=d}
+  const dur=Math.max(900,total/0.17);const t0=performance.now();
+  (function f(now){let dist=Math.min(1,(now-t0)/dur)*total;let k=0;while(k<segs.length-1&&dist>segs[k]){dist-=segs[k];k++}
+    const r=segs[k]?dist/segs[k]:1;put([pts[k][0]+(pts[k+1][0]-pts[k][0])*r,pts[k][1]+(pts[k+1][1]-pts[k][1])*r]);
+    if(now-t0<dur)requestAnimationFrame(f);else{put(pts[pts.length-1]);done&&done()}})(t0)}
+let wi=0,wok=0,busy=false;const storyEl=document.getElementById("story");
+function drawQ(){const q=document.getElementById("wq"),o=document.getElementById("wOpts");document.getElementById("wWhy").textContent="";
+  if(wi>=WALK.length){document.getElementById("wNum").textContent="Home again!";q.textContent="Mia and Biscuit are home. Great walk!";o.innerHTML="";document.getElementById("replay").hidden=false;mark("walk");return}
+  const [s,opts,ans]=WALK[wi];document.getElementById("wNum").textContent=`Step ${wi+1} of ${WALK.length}`;q.innerHTML=s.replace("___","<u>&nbsp;?&nbsp;</u>");o.innerHTML="";let first=true;
+  shuffle(opts).forEach(t=>{const b=document.createElement("button");b.className="opt";b.textContent=t;
+    b.onclick=()=>{if(busy)return;const i=wi,[,,,pts,why]=WALK[i];
+      if(first){if(t===ans)wok++;TR.answer("walk",i,s,t,ans,t===ans,wok,WALK.length);if(i===WALK.length-1)TR.finish("walk",wok,WALK.length)}
+      if(t===ans){busy=true;b.classList.add("ok");document.getElementById("wWhy").textContent=why;q.innerHTML=s.replace("___",`<b>${ans}</b>`);
+        animate(pts,()=>{busy=false;storyEl.insertAdjacentHTML("beforeend",`<li>${s.replace("___",`<b>${ans}</b>`)}</li>`);wi++;document.getElementById("s-walk").textContent=`First-try answers: ${wok} / ${Math.max(wi,1)}`;drawQ()})}
+      else{first=false;b.classList.add("no");setTimeout(()=>b.classList.remove("no"),500)}};o.appendChild(b)})}
+drawQ();
+document.getElementById("replay").onclick=()=>{put([105,118]);let k=0;(function n(){if(k<WALK.length)animate(WALK[k++][3],n)})()};
+RESTORE.push(S=>{const a=S.walk&&S.walk.answers;if(!a)return;const n=Object.keys(a).length;if(!n)return;
+  wi=Math.min(n,WALK.length);wok=Object.values(a).filter(r=>r.ok).length;storyEl.innerHTML="";
+  for(let k=0;k<wi;k++)storyEl.insertAdjacentHTML("beforeend",`<li>${WALK[k][0].replace("___",`<b>${WALK[k][2]}</b>`)}</li>`);
+  const last=WALK[wi-1][3];put(last[last.length-1]);document.getElementById("s-walk").textContent=`First-try answers: ${wok} / ${wi}`;drawQ()});
+
+/* choose helper */
+function choose(elId,data,scoreId,act){let ok=0,tried=0;const el=document.getElementById(elId),apply=[];
+  const upd=()=>{document.getElementById(scoreId).textContent=`First-try answers: ${ok} / ${tried}`;if(tried===data.length)mark(act)};
+  data.forEach(([s,opts,ans,why],i)=>{const d=document.createElement("div");d.className="q";
+    d.innerHTML=`<span class="n">${i+1}</span><p class="s">${s.replace("___","<u>&nbsp;?&nbsp;</u>")}</p><div class="opts"></div><p class="why" hidden></p>`;
+    const o=d.querySelector(".opts"),w=d.querySelector(".why");let answered=false;
+    shuffle(opts).forEach(t=>{const b=document.createElement("button");b.className="opt";b.textContent=t;
+      b.onclick=()=>{o.querySelectorAll(".opt").forEach(x=>x.classList.remove("no"));const first=!answered;
+        if(t===ans){b.classList.add("ok");w.hidden=false;w.textContent=why;(d.querySelector(".s u")||{}).innerHTML=`&nbsp;${ans}&nbsp;`;if(!answered){answered=true;tried++;ok++}}
+        else{b.classList.add("no");if(!answered){answered=true;tried++}}
+        upd();if(first){TR.answer(act,i,s,t,ans,t===ans,ok,data.length);if(tried===data.length)TR.finish(act,ok,data.length)}};o.appendChild(b)});
+    apply[i]=rec=>{if(answered)return;answered=true;tried++;if(rec.ok)ok++;
+      o.querySelectorAll(".opt").forEach(x=>{if(x.textContent===ans)x.classList.add("ok");else if(!rec.ok&&x.textContent===rec.a)x.classList.add("no")});
+      w.hidden=false;w.textContent=why;(d.querySelector(".s u")||{}).innerHTML=`&nbsp;${ans}&nbsp;`};
+    el.appendChild(d)});
+  RESTORE.push(S=>{const a=S[act]&&S[act].answers;if(!a)return;Object.entries(a).forEach(([i,r])=>apply[i]&&apply[i](r));if(tried)upd()})}
+
+/* 2 tricky */
+choose("tricky",[
+ ["Come ___ the kitchen, dinner's ready!",["into","in"],"into","There's a noun (the kitchen): into."],
+ ["The door's open. Please come ___.",["in","into"],"in","No noun after it: in."],
+ ["He went ___ the house without his keys.",["out of","out"],"out of","There's a noun (the house): out of."],
+ ["She went ___ on Friday night and came home at 3 a.m.",["out","out of"],"out","No noun: out."],
+ ["We walked ___ the forest for two hours.",["through","across"],"through","Inside something (a forest): through."],
+ ["He swam ___ the river to the other side.",["across","through"],"across","From one side of something flat to the other: across."],
+ ["Go ___! I don't want to talk to you.",["away","back"],"away","Movement to another place, far from here: away."],
+ ["We left the café and went ___ to our hotel.",["back","away"],"back","To the place where we were before: back."],
+ ["(Diana, at home, on the phone:) \"Victoria, can you ___ to my place tonight?\"",["come","go"],"come","Movement towards the speaker: come."],
+ ["I'm tired. I'm going to ___ home now.",["go","come"],"go","Movement away from where you are now: go."],
+ ["The ball went ___ the goalkeeper's head.",["over","through"],"over","Above something: over."],
+ ["The runners ran twice ___ the track.",["round","across"],"round","In a circle: round."]
+],"s-tricky","tricky");
+
+/* 3 sports sort */
+(function(){const C={play:["play","⚽"],go:["go","🚴"],do:["do","🧘"]};
+  const W=[["athletics","do"],["baseball","play"],["basketball","play"],["cycling","go"],["football","play"],["gymnastics","do"],["handball","play"],["karate","do"],["rugby","play"],["skiing","go"],["tennis","play"],["volleyball","play"],["windsurfing","go"],["yoga","do"],["swimming","go"]];
+  let list=shuffle(W),i=0,ok=0,first=true,pick=null;const cats=document.getElementById("spCats"),fb=document.getElementById("spFb"),nx=document.getElementById("spNext");
+  Object.entries(C).forEach(([k,[l,ic]])=>{const b=document.createElement("button");b.className="cat";b.innerHTML=`<span class="ic">${ic}</span>${l}`;
+    b.onclick=()=>{if(!nx.hidden)return;const a=list[i];
+      if(k===a[1]){b.classList.add("ok");if(first)ok++;TR.answer("sports",a[0],a[0],first?k:pick,a[1],first,ok,list.length);
+        fb.className="feedback ok";fb.textContent=`Yes! ${a[1]} ${a[0]}.`;nx.hidden=false;
+        document.getElementById("s-sports").textContent=`First-try answers: ${ok} / ${i+1}`;if(i===list.length-1){nx.textContent="Finished!";TR.finish("sports",ok,list.length);mark("sports")}}
+      else{if(first){first=false;pick=k}b.classList.add("no");fb.className="feedback no";fb.textContent="Not quite. Try again!";setTimeout(()=>b.classList.remove("no"),500)}};cats.appendChild(b)});
+  function draw(){const a=list[i];first=true;document.getElementById("spNum").textContent=`${i+1} / ${list.length}`;document.getElementById("spWord").textContent=a[0];fb.textContent="";nx.hidden=true;cats.querySelectorAll(".cat").forEach(c=>c.classList.remove("ok","no"))}
+  nx.onclick=()=>{if(i<list.length-1){i++;draw()}};draw();
+  RESTORE.push(S=>{const a=S.sports&&S.sports.answers;if(!a)return;const d=Object.keys(a);if(!d.length)return;
+    list=[...list.filter(x=>d.includes(x[0])),...list.filter(x=>!d.includes(x[0]))];ok=Object.values(a).filter(r=>r.ok).length;i=Math.min(d.length,list.length-1);
+    document.getElementById("s-sports").textContent=`First-try answers: ${ok} / ${d.length}`;draw();if(d.length>=list.length){nx.hidden=false;nx.textContent="Finished!";fb.className="feedback ok";fb.textContent="You've sorted all the sports.";mark("sports")}})})();
+
+/* 4 stress */
+(function(){const SW=[[["ath","le","tics"],1],[["base","ball"],0],[["bas","ket","ball"],0],[["cy","cling"],0],[["gym","nas","tics"],1],[["hand","ball"],0],[["ka","ra","te"],1],[["rug","by"],0],[["ski","ing"],0],[["ten","nis"],0],[["vol","ley","ball"],0],[["wind","surf","ing"],0],[["yo","ga"],0],[["bad","min","ton"],0]];
+  const el=document.getElementById("stress");let ok=0,tried=0;const apply=[];
+  const upd=()=>{document.getElementById("s-stress").textContent=`First-try answers: ${ok} / ${tried}`;if(tried===SW.length)mark("stress")};
+  SW.forEach(([syl,st],i)=>{const row=document.createElement("div");row.className="srow";let answered=false;const word=syl.join("");
+    syl.forEach((s,k)=>{const b=document.createElement("button");b.className="syl";b.textContent=s;b.setAttribute("aria-label",`${word}: stress on ${s}`);
+      b.onclick=()=>{if(row.classList.contains("solved"))return;const first=!answered;
+        if(k===st){b.classList.add("ok");row.classList.add("solved");if(!answered){answered=true;tried++;ok++}}
+        else{b.classList.add("no");setTimeout(()=>b.classList.remove("no"),500);if(!answered){answered=true;tried++}}
+        upd();if(first){TR.answer("stress",i,word,syl.map((x,j)=>j===k?x.toUpperCase():x).join("·"),syl.map((x,j)=>j===st?x.toUpperCase():x).join("·"),k===st,ok,SW.length);if(tried===SW.length)TR.finish("stress",ok,SW.length)}};row.appendChild(b)});
+    apply[i]=rec=>{if(answered)return;answered=true;tried++;if(rec.ok)ok++;row.classList.add("solved");row.children[st].classList.add("ok")};
+    el.appendChild(row)});
+  RESTORE.push(S=>{const a=S.stress&&S.stress.answers;if(!a)return;Object.entries(a).forEach(([i,r])=>apply[i]&&apply[i](r));if(tried)upd()})})();
+
+/* 5 match */
+const MOPT=["along","past","across","towards","out","over","into","round","through"];
+const MT=[["Ivanova runs","the left side of the pitch.","along"],["She goes","one defender, and then another!","past"],["She kicks the ball","the pitch to Petrova.","across"],["Petrova runs","the goal.","towards"],["The goalkeeper comes","of her goal.","out"],["Petrova kicks the ball","the goalkeeper's head…","over"],["…and","the net! GOAL!","into"],["The players run","the stadium with the cup.","round"]];
+const mEl=document.getElementById("match");
+const mScore=()=>MT.filter((x,j)=>mEl.children[j].querySelector("select").value===x[2]).length;
+MT.forEach(([a,b,ans],i)=>{const li=document.createElement("li");
+  li.innerHTML=`<span>${a}</span><select id="mt-${i}" aria-label="Gap ${i+1}"><option value="">…</option>${MOPT.map(x=>`<option>${x}</option>`).join("")}</select><span>${b}</span><span class="mark"></span>`;mEl.appendChild(li);
+  li.querySelector("select").addEventListener("change",e=>{const v=e.target.value;if(v)TR.answer("match",i,`${a} ___ ${b}`,v,ans,v===ans,mScore(),MT.length)})});
+document.getElementById("mCheck").onclick=()=>{let n=0;MT.forEach(([,,ans],i)=>{const li=mEl.children[i],v=li.querySelector("select").value,m=li.querySelector(".mark"),g=v===ans;
+  li.className=v?(g?"ok":"no"):"";m.className="mark "+(g?"ok":"no");m.textContent=!v?"":g?"✓":"try again";if(g)n++});
+  document.getElementById("s-match").textContent=`${n} / ${MT.length}`;TR.finish("match",n,MT.length);if(n===MT.length)mark("match")};
+RESTORE.push(S=>{const a=S.match&&S.match.answers;if(a)Object.entries(a).forEach(([i,r])=>{const s=mEl.children[i]&&mEl.children[i].querySelector("select");if(s&&r.a)s.value=r.a})});
+choose("verbs",[
+ ["In volleyball, you ___ the ball over the net with your hands.",["hit","kick","run"],"hit","hit = touch something hard with your hand or a racket."],
+ ["The goalkeeper can ___ the ball far with her hands.",["throw","kick","hit"],"throw","throw = send something through the air with your hand."],
+ ["In a marathon, you ___ 42 kilometres.",["run","throw","kick"],"run","run = move fast on your feet."],
+ ["In football, you ___ the ball with your foot.",["kick","hit","throw"],"kick","kick = hit with your foot."],
+ ["In tennis, you ___ the ball with a racket.",["hit","throw","kick"],"hit","You hit the ball with a racket."]
+],"s-verbs","verbs");
+
+/* talk */
+(function(){const T=["Describe your way from home to the nearest shop. Use at least four prepositions of movement.","Which sports do you play, go or do? What did you do as a child?","What's the most exciting sports event you've ever watched?","Have you ever been to a live match or a race? Describe it.","Which sport is the most boring to watch? Why?","Describe a walk you love: where do you go, and what do you go past?"];
+  const el=document.getElementById("talk");T.forEach((t,i)=>{const b=document.createElement("button");b.className="paw";b.textContent="⚽";b.setAttribute("aria-label","Open question "+(i+1));b.onclick=()=>{b.classList.add("open");b.textContent=t};el.appendChild(b)})})();
+
+TR.init("move").then(S=>RESTORE.forEach(f=>{try{f(S)}catch(e){console.error(e)}}));
+</script>
+</body>
+</html>
