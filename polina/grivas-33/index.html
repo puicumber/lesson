@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Review: Collocations & Move Idioms</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+[hidden]{display:none!important} body{margin:0}
+
+/* Review page: case-file header, flashcards first, then self-checking exercises. Data lives in REVIEW below. */
+:root{
+  --bg:#f1ece2; --card:#fbf8f2; --paper:#f6efe0; --ink:#1f2433; --muted:#5f6475; --line:#d8cfbd;
+  --navy:#2b3a67; --navy-soft:#2b3a6714; --stamp:#b8402f; --stamp-soft:#b8402f1a;
+  --ok:#2f7a52; --ok-soft:#2f7a521c; --bad:#b8402f; --bad-soft:#b8402f1c;
+  --display:"Fraunces",Georgia,serif;
+  --body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#15171f; --card:#1d2029; --paper:#232631; --ink:#e9e6df; --muted:#a6a9b6; --line:#353948;
+  --navy:#9fb2ec; --navy-soft:#9fb2ec1c; --stamp:#f08a78; --stamp-soft:#f08a7822;
+  --ok:#6cc596; --ok-soft:#6cc59622; --bad:#f08a78; --bad-soft:#f08a7822; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#15171f; --card:#1d2029; --paper:#232631; --ink:#e9e6df; --muted:#a6a9b6; --line:#353948;
+  --navy:#9fb2ec; --navy-soft:#9fb2ec1c; --stamp:#f08a78; --stamp-soft:#f08a7822;
+  --ok:#6cc596; --ok-soft:#6cc59622; --bad:#f08a78; --bad-soft:#f08a7822; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 64px}
+.wrap{max-width:920px;margin:0 auto;display:flex;flex-direction:column;gap:24px}
+h1,h2{font-family:var(--display);margin:0;line-height:1.05;text-wrap:balance}
+h1{font-size:clamp(36px,7vw,58px);font-weight:800;letter-spacing:-.01em}
+h2{font-size:clamp(26px,4vw,34px);font-weight:800}
+p{margin:0}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.lede{color:var(--muted);max-width:64ch}
+.tip{font-size:14px;color:var(--muted);font-style:italic}
+
+.file{position:relative;border:1px solid var(--line);border-radius:6px 18px 18px 18px;padding:30px clamp(20px,4vw,38px) 26px;background:var(--paper);display:flex;flex-direction:column;gap:10px;margin-top:22px}
+.file::before{content:"REVIEW FILE";position:absolute;top:-22px;left:-1px;font-family:var(--mono);font-size:12px;letter-spacing:.12em;padding:4px 16px;background:var(--paper);border:1px solid var(--line);border-bottom:0;border-radius:10px 10px 0 0;color:var(--muted)}
+.file h1{color:var(--navy)}
+.stamp{position:absolute;right:clamp(14px,4vw,34px);top:20px;font-family:var(--mono);font-weight:600;font-size:13px;letter-spacing:.16em;color:var(--stamp);border:2px solid var(--stamp);border-radius:6px;padding:6px 10px;transform:rotate(-6deg);opacity:.85}
+@media (max-width:560px){.stamp{position:static;align-self:flex-start;transform:none}}
+
+nav.tabs{display:flex;flex-wrap:wrap;gap:8px}
+.tab{appearance:none;cursor:pointer;font:inherit;font-weight:700;font-size:15px;border-radius:999px;padding:8px 16px;border:1px solid var(--line);background:var(--card);color:var(--ink);display:inline-flex;gap:8px;align-items:center}
+.tab:hover{border-color:var(--navy)}
+.tab[aria-selected="true"]{background:var(--navy);border-color:var(--navy);color:var(--card)}
+.tab .best{font-family:var(--mono);font-size:12px;font-weight:500;opacity:.8}
+.tab:focus-visible,.btn:focus-visible,input:focus-visible,.opt:focus-visible,.flash:focus-visible,.filter:focus-visible,.coin:focus-visible{outline:2px solid var(--stamp);outline-offset:2px}
+
+section.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:clamp(20px,4vw,34px);display:flex;flex-direction:column;gap:22px}
+.head{display:flex;flex-direction:column;gap:8px}
+.btn{appearance:none;cursor:pointer;font:inherit;font-weight:700;font-size:16px;border-radius:999px;padding:10px 20px;border:1px solid var(--navy);background:var(--navy);color:var(--card)}
+.btn.ghost{background:transparent;color:var(--navy)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.score{font-family:var(--mono);font-weight:600;color:var(--navy);font-variant-numeric:tabular-nums}
+
+/* flashcards */
+.flash{appearance:none;cursor:pointer;font:inherit;color:var(--ink);width:100%;min-height:240px;border-radius:18px;border:2px solid var(--line);background:var(--paper);padding:28px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center}
+.flash .w{font-family:var(--display);font-size:clamp(30px,6vw,46px);font-weight:800;color:var(--navy);line-height:1.1}
+.flash .t{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.flash .d{font-size:20px;max-width:46ch}
+.flash .e{font-style:italic;color:var(--muted);max-width:50ch}
+.flash.back{border-color:var(--stamp)}
+.filters{display:flex;gap:6px;flex-wrap:wrap}
+.filter{appearance:none;cursor:pointer;font:inherit;font-size:14px;border-radius:8px;padding:5px 12px;border:1px solid var(--line);background:transparent;color:var(--muted)}
+.filter[aria-pressed="true"]{border-color:var(--stamp);background:var(--stamp-soft);color:var(--ink)}
+.bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden}
+.bar span{display:block;height:100%;background:var(--stamp);transition:width .3s}
+
+/* multiple choice */
+.qs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:700px){.qs{grid-template-columns:1fr}}
+.q{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.q .n{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.1em}
+.q .s{font-weight:700}
+.q .s u{text-decoration:none;border-bottom:2px solid var(--navy);color:var(--navy)}
+.opts{display:flex;gap:6px;flex-wrap:wrap}
+.opt{appearance:none;cursor:pointer;font:inherit;font-size:15px;border-radius:8px;padding:6px 12px;background:var(--card);color:var(--ink);border:1px solid var(--line)}
+.opt:hover{border-color:var(--navy)}
+.opt.ok{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.opt.no{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.why{font-size:14px;color:var(--muted)}
+
+/* typed */
+.items{display:flex;flex-direction:column;gap:12px;padding:0;margin:0}
+.items li{list-style:none;background:var(--bg);border:1px solid transparent;border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.items li.ok{border-color:var(--ok)}.items li.no{border-color:var(--bad)}
+.items .n{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.1em}
+.key{font-family:var(--mono);font-weight:600;letter-spacing:.08em;color:var(--stamp);background:var(--stamp-soft);border-radius:6px;padding:1px 8px}
+.line{display:flex;flex-wrap:wrap;gap:6px;align-items:baseline}
+input[type=text]{font:inherit;font-size:16px;color:var(--ink);background:var(--card);border:1px solid var(--navy);border-radius:8px;padding:4px 8px;flex:1 1 200px;min-width:0;max-width:100%}
+.fb{font-size:14px}
+.fb.ok{color:var(--ok)}.fb.no{color:var(--bad)}
+.fb .ans{font-weight:700}
+
+/* speaking prompts */
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:700px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:420px){.cards{grid-template-columns:1fr}}
+.coin{appearance:none;cursor:pointer;font:inherit;color:var(--ink);background:var(--paper);border:2px dashed var(--stamp);border-radius:14px;min-height:120px;padding:14px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:15px}
+.coin:not(.open){font-family:var(--mono);font-size:22px;font-weight:600;color:var(--stamp);letter-spacing:.1em}
+.coin.open{border-style:solid;border-color:var(--line)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+<script src="../../assets/config.js?v=11"></script>
+<script src="../../assets/portal.js?v=3"></script>
+</head>
+<body>
+<div class="wrap">
+  <header class="file">
+    <span class="stamp" id="stamp"></span>
+    <span class="eyebrow" id="eyebrow"></span>
+    <h1 id="title"></h1>
+    <p class="lede" id="lede"></p>
+    <p class="tip" id="saveState"></p>
+  </header>
+  <nav class="tabs" role="tablist" id="tabs"></nav>
+  <div id="panels"></div>
+</div>
+
+<script>
+/* ===== REVIEW DATA (change this block for each new session) ===== */
+const REVIEW={
+ set:"g33",
+ stamp:"GRIVAS P.33–35",
+ eyebrow:"CPE review · Vocabulary practice",
+ title:"Collocations, en- verbs & move idioms",
+ lede:"Pages 33–35 in one place, built around the mistakes you made. Start with the flashcards, then aim for 80% or more in each exercise.",
+ cards:[
+  ["fall back on","collocation","use something as a backup when other things fail","Fortunately, we had a second plan to fall back on."],
+  ["a coat of paint","collocation","one layer of paint","Most people apply at least two coats of paint."],
+  ["get round to (doing)","collocation","finally find the time to do something","One day I'll get round to finishing this project."],
+  ["shed light on","collocation","help to explain something","His evidence may shed light on this difficult case."],
+  ["a sharp blade","collocation","the cutting part of a knife","Use a sharp blade to cut the card."],
+  ["your fair share of","collocation","as much as is reasonable","She's had more than her fair share of opportunities."],
+  ["assist in","collocation","help with an activity","Several volunteers agreed to assist in the organisation."],
+  ["little sign of","collocation","almost no evidence of","There is still little sign of the case being solved."],
+  ["no … whatsoever","collocation","none at all (emphatic)","My brother gave me no help whatsoever."],
+  ["pride yourself on","collocation","be proud of a quality you have","I pride myself on being a careful driver."],
+  ["kill time","collocation","do something while you wait","I killed time looking round the shops."],
+  ["enslave","en- verb","make someone a slave","Millions of people were enslaved."],
+  ["encircle","en- verb","surround, form a circle around","A high wall encircles the prison."],
+  ["enlist","en- verb","join the army; get someone's help","He enlisted as soon as war was declared."],
+  ["enlighten","en- verb","explain something so someone understands","Could someone enlighten me about the new rules?"],
+  ["enforce","en- verb","make people obey a law or rule","The ban was never properly enforced."],
+  ["racially motivated","word family","done because of someone's race","Several racially motivated attacks were reported."],
+  ["multiracial","word family","with people of many races","We live in a multiracial society."],
+  ["discriminatory","word family","treating people unfairly (laws, practices)","These laws are racially discriminatory."],
+  ["emigrate / immigrate","word family","emigrate = leave your country; immigrate = come into a new one","She emigrated from Russia and immigrated to Canada."],
+  ["persecution / persecutor","word family","cruel treatment of a group / the person doing it","The persecution of minorities must stop."],
+  ["pepper with","spice verb","include a lot of something","His French is peppered with English words."],
+  ["spice up","spice verb","make something more interesting","Add a few anecdotes to spice up your talk."],
+  ["curry favour with","spice verb","try to please someone to gain an advantage","Politicians will do anything to curry favour with voters."],
+  ["be on the move","move idiom","be travelling from place to place","After a year in Leeds, the family is on the move again."],
+  ["make a move","move idiom","take action; leave","It's late, we should make a move."],
+  ["get a move on","move idiom","hurry","Get a move on or we'll be late!"],
+  ["be moved by","move idiom","feel strong emotion because of something","We were deeply moved by her kind words."],
+  ["not move a muscle","move idiom","stay completely still","The children didn't move a muscle."],
+  ["move heaven and earth","move idiom","try as hard as possible","He'd move heaven and earth to save the clinic."]
+ ],
+ filters:[["all","All"],["collocation","Collocations"],["en- verb","en- verbs"],["word family","Word families"],["spice verb","Spice verbs"],["move idiom","Move idioms"]],
+ parts:[
+  {id:"colloc",tab:"Collocations",title:"Which word fits?",lede:"The first four are the ones you missed on p. 33.",type:"choose",items:[
+   ["The walls need at least two ___ of paint.",["coats","levels","layers of"],"coats","A coat of paint = one layer."],
+   ["The new report may ___ some light on the causes of burnout.",["shed","shine","reflect"],"shed","Shed light on = help to explain."],
+   ["You'll need a sharp ___ to cut the bandage.",["blade","steel","point"],"blade","The blade is the cutting part; steel is the material."],
+   ["Three nurses agreed to ___ in organising the event.",["assist","partake","support"],"assist","Assist in. Partake in is for food and fun activities."],
+   ["If the project fails, we have a backup plan to fall ___ on.",["back","behind","out"],"back","Fall back on = use as a backup."],
+   ["I keep meaning to update my CV but never get ___ to it.",["round","over","up"],"round","Get round to = finally find time."],
+   ["She's had more than her fair ___ of bad luck.",["share","portion","helping"],"share","Your fair share of."],
+   ["He gave me no support ___.",["whatsoever","however","in so far"],"whatsoever","No … whatsoever = none at all."],
+   ["The therapist prides herself ___ being punctual.",["on","in","of"],"on","Pride yourself ON."],
+   ["We had an hour to ___ before the lecture, so we had coffee.",["kill","hang","strangle"],"kill","Kill time."]
+  ]},
+  {id:"enverbs",tab:"en- verbs",title:"en- verbs",lede:"You mixed up encircle, enforce and enslave. Read the whole sentence first.",type:"choose",items:[
+   ["A high fence ___ the hospital grounds.",["encircles","enslaves","enforces"],"encircles","Encircle = go all the way round."],
+   ["The new smoking ban is strictly ___ on the wards.",["enforced","encircled","enlisted"],"enforced","A law or ban is enforced."],
+   ["For centuries, millions of Africans were ___.",["enslaved","enforced","enlightened"],"enslaved","Enslave = make someone a slave."],
+   ["He ___ in the navy at eighteen.",["enlisted","enforced","encircled"],"enlisted","Enlist = join the armed forces."],
+   ["Could someone ___ me as to why the meeting was cancelled?",["enlighten","enlist","enforce"],"enlighten","Enlighten = explain so someone understands."],
+   ["Those who were ___ had no choice but to obey.",["enslaved","encircled","enlightened"],"enslaved","People who are made slaves."]
+  ]},
+  {id:"forms",tab:"Word families",title:"Word formation",lede:"Type the right form of the word in capitals.",type:"typed",items:[
+   {a:"We live in a",b:"society.",stem:"RACE",acc:["multiracial","multi-racial"],why:"Many races → multiracial."},
+   {a:"Hopefully the level of",b:"will decline.",stem:"RACE",acc:["racism"],why:"Noun after 'the level of'."},
+   {a:"A number of",b:"motivated crimes have been committed.",stem:"RACE",acc:["racially"],why:"Adverb before a participle: racially motivated."},
+   {a:"Immigrants claim they are the victims of",b:".",stem:"DISCRIMINATE",acc:["discrimination"],why:"Victims of + noun."},
+   {a:"These laws are racially",b:".",stem:"DISCRIMINATE",acc:["discriminatory"],why:"Adjective for laws and practices: discriminatory."},
+   {a:"It's hard for illegal",b:"to find well-paid work.",stem:"MIGRATE",acc:["immigrants","migrants"],why:"People who arrive in a country."},
+   {a:"Many families are choosing to",b:"to Canada.",stem:"MIGRATE",acc:["emigrate"],why:"Leaving your own country → emigrate."},
+   {a:"We must put a stop to the",b:"of ethnic minorities.",stem:"PERSECUTE",acc:["persecution"],why:"Noun after 'the'."},
+   {a:"He was one of the main",b:"of the Roma.",stem:"PERSECUTE",acc:["persecutors"],why:"People who persecute → persecutors (plural after 'one of the main')."}
+  ]},
+  {id:"move",tab:"Move idioms",title:"Move & spice",lede:"Pick the expression that fits.",type:"choose",items:[
+   ["She swore she would ___ to keep the clinic open.",["move heaven and earth","make a move","get a move on"],"move heaven and earth","Try as hard as possible."],
+   ["If you don't ___, we'll miss the train.",["get a move on","make a move","be on the move"],"get a move on","Hurry."],
+   ["After only a year in Kazan, the family is ___ again.",["on the move","moved by","making a move"],"on the move","Travelling, moving home."],
+   ["The children didn't ___ when the music stopped.",["move a muscle","get a move on","make a move"],"move a muscle","Not move a muscle = stay completely still."],
+   ["We were deeply ___ her letter.",["moved by","on the move","moved with"],"moved by","Be moved by = feel strong emotion."],
+   ["She always waits for someone else to ___ instead of acting herself.",["make a move","get a move on","move a muscle"],"make a move","Take action first."],
+   ["His speech was ___ with jokes.",["peppered","spiced","curried"],"peppered","Pepper with = include a lot of."],
+   ["Some politicians will say anything to ___ favour with voters.",["curry","pepper","spice"],"curry","Curry favour with."]
+  ]}
+ ],
+ talk:["Describe a time you had to move heaven and earth to get something done.","What do you have a backup plan to fall back on?","What's something you never get round to doing?","Which film or book has deeply moved you?","What do you pride yourself on?","How do you kill time when you're waiting?","Is it ever OK to curry favour with your boss?","Should every country be a multiracial society?"]
+};
+/* ===== END OF DATA ===== */
+
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const norm=s=>s.toLowerCase().replace(/[’‘`]/g,"'").replace(/\s+/g," ").replace(/[.!?]+$/,"").trim();
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const R=REVIEW;
+$("stamp").textContent=R.stamp;$("eyebrow").textContent=R.eyebrow;$("title").textContent=R.title;$("lede").textContent=R.lede;
+
+/* portal saving */
+const PT=window.Portal;const canSave=!!(PT&&PT.ready&&PT.code());
+const save=(a,sc,t,d)=>{if(canSave)PT.log(R.set+"/"+a,sc,t,d)};
+$("saveState").textContent=canSave?"Your progress is saved to your portal.":"Tip: open this page from your personal portal link to save your progress.";
+
+/* tabs and panels */
+const TABS=[["cards","Flashcards"],...R.parts.map(p=>[p.id,p.tab]),...(R.talk&&R.talk.length?[["talk","Speaking"]]:[])];
+TABS.forEach(([id,name])=>{const b=document.createElement("button");b.className="tab";b.setAttribute("role","tab");b.id="t-"+id;b.innerHTML=`${esc(name)}<span class="best" id="best-${id}"></span>`;b.onclick=()=>show(id);$("tabs").appendChild(b);
+  const s=document.createElement("section");s.className="panel";s.id="p-"+id;s.setAttribute("role","tabpanel");s.hidden=true;$("panels").appendChild(s)});
+function show(id){TABS.forEach(([t])=>{$("p-"+t).hidden=t!==id;$("t-"+t).setAttribute("aria-selected",t===id)});try{if(location.hash!=="#"+id)history.replaceState(null,"","#"+id)}catch(e){}}
+
+/* flashcards */
+$("p-cards").innerHTML=`<div class="head"><span class="eyebrow">Step 1</span><h2>Flashcards</h2><p class="lede">Say the meaning out loud, then tap the card to check. "Got it" removes the card; "Again" keeps it in the pile.</p></div>
+ <div class="filters" id="filters"></div><div class="bar"><span id="bar" style="width:0"></span></div><button class="flash" id="flash"></button>
+ <div class="row"><button class="btn ghost" id="again">Again</button><button class="btn" id="gotit">Got it</button><span class="score" id="fCount"></span><button class="btn ghost" id="fReset" style="margin-left:auto">Start again</button></div>`;
+const KEY="rev-"+R.set+"-known";let filter="all",known=new Set(store.get(KEY,[])),deck=[],cur=null,flipped=false,cardTimer=null;
+const saveCards=()=>{clearTimeout(cardTimer);cardTimer=setTimeout(()=>save("cards",known.size,R.cards.length,{known:[...known]}),2500)};
+(R.filters||[["all","All"]]).forEach(([k,l])=>{const b=document.createElement("button");b.className="filter";b.textContent=l;b.setAttribute("aria-pressed",k===filter);
+  b.onclick=()=>{filter=k;$("filters").querySelectorAll(".filter").forEach(x=>x.setAttribute("aria-pressed",x===b));buildDeck()};$("filters").appendChild(b)});
+const pool=()=>R.cards.filter(w=>filter==="all"||w[1]===filter);
+function buildDeck(){deck=shuffle(pool().filter(w=>!known.has(w[0])));next()}
+function next(){cur=deck.shift()||null;flipped=false;renderCard()}
+function renderCard(){const f=$("flash"),p=pool(),k=p.filter(w=>known.has(w[0])).length;
+  $("bar").style.width=(p.length?k/p.length*100:0)+"%";$("fCount").textContent=`${k} of ${p.length} learned`;f.classList.toggle("back",flipped);
+  if(!cur){f.innerHTML=`<span class="w">All done!</span><span class="d">You know every card in this set. Try the exercises next.</span>`;return}
+  f.innerHTML=flipped?`<span class="t">${esc(cur[1])}</span><span class="w">${esc(cur[0])}</span><span class="d">${esc(cur[2])}</span><span class="e">${esc(cur[3])}</span>`
+    :`<span class="t">${esc(cur[1])}</span><span class="w">${esc(cur[0])}</span><span class="tip">Tap to see the meaning</span>`}
+$("flash").onclick=()=>{if(cur){flipped=!flipped;renderCard()}};
+$("gotit").onclick=()=>{if(!cur)return;known.add(cur[0]);store.set(KEY,[...known]);saveCards();next()};
+$("again").onclick=()=>{if(!cur)return;deck.splice(Math.min(3,deck.length),0,cur);next()};
+$("fReset").onclick=()=>{known=new Set();store.set(KEY,[]);saveCards();buildDeck()};
+buildDeck();
+
+/* exercises */
+R.parts.forEach((p,pi)=>{const el=$("p-"+p.id);
+  el.innerHTML=`<div class="head"><span class="eyebrow">Step ${pi+2}</span><h2>${esc(p.title)}</h2><p class="lede">${esc(p.lede)}</p></div>`;
+  if(p.type==="choose")buildChoose(el,p);else buildTyped(el,p)});
+
+function buildChoose(el,p){const box=document.createElement("div");el.appendChild(box);
+  const row=document.createElement("div");row.className="row";row.innerHTML=`<span class="score"></span><button class="btn ghost">Start again</button>`;el.appendChild(row);
+  const sc=row.querySelector(".score");row.querySelector("button").onclick=draw;
+  function draw(){box.className="qs";box.innerHTML="";sc.textContent="";let ok=0,tried=0,saved=false;const wrong=[];
+    shuffle(p.items).forEach(([s,opts,ans,why],i)=>{const d=document.createElement("div");d.className="q";
+      d.innerHTML=`<span class="n">${i+1}</span><p class="s">${esc(s).replace("___","<u>&nbsp;?&nbsp;</u>")}</p><div class="opts"></div><p class="why" hidden></p>`;
+      const o=d.querySelector(".opts"),w=d.querySelector(".why");let answered=false;
+      shuffle(opts).forEach(t=>{const b=document.createElement("button");b.className="opt";b.textContent=t;
+        b.onclick=()=>{if(o.querySelector(".ok"))return;o.querySelectorAll(".opt").forEach(x=>x.classList.remove("no"));
+          if(t===ans){b.classList.add("ok");w.hidden=false;w.textContent=why;d.querySelector(".s u").innerHTML=`&nbsp;${esc(ans)}&nbsp;`;if(!answered){answered=true;tried++;ok++}}
+          else{b.classList.add("no");if(!answered){answered=true;tried++;wrong.push(s.replace("___",ans))}}
+          if(tried===p.items.length&&!saved){saved=true;save(p.id,ok,p.items.length,{wrong})}
+          sc.textContent=saved?`Score: ${ok} / ${p.items.length}`+(ok/p.items.length>=.8?" ✓ passed":" · aim for 80%"):`First-try answers: ${ok} / ${tried}`};o.appendChild(b)});
+      box.appendChild(d)})}
+  draw()}
+
+function buildTyped(el,p){const ol=document.createElement("ol");ol.className="items";el.appendChild(ol);
+  p.items.forEach((it,k)=>{const li=document.createElement("li");
+    li.innerHTML=`<span class="n">${k+1}</span><div class="line"><span>${esc(it.a)}</span><input type="text" aria-label="Answer ${k+1}" autocomplete="off" autocapitalize="off" spellcheck="false"><span>${esc(it.b)}</span><span class="key">${esc(it.stem)}</span></div><p class="fb" hidden></p>`;
+    li.querySelector("input").addEventListener("keydown",e=>{if(e.key==="Enter"){const nx=ol.children[k+1];if(nx)nx.querySelector("input").focus()}});ol.appendChild(li)});
+  const row=document.createElement("div");row.className="row";row.innerHTML=`<button class="btn">Check answers</button><button class="btn ghost">Clear</button><span class="score"></span>`;el.appendChild(row);
+  const [chk,clr]=row.querySelectorAll("button"),sc=row.querySelector(".score");
+  chk.onclick=()=>{let n=0;const wrong=[];p.items.forEach((it,k)=>{const li=ol.children[k],v=norm(li.querySelector("input").value),good=it.acc.map(norm).includes(v),fb=li.querySelector(".fb");
+    li.className=good?"ok":"no";fb.hidden=false;fb.className="fb "+(good?"ok":"no");fb.innerHTML=(good?"✓ ":`✗ Answer: <span class="ans">${esc(it.acc[0])}</span>. `)+esc(it.why);if(good)n++;else wrong.push(`${it.stem} → ${it.acc[0]}`)});
+    sc.textContent=`${n} / ${p.items.length}`+(n/p.items.length>=.8?" ✓ passed":"");save(p.id,n,p.items.length,{wrong})};
+  clr.onclick=()=>{[...ol.children].forEach(li=>{li.className="";li.querySelector("input").value="";li.querySelector(".fb").hidden=true});sc.textContent=""}}
+
+/* speaking */
+if(R.talk&&R.talk.length){$("p-talk").innerHTML=`<div class="head"><span class="eyebrow">Last step</span><h2>Speaking</h2><p class="lede">Open a card and answer out loud for about a minute. Use at least two expressions from this page.</p></div><div class="cards" id="talk"></div>`;
+  R.talk.forEach((t,i)=>{const b=document.createElement("button");b.className="coin";b.textContent="Q"+(i+1);b.setAttribute("aria-label","Open question "+(i+1));b.onclick=()=>{b.classList.add("open");b.textContent=t};$("talk").appendChild(b)})}
+
+/* restore portal state */
+if(canSave)PT.getPortal(PT.code()).then(d=>{if(!d)return;const st=d.state&&d.state[R.set+"/cards"];if(st&&st.known){st.known.forEach(k=>known.add(k));store.set(KEY,[...known]);buildDeck()}
+  const r=d.results||{};TABS.forEach(([id])=>{const x=r[R.set+"/"+id];if(x&&x.total)$("best-"+id).textContent=`${Math.round(x.best/x.total*100)}%`})}).catch(()=>{});
+
+const h=location.hash.slice(1);show(TABS.some(t=>t[0]===h)?h:"cards");
+</script>
+</body>
+</html>

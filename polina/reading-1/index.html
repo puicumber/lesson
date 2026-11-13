@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Reading: Strangers Everywhere</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+[hidden]{display:none!important} body{margin:0}
+
+/* Review page: case-file header, flashcards first, then self-checking exercises. Data lives in REVIEW below. */
+:root{
+  --bg:#f1ece2; --card:#fbf8f2; --paper:#f6efe0; --ink:#1f2433; --muted:#5f6475; --line:#d8cfbd;
+  --navy:#2b3a67; --navy-soft:#2b3a6714; --stamp:#b8402f; --stamp-soft:#b8402f1a;
+  --ok:#2f7a52; --ok-soft:#2f7a521c; --bad:#b8402f; --bad-soft:#b8402f1c;
+  --display:"Fraunces",Georgia,serif;
+  --body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#15171f; --card:#1d2029; --paper:#232631; --ink:#e9e6df; --muted:#a6a9b6; --line:#353948;
+  --navy:#9fb2ec; --navy-soft:#9fb2ec1c; --stamp:#f08a78; --stamp-soft:#f08a7822;
+  --ok:#6cc596; --ok-soft:#6cc59622; --bad:#f08a78; --bad-soft:#f08a7822; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#15171f; --card:#1d2029; --paper:#232631; --ink:#e9e6df; --muted:#a6a9b6; --line:#353948;
+  --navy:#9fb2ec; --navy-soft:#9fb2ec1c; --stamp:#f08a78; --stamp-soft:#f08a7822;
+  --ok:#6cc596; --ok-soft:#6cc59622; --bad:#f08a78; --bad-soft:#f08a7822; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 64px}
+.wrap{max-width:920px;margin:0 auto;display:flex;flex-direction:column;gap:24px}
+h1,h2{font-family:var(--display);margin:0;line-height:1.05;text-wrap:balance}
+h1{font-size:clamp(36px,7vw,58px);font-weight:800;letter-spacing:-.01em}
+h2{font-size:clamp(26px,4vw,34px);font-weight:800}
+p{margin:0}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.lede{color:var(--muted);max-width:64ch}
+.tip{font-size:14px;color:var(--muted);font-style:italic}
+
+.file{position:relative;border:1px solid var(--line);border-radius:6px 18px 18px 18px;padding:30px clamp(20px,4vw,38px) 26px;background:var(--paper);display:flex;flex-direction:column;gap:10px;margin-top:22px}
+.file::before{content:"REVIEW FILE";position:absolute;top:-22px;left:-1px;font-family:var(--mono);font-size:12px;letter-spacing:.12em;padding:4px 16px;background:var(--paper);border:1px solid var(--line);border-bottom:0;border-radius:10px 10px 0 0;color:var(--muted)}
+.file h1{color:var(--navy)}
+.stamp{position:absolute;right:clamp(14px,4vw,34px);top:20px;font-family:var(--mono);font-weight:600;font-size:13px;letter-spacing:.16em;color:var(--stamp);border:2px solid var(--stamp);border-radius:6px;padding:6px 10px;transform:rotate(-6deg);opacity:.85}
+@media (max-width:560px){.stamp{position:static;align-self:flex-start;transform:none}}
+
+nav.tabs{display:flex;flex-wrap:wrap;gap:8px}
+.tab{appearance:none;cursor:pointer;font:inherit;font-weight:700;font-size:15px;border-radius:999px;padding:8px 16px;border:1px solid var(--line);background:var(--card);color:var(--ink);display:inline-flex;gap:8px;align-items:center}
+.tab:hover{border-color:var(--navy)}
+.tab[aria-selected="true"]{background:var(--navy);border-color:var(--navy);color:var(--card)}
+.tab .best{font-family:var(--mono);font-size:12px;font-weight:500;opacity:.8}
+.tab:focus-visible,.btn:focus-visible,input:focus-visible,.opt:focus-visible,.flash:focus-visible,.filter:focus-visible,.coin:focus-visible{outline:2px solid var(--stamp);outline-offset:2px}
+
+section.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:clamp(20px,4vw,34px);display:flex;flex-direction:column;gap:22px}
+.head{display:flex;flex-direction:column;gap:8px}
+.btn{appearance:none;cursor:pointer;font:inherit;font-weight:700;font-size:16px;border-radius:999px;padding:10px 20px;border:1px solid var(--navy);background:var(--navy);color:var(--card)}
+.btn.ghost{background:transparent;color:var(--navy)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.score{font-family:var(--mono);font-weight:600;color:var(--navy);font-variant-numeric:tabular-nums}
+
+/* flashcards */
+.flash{appearance:none;cursor:pointer;font:inherit;color:var(--ink);width:100%;min-height:240px;border-radius:18px;border:2px solid var(--line);background:var(--paper);padding:28px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center}
+.flash .w{font-family:var(--display);font-size:clamp(30px,6vw,46px);font-weight:800;color:var(--navy);line-height:1.1}
+.flash .t{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.flash .d{font-size:20px;max-width:46ch}
+.flash .e{font-style:italic;color:var(--muted);max-width:50ch}
+.flash.back{border-color:var(--stamp)}
+.filters{display:flex;gap:6px;flex-wrap:wrap}
+.filter{appearance:none;cursor:pointer;font:inherit;font-size:14px;border-radius:8px;padding:5px 12px;border:1px solid var(--line);background:transparent;color:var(--muted)}
+.filter[aria-pressed="true"]{border-color:var(--stamp);background:var(--stamp-soft);color:var(--ink)}
+.bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden}
+.bar span{display:block;height:100%;background:var(--stamp);transition:width .3s}
+
+/* multiple choice */
+.qs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:700px){.qs{grid-template-columns:1fr}}
+.q{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.q .n{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.1em}
+.q .s{font-weight:700}
+.q .s u{text-decoration:none;border-bottom:2px solid var(--navy);color:var(--navy)}
+.opts{display:flex;gap:6px;flex-wrap:wrap}
+.opt{appearance:none;cursor:pointer;font:inherit;font-size:15px;border-radius:8px;padding:6px 12px;background:var(--card);color:var(--ink);border:1px solid var(--line)}
+.opt:hover{border-color:var(--navy)}
+.opt.ok{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.opt.no{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.why{font-size:14px;color:var(--muted)}
+
+/* typed */
+.items{display:flex;flex-direction:column;gap:12px;padding:0;margin:0}
+.items li{list-style:none;background:var(--bg);border:1px solid transparent;border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.items li.ok{border-color:var(--ok)}.items li.no{border-color:var(--bad)}
+.items .n{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.1em}
+.key{font-family:var(--mono);font-weight:600;letter-spacing:.08em;color:var(--stamp);background:var(--stamp-soft);border-radius:6px;padding:1px 8px}
+.line{display:flex;flex-wrap:wrap;gap:6px;align-items:baseline}
+input[type=text]{font:inherit;font-size:16px;color:var(--ink);background:var(--card);border:1px solid var(--navy);border-radius:8px;padding:4px 8px;flex:1 1 200px;min-width:0;max-width:100%}
+.fb{font-size:14px}
+.fb.ok{color:var(--ok)}.fb.no{color:var(--bad)}
+.fb .ans{font-weight:700}
+
+/* speaking prompts */
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:700px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:420px){.cards{grid-template-columns:1fr}}
+.coin{appearance:none;cursor:pointer;font:inherit;color:var(--ink);background:var(--paper);border:2px dashed var(--stamp);border-radius:14px;min-height:120px;padding:14px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:15px}
+.coin:not(.open){font-family:var(--mono);font-size:22px;font-weight:600;color:var(--stamp);letter-spacing:.1em}
+.coin.open{border-style:solid;border-color:var(--line)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+/* reading lesson */
+.text{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:clamp(18px,4vw,30px);display:flex;flex-direction:column;gap:14px;font-size:17px;line-height:1.75;max-width:70ch}
+.text h3{font-family:var(--display);font-size:clamp(22px,4vw,28px);margin:0;color:var(--navy);line-height:1.15}
+.text .by{font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.text .pn{font-family:var(--mono);font-size:12px;color:var(--muted);margin-right:6px}
+.gap{border:2px dashed var(--stamp);border-radius:12px;padding:12px 14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:var(--stamp-soft)}
+.gap.ok{border-style:solid;border-color:var(--ok);background:var(--ok-soft)}
+.gap.no{border-style:solid;border-color:var(--bad);background:var(--bad-soft)}
+.gap .gl{font-family:var(--mono);font-weight:600;color:var(--stamp)}
+.gap p{flex-basis:100%;font-size:15px}
+select{font:inherit;font-size:16px;color:var(--ink);background:var(--card);border:1px solid var(--navy);border-radius:8px;padding:4px 8px}
+select:focus-visible{outline:2px solid var(--stamp);outline-offset:2px}
+.paras{display:flex;flex-direction:column;gap:10px}
+.para{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:12px 16px;font-size:15px}
+.para b{font-family:var(--mono);color:var(--stamp);margin-right:6px}
+.plan{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
+@media (max-width:700px){.plan{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.plan div{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:14px}
+.plan b{display:block;font-family:var(--mono);color:var(--stamp);font-size:13px}
+details.textbox{border:1px solid var(--line);border-radius:12px;padding:10px 14px;background:var(--bg)}
+details.textbox summary{cursor:pointer;font-weight:700;color:var(--navy)}
+details.textbox[open] summary{margin-bottom:10px}
+textarea{font:inherit;font-size:16px;color:var(--ink);background:var(--card);border:1px solid var(--navy);border-radius:10px;padding:10px;width:100%;min-height:180px}
+textarea:focus-visible{outline:2px solid var(--stamp);outline-offset:2px}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.js"></script>
+<script src="../../assets/config.js?v=11"></script>
+<script src="../../assets/portal.js?v=2"></script>
+</head>
+<body>
+<div class="wrap">
+  <header class="file">
+    <span class="stamp">READING · 60 MIN</span>
+    <span class="eyebrow">CPE reading lesson · Belonging</span>
+    <h1>Strangers everywhere</h1>
+    <p class="lede">A one-hour mixed-skills lesson built on today's words from Grivas pp. 33–35. Work through the tabs in order. Everything except the last step checks itself.</p>
+    <div class="plan" aria-label="Lesson plan">
+      <div><b>5 min</b>Warm-up</div><div><b>15 min</b>Gapped text</div><div><b>10 min</b>Questions</div><div><b>10 min</b>Vocabulary</div><div><b>10 min</b>Use of English</div><div><b>10 min</b>Speak or write</div>
+    </div>
+    <p class="tip" id="saveState"></p>
+  </header>
+  <nav class="tabs" role="tablist" id="tabs"></nav>
+
+  <section class="panel" id="p-warm" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Step 1 · 5 min</span><h2>Warm-up: today's words</h2><p class="lede">Quick recap of what you practised this afternoon. Only your first try counts.</p></div>
+    <div class="qs" id="warmQs"></div>
+    <div class="row"><span class="score" id="warmScore"></span></div>
+  </section>
+
+  <section class="panel" id="p-gapped" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Step 2 · 15 min · like Reading Part 7</span><h2>Gapped text</h2><p class="lede">Four paragraphs have been removed from the article. Read the whole text first, then choose which paragraph (A–E) fits each gap. There is one extra paragraph you don't need. Look for linking words: <em>however, that price, so what helps?</em></p></div>
+    <article class="text" id="article"></article>
+    <h3 class="eyebrow">The removed paragraphs</h3>
+    <div class="paras" id="paras"></div>
+    <div class="row"><button class="btn" id="gapCheck">Check gaps</button><span class="score" id="gapScore"></span></div>
+  </section>
+
+  <section class="panel" id="p-mc" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Step 3 · 10 min · like Reading Part 5</span><h2>Questions on the text</h2><p class="lede">Open the full text below if you need it. Only your first try counts.</p></div>
+    <details class="textbox"><summary>Show the full article</summary><div class="text" id="fullText"></div></details>
+    <div class="qs" id="mcQs"></div>
+    <div class="row"><span class="score" id="mcScore"></span></div>
+  </section>
+
+  <section class="panel" id="p-vocab" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Step 4 · 10 min</span><h2>Find it in the text</h2><p class="lede">Find a word or phrase in the article that matches each meaning. Write it in the form used in the text. The paragraph is given in brackets.</p></div>
+    <details class="textbox"><summary>Show the full article</summary><div class="text" id="fullText2"></div></details>
+    <ol class="items" id="vocabList"></ol>
+    <div class="row"><button class="btn" id="vocabCheck">Check answers</button><span class="score" id="vocabScore"></span></div>
+  </section>
+
+  <section class="panel" id="p-uoe" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Step 5 · 10 min · Use of English</span><h2>Word formation &amp; transformations</h2><p class="lede">Part A: type the right form of the word in capitals. Part B: complete the second sentence with 3–8 words, using the word given.</p></div>
+    <h3 class="eyebrow">A · Word formation (Part 3)</h3>
+    <ol class="items" id="wfList"></ol>
+    <h3 class="eyebrow">B · Key word transformations (Part 4)</h3>
+    <ol class="items" id="kwtList"></ol>
+    <div class="row"><button class="btn" id="uoeCheck">Check answers</button><span class="score" id="uoeScore"></span></div>
+  </section>
+
+  <section class="panel" id="p-talk" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Step 6 · 10 min</span><h2>Speak or write</h2><p class="lede">Choose one. Use at least <b>four</b> expressions from today: shed light on, insularity, peppered with, fall back on, enforce, racially motivated, whatsoever, curry favour with, move heaven and earth, get round to…</p></div>
+    <div class="q"><span class="n">SPEAKING · 2 MINUTES</span><p class="s">Is it better for migrant communities to blend in or to keep their own identity? Record a voice message and send it to Claude.</p></div>
+    <div class="q"><span class="n">WRITING · ABOUT 120 WORDS</span><p class="s">You read the article above in a magazine. Write a short letter to the editor, saying which idea you agree with most and why.</p>
+      <textarea id="draft" aria-label="Your letter" placeholder="Dear Editor, …"></textarea>
+      <div class="row"><span class="score" id="wc">0 words</span><button class="btn ghost" id="copyDraft">Copy text</button></div>
+      <p class="tip">Your draft stays on this device. Copy it and send it to Claude for feedback.</p></div>
+  </section>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const norm=s=>s.toLowerCase().replace(/[’‘`]/g,"'").replace(/\s+/g," ").replace(/[.!?,]+$/,"").trim();
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const SET="read1";
+const PT=window.Portal;const canSave=!!(PT&&PT.ready&&PT.code());
+const save=(a,sc,t,d)=>{if(canSave)PT.log(SET+"/"+a,sc,t,d)};
+$("saveState").textContent=canSave?"Your progress is saved to your portal.":"Tip: open this page from your personal portal link to save your progress.";
+
+/* ---------- content ---------- */
+const TITLE="Strangers everywhere: what migration teaches us about belonging";
+const BODY=[
+ "Psychologists have long been fascinated by people who are permanently on the move. Whether they are refugees fleeing persecution, families who emigrate in search of a better life, or communities whose way of life has always been nomadic, their experience sheds light on a question that concerns all of us: what does it actually mean to belong?",
+ "GAP1",
+ "Consider the case of second-generation immigrants. Born and raised in a multiracial city, many describe feeling caught between two worlds: too foreign for their classmates, too local for their grandparents. Their speech is peppered with words from both languages, and they switch identities as easily as they switch accents. Far from being a weakness, this flexibility often turns out to be a resource they can fall back on for the rest of their lives.",
+ "GAP2",
+ "It is tempting to dismiss such insularity as mere stubbornness. Psychologists see it differently. When the world outside has enslaved your ancestors, enforced bans on your music and treated your way of life as a crime, distrust is not irrational; it is a lesson learnt the hard way. Closing ranks protects the group's identity, even if it comes at a price.",
+ "GAP3",
+ "So what helps? Interestingly, there is little sign in the research that forcing people to assimilate works. Programmes that pressure newcomers to abandon their culture tend to backfire, leaving them with no sense of belonging whatsoever. What seems to matter far more is having at least one place, be it a club, a classroom or a clinic, where they are accepted exactly as they are.",
+ "GAP4",
+ "Perhaps the most striking finding is how little it takes. A teacher who learns to pronounce a child's name correctly, a doctor who finally gets round to asking about a family's history, a neighbour who moves heaven and earth to include a newcomer in the street party: such small acts can do more for mental health than any national policy. Belonging, it turns out, depends less on where you are than on who notices you."
+];
+const PARAS={
+ A:"For most of us, the answer seems obvious. We belong where we were born, where our language is spoken and where people recognise our faces in the street. Yet researchers increasingly argue that belonging is a matter of relationships rather than geography, and that it can be lost even by those who never leave home.",
+ B:"Not every group, however, adapts by blending in. Some survive precisely because they refuse to. Communities that have endured centuries of discriminatory laws often develop a deliberate insularity, encircling themselves with customs, rules and even a language that outsiders cannot penetrate.",
+ C:"That price is usually paid by the young. Teenagers who grow up in closed communities report noticeably higher levels of anxiety when they first face the wider world at school or at work, where they may become the target of racially motivated abuse or, more subtly, simply be ignored.",
+ D:"Therapists who work with migrant families put it simply: you cannot curry favour with a community by telling it what it ought to become. Trust is earned slowly, and it is earned by listening rather than by giving advice.",
+ E:"As a result, most nomadic groups have now settled permanently and given up their traditional languages, which explains why the problem of belonging has largely disappeared."
+};
+const KEY={GAP1:"A",GAP2:"B",GAP3:"C",GAP4:"D"};
+const WHY={
+ GAP1:"A answers the question at the end of paragraph 1 (\"what does it mean to belong?\" → \"the answer seems obvious\").",
+ GAP2:"B starts with \"however\": a contrast with the flexible, blending-in immigrants. The next paragraph picks up \"such insularity\".",
+ GAP3:"\"That price\" refers back to \"it comes at a price\" at the end of the previous paragraph.",
+ GAP4:"D continues the idea of acceptance (\"accepted exactly as they are\" → \"earned by listening\"). The next paragraph starts \"how little it takes\".",
+ E:"E is the extra paragraph: it contradicts the text, which says insular communities still exist and belonging is still a problem."
+};
+
+const WARM=[
+ ["A high fence ___ the hospital grounds.",["encircles","enforces","enslaves"],"encircles","Encircle = go all the way round."],
+ ["The new report may ___ light on the causes of burnout.",["shed","shine","throw up"],"shed","Shed light on = help to explain."],
+ ["The curfew was strictly ___ by the police.",["enforced","enlisted","encircled"],"enforced","A rule or ban is enforced."],
+ ["His English is ___ with Russian words.",["peppered","spiced","curried"],"peppered","Be peppered with = contain lots of."],
+ ["He's always trying to curry ___ with the boss.",["favour","favours","favourite"],"favour","Curry favour with sb."],
+ ["Police are investigating a ___ motivated attack.",["racially","racial","racist"],"racially","Adverb before a participle."],
+ ["These rules are clearly ___ against women.",["discriminatory","discriminative","discriminating"],"discriminatory","Discriminatory laws / rules / practices."],
+ ["The walls needed three ___ of paint.",["coats","levels","layers"],"coats","A coat of paint."]
+];
+const MC=[
+ ["According to paragraph 1, why are psychologists interested in people who are always on the move?",["Their experience reveals something that matters to everyone.","They are more resilient than people who stay at home.","They are usually victims of persecution.","They have no sense of belonging at all."],0,"\"…sheds light on a question that concerns all of us.\""],
+ ["What does the writer suggest about second-generation immigrants?",["Their ability to move between cultures can benefit them.","They are confused about who they really are.","They feel closer to their grandparents than to their classmates.","They speak neither language particularly well."],0,"\"Far from being a weakness, this flexibility… a resource they can fall back on.\""],
+ ["How do psychologists view the insularity of some communities?",["As an understandable reaction to past experience.","As a sign of stubbornness that should be discouraged.","As the main reason young people feel anxious.","As something that has disappeared in modern times."],0,"\"Distrust is not irrational; it is a lesson learnt the hard way.\""],
+ ["What does the research say about forcing people to assimilate?",["It can leave them feeling they belong nowhere.","It works well if it starts at school.","It is supported by most therapists.","It has helped communities trust each other."],0,"\"…leaving them with no sense of belonging whatsoever.\""],
+ ["What is the main point of the final paragraph?",["Belonging depends on being recognised by other people.","Governments should spend more on integration policies.","Teachers and doctors need better training.","Newcomers should make more effort to join in."],0,"\"Belonging… depends less on where you are than on who notices you.\""]
+];
+const VOCAB=[
+ {m:"helps to explain (1)",acc:["sheds light on","sheds light"]},
+ {m:"leaving your own country to live in another (1)",acc:["emigrate"]},
+ {m:"containing a lot of (2)",acc:["peppered with","peppered"]},
+ {m:"use as a backup when needed (2)",acc:["fall back on"]},
+ {m:"surrounding completely (paragraph B)",acc:["encircling"]},
+ {m:"made people obey (3)",acc:["enforced"]},
+ {m:"supporting each other against outsiders (3)",acc:["closing ranks"]},
+ {m:"at all (used after a negative) (4)",acc:["whatsoever"]},
+ {m:"try to win someone's approval for your own benefit (paragraph D)",acc:["curry favour with","curry favour"]},
+ {m:"finally finds the time to do something (5)",acc:["gets round to","gets around to"]},
+ {m:"tries as hard as possible (5)",acc:["moves heaven and earth"]}
+];
+
+/* ---------- tabs ---------- */
+const TABS=[["warm","Warm-up"],["gapped","Gapped text"],["mc","Questions"],["vocab","Vocabulary"],["uoe","Use of English"],["talk","Speak or write"]];
+TABS.forEach(([id,name])=>{const b=document.createElement("button");b.className="tab";b.setAttribute("role","tab");b.id="t-"+id;b.innerHTML=`${esc(name)}<span class="best" id="best-${id}"></span>`;b.onclick=()=>show(id);$("tabs").appendChild(b)});
+function show(id){TABS.forEach(([t])=>{$("p-"+t).hidden=t!==id;$("t-"+t).setAttribute("aria-selected",t===id)});try{if(location.hash!=="#"+id)history.replaceState(null,"","#"+id)}catch(e){}}
+
+/* ---------- choose builder ---------- */
+function choose(box,scoreEl,items,act,mapItem){let ok=0,tried=0,saved=false;const wrong=[];box.className="qs";
+  items.forEach((raw,i)=>{const [s,opts,ans,why]=mapItem(raw);const d=document.createElement("div");d.className="q";
+    d.innerHTML=`<span class="n">${i+1}</span><p class="s">${esc(s).replace("___","<u>&nbsp;?&nbsp;</u>")}</p><div class="opts"></div><p class="why" hidden></p>`;
+    const o=d.querySelector(".opts"),w=d.querySelector(".why");let answered=false;
+    shuffle(opts).forEach(t=>{const b=document.createElement("button");b.className="opt";b.textContent=t;
+      b.onclick=()=>{if(o.querySelector(".ok"))return;o.querySelectorAll(".opt").forEach(x=>x.classList.remove("no"));
+        if(t===ans){b.classList.add("ok");w.hidden=false;w.textContent=why;const u=d.querySelector(".s u");if(u)u.innerHTML=`&nbsp;${esc(ans)}&nbsp;`;if(!answered){answered=true;tried++;ok++}}
+        else{b.classList.add("no");if(!answered){answered=true;tried++;wrong.push(s)}}
+        if(tried===items.length&&!saved){saved=true;save(act,ok,items.length,{wrong})}
+        scoreEl.textContent=saved?`Score: ${ok} / ${items.length}`+(ok/items.length>=.8?" ✓ passed":" · aim for 80%"):`First-try answers: ${ok} / ${tried}`};o.appendChild(b)});
+    box.appendChild(d)})}
+choose($("warmQs"),$("warmScore"),shuffle(WARM),"warm",x=>x);
+choose($("mcQs"),$("mcScore"),MC,"mc",([q,opts,ai,why])=>[q,opts,opts[ai],why]);
+
+/* ---------- article ---------- */
+function fullHTML(){let n=0;return `<h3>${esc(TITLE)}</h3><span class="by">Feature · Psychology</span>`+BODY.map(p=>{if(p.startsWith("GAP"))return `<p><span class="pn">${KEY[p]}</span>${esc(PARAS[KEY[p]])}</p>`;n++;return `<p><span class="pn">${n}</span>${esc(p)}</p>`}).join("")}
+$("fullText").innerHTML=fullHTML();$("fullText2").innerHTML=fullHTML();
+(function(){const a=$("article");let n=0;a.innerHTML=`<h3>${esc(TITLE)}</h3><span class="by">Feature · Psychology</span>`;
+  BODY.forEach(p=>{if(p.startsWith("GAP")){const g=document.createElement("div");g.className="gap";g.id="g-"+p;const k=p.slice(3);
+      g.innerHTML=`<span class="gl">Gap ${k}</span><select aria-label="Paragraph for gap ${k}"><option value="">choose…</option>${"ABCDE".split("").map(l=>`<option>${l}</option>`).join("")}</select><p class="why" hidden></p>`;a.appendChild(g)}
+    else{n++;const e=document.createElement("p");e.innerHTML=`<span class="pn">${n}</span>${esc(p)}`;a.appendChild(e)}});
+  "ABCDE".split("").forEach(l=>{const d=document.createElement("div");d.className="para";d.innerHTML=`<b>${l}</b>${esc(PARAS[l])}`;$("paras").appendChild(d)})})();
+$("gapCheck").onclick=()=>{let ok=0;const wrong=[];Object.keys(KEY).forEach(g=>{const el=$("g-"+g),v=el.querySelector("select").value,good=v===KEY[g],w=el.querySelector(".why");
+  el.className="gap "+(good?"ok":"no");w.hidden=false;w.textContent=(good?"✓ ":`✗ Answer: ${KEY[g]}. `)+WHY[g];if(good)ok++;else wrong.push(`${g}: ${v||"-"} → ${KEY[g]}`)});
+  $("gapScore").textContent=`${ok} / 4`+(ok>=3?" ✓ passed":"")+" · "+WHY.E;save("gapped",ok,4,{wrong})};
+
+/* ---------- vocab ---------- */
+VOCAB.forEach((it,k)=>{const li=document.createElement("li");li.innerHTML=`<span class="n">${k+1}</span><div class="line"><span>${esc(it.m)}</span><input type="text" aria-label="Answer ${k+1}" autocomplete="off" autocapitalize="off" spellcheck="false"></div><p class="fb" hidden></p>`;
+  li.querySelector("input").addEventListener("keydown",e=>{if(e.key==="Enter"){const nx=$("vocabList").children[k+1];if(nx)nx.querySelector("input").focus()}});$("vocabList").appendChild(li)});
+$("vocabCheck").onclick=()=>{let n=0;const wrong=[];VOCAB.forEach((it,k)=>{const li=$("vocabList").children[k],v=norm(li.querySelector("input").value),good=it.acc.map(norm).includes(v),fb=li.querySelector(".fb");
+  li.className=good?"ok":"no";fb.hidden=false;fb.className="fb "+(good?"ok":"no");fb.innerHTML=good?"✓":`✗ Answer: <span class="ans">${esc(it.acc[0])}</span>`;if(good)n++;else wrong.push(it.acc[0])});
+  $("vocabScore").textContent=`${n} / ${VOCAB.length}`+(n/VOCAB.length>=.8?" ✓ passed":"");save("vocab",n,VOCAB.length,{wrong})};
+
+
+/* ---------- use of English ---------- */
+const WF=[
+ {a:"Many refugees flee their homeland to escape religious",b:".",stem:"PERSECUTE",acc:["persecution"],why:"Noun after an adjective."},
+ {a:"Second-generation immigrants grow up in a",b:"environment.",stem:"CULTURE",acc:["multicultural","bicultural"],why:"Many cultures → multicultural (like multiracial)."},
+ {a:"The community's",b:"has helped it survive.",stem:"INSULAR",acc:["insularity"],why:"Noun: insular → insularity."},
+ {a:"Forcing newcomers to assimilate is often",b:".",stem:"PRODUCE",acc:["counterproductive","counter-productive","unproductive"],why:"Has the opposite effect → counterproductive."},
+ {a:"Teenagers may be the target of",b:"motivated abuse.",stem:"RACE",acc:["racially"],why:"Adverb before a participle."},
+ {a:"Many families decide to",b:"in search of a better life.",stem:"MIGRATE",acc:["emigrate"],why:"Leaving your country → emigrate."}
+];
+const KWT=[
+ {first:"We never found the time to ask about her family history.",key:"ROUND",a:"We never",b:"about her family history.",acc:["got round to asking","got around to asking"],why:"Get round to + -ing."},
+ {first:"The community is surrounded by rules that outsiders cannot understand.",key:"ENCIRCLED",a:"The community",b:"rules that outsiders cannot understand.",acc:["is encircled by"],why:"Passive: is encircled by."},
+ {first:"The study helps to explain why some groups resist change.",key:"LIGHT",a:"The study",b:"why some groups resist change.",acc:["sheds light on","throws light on","shed light on"],why:"Shed light on = help to explain."},
+ {first:"She tried as hard as possible to include the new family.",key:"HEAVEN",a:"She",b:"to include the new family.",acc:["moved heaven and earth"],why:"Move heaven and earth, past tense."}
+];
+function typedRow(list,label,html){const li=document.createElement("li");li.innerHTML=html;list.appendChild(li);return li}
+WF.forEach((it,k)=>typedRow($("wfList"),"",`<span class="n">${k+1}</span><div class="line"><span>${esc(it.a)}</span><input type="text" aria-label="Word formation ${k+1}" autocomplete="off" autocapitalize="off" spellcheck="false"><span>${esc(it.b)}</span><span class="key">${esc(it.stem)}</span></div><p class="fb" hidden></p>`));
+KWT.forEach((it,k)=>typedRow($("kwtList"),"",`<span class="n">${k+1}</span><p>${esc(it.first)} <span class="key">${esc(it.key)}</span></p><div class="line"><span>${esc(it.a)}</span><input type="text" aria-label="Transformation ${k+1}" autocomplete="off" autocapitalize="off" spellcheck="false"><span>${esc(it.b)}</span></div><p class="fb" hidden></p>`));
+$("uoeCheck").onclick=()=>{let n=0;const wrong=[];const all=[...WF.map((it,k)=>[it,$("wfList").children[k]]),...KWT.map((it,k)=>[it,$("kwtList").children[k]])];
+  all.forEach(([it,li])=>{const v=norm(li.querySelector("input").value),good=it.acc.map(norm).includes(v),fb=li.querySelector(".fb");
+    li.className=good?"ok":"no";fb.hidden=false;fb.className="fb "+(good?"ok":"no");fb.innerHTML=(good?"✓ ":`✗ Answer: <span class="ans">${esc(it.acc[0])}</span>. `)+esc(it.why);if(good)n++;else wrong.push(it.acc[0])});
+  $("uoeScore").textContent=`${n} / ${all.length}`+(n/all.length>=.8?" ✓ passed":"");save("uoe",n,all.length,{wrong})};
+
+/* ---------- writing ---------- */
+const DK="read1-draft";$("draft").value=store.get(DK,"");
+const wc=()=>{const t=$("draft").value.trim();$("wc").textContent=(t?t.split(/\s+/).length:0)+" words"};wc();
+$("draft").addEventListener("input",()=>{store.set(DK,$("draft").value);wc()});
+$("copyDraft").onclick=async()=>{try{await navigator.clipboard.writeText($("draft").value);$("copyDraft").textContent="Copied!"}catch(e){$("draft").select()}};
+
+/* ---------- portal state ---------- */
+if(canSave)PT.getPortal(PT.code()).then(d=>{if(!d)return;const r=d.results||{};TABS.forEach(([id])=>{const x=r[SET+"/"+id];if(x&&x.total)$("best-"+id).textContent=`${Math.round(x.best/x.total*100)}%`})}).catch(()=>{});
+const h=location.hash.slice(1);show(TABS.some(t=>t[0]===h)?h:"warm");
+</script>
+</body>
+</html>
