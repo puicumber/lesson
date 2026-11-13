@@ -101,7 +101,7 @@ function rand(){const a="abcdefghjkmnpqrstuvwxyz23456789";let s="";for(let i=0;i
 async function load(){
   const [s,m,r]=await Promise.all([db.from("students").select("*").order("name"),db.from("materials").select("*").order("created_at",{ascending:false}),db.from("results").select("*").order("created_at",{ascending:false}).limit(1000)]);
   if(s.error||m.error||r.error){$("msg").hidden=false;$("msg").textContent="Couldn't load data: "+(s.error||m.error||r.error).message;return}
-  S=s.data;M=m.data;DONE=r.data.filter(z=>z.activity.startsWith("done:"));R=r.data.filter(z=>!z.activity.startsWith("done:"));draw();
+  S=s.data;M=m.data;DONE=r.data.filter(z=>z.activity.startsWith("done:"));R=r.data.filter(z=>!z.activity.startsWith("done:"));await repairSets();draw();
 }
 function draw(){
   const st=$("students");st.innerHTML="";
@@ -115,6 +115,11 @@ function draw(){
   if(!R.length)rc.innerHTML='<tr><td colspan="4" class="muted">No results yet. They will appear here when students do the exercises.</td></tr>';
   $("mStudent").innerHTML=S.map(x=>`<option value="${x.code}">${x.name}</option>`).join("");
 }
+const URLSET={movement:"move",adverbs:"adv"};
+function guessSet(u){u=(u||"").split(/[?#]/)[0].replace(/\/index\.html$/,"").replace(/\/+$/,"");const seg=u.split("/").pop();
+  if(ACT[seg])return seg;if(URLSET[seg]&&ACT[URLSET[seg]])return URLSET[seg];
+  return Object.keys(ACT).find(k=>u.includes("/"+k+"/")||u.includes("/"+k+"-"))||null}
+async function repairSets(){const fix=M.filter(m=>!m.activity&&guessSet(m.url));for(const m of fix){m.activity=guessSet(m.url);try{await db.from("materials").update({activity:m.activity}).eq("id",m.id)}catch(e){}}}
 function detail(x){
   $("detail").hidden=false;$("dName").textContent=`${x.name} · ${x.level||""}`;$("dLink").textContent=link(x.code);
   const mt=$("dMat");mt.innerHTML="";const mats=M.filter(m=>m.student_code===x.code);
@@ -153,8 +158,7 @@ function detail(x){
   $("detail").scrollIntoView({behavior:"smooth"});
 }
 $("actList").innerHTML=Object.keys(ACT).map(k=>`<option value="${k}">`).join("");
-$("mUrl").addEventListener("input",()=>{const u=$("mUrl").value;if($("mAct").value)return;
-  const k=Object.keys(ACT).find(k=>u.includes("/"+k+"/")||u.includes("/"+k+"-")||u.endsWith("/"+k));if(k)$("mAct").value=k});
+$("mUrl").addEventListener("input",()=>{const u=$("mUrl").value;if($("mAct").value)return;const k=guessSet(u);if(k)$("mAct").value=k});
 $("dClose").onclick=()=>$("detail").hidden=true;
 $("ansClose").onclick=()=>$("ansBox").hidden=true;
 function answers(x,m,s,rs){const r=rs.find(z=>z.details&&z.details.answers&&Object.keys(z.details.answers).length);const a=r.details.answers;
