@@ -115,7 +115,7 @@ function draw(){
   if(!R.length)rc.innerHTML='<tr><td colspan="4" class="muted">No results yet. They will appear here when students do the exercises.</td></tr>';
   $("mStudent").innerHTML=S.map(x=>`<option value="${x.code}">${x.name}</option>`).join("");
 }
-const URLSET={movement:"move",adverbs:"adv","grivas-28":"g28","grivas-30":"g30","grivas-33":"g33"};
+const URLSET={movement:"move",adverbs:"adv","grivas-28":"g28","grivas-30":"g30","grivas-33":"g33","reading-1":"read1"};
 function guessSet(u){u=(u||"").split(/[?#]/)[0].replace(/\/index\.html$/,"").replace(/\/+$/,"");const seg=u.split("/").pop();
   if(ACT[seg])return seg;if(URLSET[seg]&&ACT[URLSET[seg]])return URLSET[seg];
   return Object.keys(ACT).find(k=>u.includes("/"+k+"/")||u.includes("/"+k+"-"))||null}
