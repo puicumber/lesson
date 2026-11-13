@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Keep the Rally Going</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+/* Layout: a table-tennis table seen from above. Conversation = a rally: every turn sends the ball to the other side. Steps run top to bottom like a training session. Deliberately one dark-blue theme. */
+:root{
+  --floor:#0f1d33; --table:#1d4e89; --table2:#163f70; --line:#ffffff; --ink:#eef3fa; --muted:#a9bad3; --edge:#2c5a92;
+  --ball:#ff8a1f; --v:#ff5d8f; --d:#3ddc97; --gold:#ffd166; --bad:#ff6b6b; --paper:#fbfcfe; --paper-ink:#132238;
+  --display:"Archivo Black","Arial Black",Impact,sans-serif; --body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--floor);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55;
+  background-image:repeating-linear-gradient(0deg,#ffffff06 0 1px,transparent 1px 48px),repeating-linear-gradient(90deg,#ffffff06 0 1px,transparent 1px 48px);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px 64px}
+.wrap{max-width:1000px;margin:0 auto;display:flex;flex-direction:column;gap:24px}
+h1,h2,h3{font-family:var(--display);font-weight:400;margin:0;line-height:1.05;text-wrap:balance}
+h1{font-size:clamp(38px,7vw,70px);letter-spacing:-.01em}
+h1 span{color:var(--ball)}
+h2{font-size:clamp(26px,4vw,38px)}
+h3{font-size:19px;color:var(--gold)}
+p{margin:0}
+.eyebrow{font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.lede{color:var(--muted);max-width:66ch}
+.tip{font-size:14px;color:var(--muted);font-style:italic}
+
+/* the table (hero + reusable) */
+.table{position:relative;background:var(--table);border:4px solid var(--line);border-radius:10px;aspect-ratio:2.2;width:100%;overflow:hidden;box-shadow:0 20px 40px #0008}
+.table::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:4px;background:var(--line);transform:translateX(-50%)}
+.table::after{content:"";position:absolute;left:0;right:0;top:50%;height:2px;background:#ffffff88}
+.net{position:absolute;left:50%;top:-4%;bottom:-4%;width:10px;transform:translateX(-50%);background:repeating-linear-gradient(0deg,#ffffffcc 0 3px,transparent 3px 7px);border-left:2px solid #fff;border-right:2px solid #fff;z-index:2}
+.side{position:absolute;top:50%;transform:translateY(-50%);font-family:var(--display);font-size:clamp(16px,2.6vw,26px);opacity:.9}
+.side.v{left:4%;color:var(--v)} .side.d{right:4%;color:var(--d)}
+.ball{position:absolute;width:5%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff 0 12%,var(--ball) 40%);box-shadow:0 0 14px #ff8a1f99;left:20%;top:45%;transition:left .55s cubic-bezier(.3,.7,.4,1),top .55s cubic-bezier(.3,.7,.4,1);z-index:3}
+.score{position:absolute;top:6%;left:50%;transform:translateX(-50%);z-index:4;background:#0b1424;border:2px solid var(--line);border-radius:8px;padding:2px 14px;font-family:var(--display);font-size:clamp(20px,3.6vw,34px);font-variant-numeric:tabular-nums;color:var(--gold)}
+
+.hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;align-items:center}
+@media (max-width:780px){.hero{grid-template-columns:1fr}}
+.hero .txt{display:flex;flex-direction:column;gap:12px}
+
+/* steps nav */
+nav.steps{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+@media (max-width:820px){nav.steps{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.st{appearance:none;cursor:pointer;font:inherit;background:var(--table2);color:var(--ink);border:2px solid var(--edge);border-radius:10px;padding:8px 6px;display:flex;flex-direction:column;gap:2px;align-items:center;text-align:center;font-size:13px;font-weight:700}
+.st .n{font-family:var(--display);font-size:22px;color:var(--muted)}
+.st[aria-selected="true"]{border-color:var(--ball);background:#24548f}
+.st[aria-selected="true"] .n{color:var(--ball)}
+.st.done .n{color:var(--d)}
+.st:focus-visible,.btn:focus-visible,.opt:focus-visible,.card:focus-visible,.chip:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+
+section.step{background:#13284a;border:2px solid var(--edge);border-radius:18px;padding:clamp(20px,4vw,34px);display:flex;flex-direction:column;gap:20px}
+.head{display:flex;flex-direction:column;gap:8px}
+.mins{display:inline-flex;width:fit-content;font-size:13px;font-weight:700;color:#0b1424;background:var(--gold);border-radius:999px;padding:2px 10px}
+.btn{appearance:none;cursor:pointer;font:inherit;font-weight:700;font-size:16px;border-radius:999px;padding:10px 20px;border:2px solid var(--ball);background:var(--ball);color:#1a0d00}
+.btn.ghost{background:transparent;color:var(--ball)}
+.btn.v{background:var(--v);border-color:var(--v);color:#2a0412}
+.btn.d{background:var(--d);border-color:var(--d);color:#032317}
+.btn.bad{background:transparent;border-color:var(--bad);color:var(--bad)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.foot{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;border-top:1px dashed var(--edge);padding-top:16px;align-items:center}
+
+/* dead vs alive */
+.vs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+@media (max-width:720px){.vs{grid-template-columns:1fr}}
+.chat{background:var(--paper);color:var(--paper-ink);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:8px}
+.chat .t{font-family:var(--display);font-size:18px}
+.bub{max-width:88%;padding:8px 12px;border-radius:14px;font-size:15px;line-height:1.4}
+.bub.a{background:#ffe1ea;align-self:flex-start;border-bottom-left-radius:4px}
+.bub.b{background:#d4f7e7;align-self:flex-end;border-bottom-right-radius:4px}
+.bub mark{background:#ffd16688;padding:0 2px;border-radius:3px}
+.dead .t{color:#9aa4b2} .alive .t{color:#0f7a4f}
+.formula{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:640px){.formula{grid-template-columns:1fr}}
+.formula div{background:#0f2340;border:2px solid var(--edge);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:4px}
+.formula strong{font-family:var(--display);font-size:24px;color:var(--ball)}
+
+/* toolkit */
+.kit{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:780px){.kit{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:480px){.kit{grid-template-columns:1fr}}
+.kit div{background:var(--paper);color:var(--paper-ink);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:6px;border-top:8px solid var(--c)}
+.kit h3{color:var(--paper-ink);font-size:18px}
+.kit ul{margin:0;padding-left:18px;font-size:15px}
+
+/* choose */
+.qs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:720px){.qs{grid-template-columns:1fr}}
+.q{background:#0f2340;border:2px solid var(--edge);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.q .s{font-weight:700}
+.q .s span{color:var(--v)}
+.opts{display:flex;flex-direction:column;gap:6px}
+.opt{appearance:none;cursor:pointer;font:inherit;font-size:15px;text-align:left;border-radius:10px;padding:8px 12px;background:#163a66;color:var(--ink);border:2px solid transparent}
+.opt:hover{border-color:var(--ball)}
+.opt.ok{border-color:var(--d);background:#0e3b30}
+.opt.no{border-color:var(--bad);background:#3b1620}
+.why{font-size:14px;color:var(--muted)}
+
+/* big card */
+.big{background:var(--paper);color:var(--paper-ink);border-radius:18px;padding:22px;min-height:120px;display:flex;flex-direction:column;justify-content:center;gap:8px;text-align:center}
+.big .say{font-family:var(--display);font-size:clamp(22px,3.6vw,34px);line-height:1.2}
+.big .hint{font-size:15px;color:#4f607a}
+.dice{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.die{font-family:var(--display);font-size:18px;background:#0f2340;border:2px solid var(--edge);border-radius:10px;padding:6px 12px;color:var(--gold)}
+.die.on{background:var(--gold);color:#0b1424;border-color:var(--gold)}
+.timer{font-family:var(--display);font-size:42px;color:var(--gold);font-variant-numeric:tabular-nums;min-width:3ch;text-align:center}
+.timer.out{color:var(--bad)}
+.tag{display:inline-flex;font-size:13px;font-weight:700;border-radius:999px;padding:2px 10px;background:#0f2340;color:var(--gold);width:fit-content;margin-inline:auto}
+
+/* builder */
+.move{background:#0f2340;border:2px dashed var(--ball);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:6px;text-align:center}
+.move .who{font-family:var(--display);font-size:20px}
+.move .what{font-size:clamp(19px,2.6vw,24px);font-weight:700}
+.move .help{font-size:15px;color:var(--muted)}
+.topics{display:flex;flex-wrap:wrap;gap:8px}
+.chip{appearance:none;cursor:pointer;font:inherit;font-size:15px;border-radius:999px;padding:6px 14px;border:2px solid var(--edge);background:transparent;color:var(--ink)}
+.chip[aria-pressed="true"]{background:var(--ball);border-color:var(--ball);color:#1a0d00}
+.lifeline{background:var(--gold);color:#0b1424;border-radius:14px;padding:12px 16px;font-weight:700;text-align:center;animation:pop .3s ease-out}
+@keyframes pop{0%{transform:scale(.8)}70%{transform:scale(1.05)}}
+.best{font-family:var(--display);color:var(--d)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <div class="txt">
+      <span class="eyebrow">Victoria & Diana · Speaking workshop · about 50 minutes</span>
+      <h1>Keep the <span>Rally</span> Going</h1>
+      <p class="lede">A conversation is like table tennis. Answering is only half of it: you also have to send the ball back. Today you'll learn how to keep the ball in the air.</p>
+    </div>
+    <div class="table" id="heroTable"><span class="side v">V</span><span class="side d">D</span><span class="net"></span><span class="ball" id="heroBall"></span><span class="score" id="heroScore">0</span></div>
+  </header>
+
+  <nav class="steps" role="tablist" id="steps"></nav>
+
+  <!-- 1 -->
+  <section class="step" id="s-why" role="tabpanel">
+    <div class="head"><span class="eyebrow">Step 1 · Warm-up</span><h2>Why do conversations die?</h2><span class="mins">5 min</span></div>
+    <p class="lede">Read both conversations out loud, one of you is A, the other is B. What's the difference?</p>
+    <div class="vs">
+      <div class="chat dead"><span class="t">💀 The interview</span>
+        <span class="bub a">Did you do anything at the weekend?</span><span class="bub b">Yes, I went to the cinema.</span>
+        <span class="bub a">Was the film good?</span><span class="bub b">Yes.</span>
+        <span class="bub a">OK. Do you like sport?</span><span class="bub b">No.</span>
+        <span class="bub a">…</span></div>
+      <div class="chat alive"><span class="t">🏓 The rally</span>
+        <span class="bub a">Did you do anything at the weekend?</span><span class="bub b">Yes, I went to the cinema. <mark>I saw a horror film. It was terrifying!</mark> <mark>What about you?</mark></span>
+        <span class="bub a"><mark>No way, I love horror!</mark> Which one did you see?</span><span class="bub b">A new one about a haunted hotel. <mark>Have you seen it?</mark></span>
+        <span class="bub a">Not yet. <mark>Was it really scary?</mark></span></div>
+    </div>
+    <div class="formula">
+      <div><strong>1 · Answer</strong><span>Answer the question.</span><span class="tip">Yes, I went to the cinema.</span></div>
+      <div><strong>2 · Add</strong><span>Add one or two details.</span><span class="tip">I saw a horror film. It was terrifying!</span></div>
+      <div><strong>3 · Ask</strong><span>Send the ball back with a question.</span><span class="tip">What about you? Have you seen it?</span></div>
+    </div>
+    <p class="tip">Our rule for today: never answer without sending the ball back.</p>
+  </section>
+
+  <!-- 2 -->
+  <section class="step" id="s-kit" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Step 2</span><h2>Your toolkit</h2><span class="mins">5 min</span></div>
+    <p class="lede">These are the shots you'll need. Read them out loud with good intonation. Choose your favourite two from each box.</p>
+    <div class="kit" id="kit"></div>
+  </section>
+
+  <!-- 3 -->
+  <section class="step" id="s-alive" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Step 3</span><h2>Dead or alive?</h2><span class="mins">8 min</span></div>
+    <p class="lede">Which reply keeps the rally going? Choose, then explain why the others kill the conversation. Then say the dialogue out loud and continue it for two more turns.</p>
+    <div class="qs" id="alive"></div>
+  </section>
+
+  <!-- 4 -->
+  <section class="step" id="s-follow" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Step 4</span><h2>The follow-up machine</h2><span class="mins">8 min</span></div>
+    <p class="lede">One of you reads the statement. The other has <b>30 seconds</b> to ask <b>three different follow-up questions</b>. The question words below can help. Then swap.</p>
+    <div class="big"><span class="tag" id="fWho">Victoria reads</span><span class="say" id="fSay">Press "New statement"</span></div>
+    <div class="dice" id="fDice"></div>
+    <div class="row" style="justify-content:center"><button class="btn" id="fNew">New statement</button><span class="timer" id="fTimer">30</span><button class="btn ghost" id="fStart">Start 30 s</button></div>
+  </section>
+
+  <!-- 5 -->
+  <section class="step" id="s-react" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Step 5</span><h2>Reaction ping-pong</h2><span class="mins">5 min</span></div>
+    <p class="lede">Fast round! Polina reads the news. Whoever reacts first with a good phrase from the toolkit gets the point, but only if she also asks a follow-up question.</p>
+    <div class="big"><span class="say" id="rSay">Press "Next"</span><span class="hint" id="rHint"></span></div>
+    <div class="row" style="justify-content:center"><button class="btn" id="rNext">Next</button><button class="btn ghost" id="rShow">Show a good reaction</button><button class="btn v" id="rV">+1 Victoria</button><button class="btn d" id="rD">+1 Diana</button></div>
+    <p class="row" style="justify-content:center;font-family:var(--display);font-size:22px"><span style="color:var(--v)">V <span id="rsV">0</span></span><span style="color:var(--muted)">:</span><span style="color:var(--d)"><span id="rsD">0</span> D</span></p>
+  </section>
+
+  <!-- 6 -->
+  <section class="step" id="s-build" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Step 6</span><h2>Guided rally</h2><span class="mins">10 min</span></div>
+    <p class="lede">Choose a topic. The card tells you what kind of shot to play: start, answer and add, react and follow up, or send it back. Polina presses "Shot played" after each good turn, and the ball crosses the table.</p>
+    <div class="topics" id="bTopics"></div>
+    <div class="table" id="bTable"><span class="side v">V</span><span class="side d">D</span><span class="net"></span><span class="ball" id="bBall"></span><span class="score" id="bScore">0</span></div>
+    <div class="move"><span class="who" id="bWho"></span><span class="what" id="bWhat"></span><span class="help" id="bHelp"></span></div>
+    <div class="row" style="justify-content:center"><button class="btn" id="bShot">Shot played ✓</button><button class="btn ghost" id="bReset">New rally</button></div>
+  </section>
+
+  <!-- 7 -->
+  <section class="step" id="s-free" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Step 7 · The final</span><h2>Free rally</h2><span class="mins">8 min</span></div>
+    <p class="lede">No cards now. Pick a topic and talk for 3 minutes. Polina presses "Hit" for every turn. If you freeze, press "Lifeline" for a rescue phrase. Can you beat your record?</p>
+    <div class="topics" id="fTopics"></div>
+    <div class="table" id="fTable"><span class="side v">V</span><span class="side d">D</span><span class="net"></span><span class="ball" id="fBall"></span><span class="score" id="fScore">0</span></div>
+    <div class="row" style="justify-content:center"><span class="timer" id="frTimer">3:00</span><button class="btn ghost" id="frStart">Start 3 min</button><button class="btn" id="frHit">Hit 🏓</button><button class="btn bad" id="frLife">Lifeline</button><button class="btn ghost" id="frReset">Reset</button></div>
+    <div class="lifeline" id="frLL" hidden></div>
+    <p class="tip" style="text-align:center">Best rally today: <span class="best" id="frBest">0</span> shots</p>
+  </section>
+</div>
+
+<script>
+const STEPS=[["why","Why?"],["kit","Toolkit"],["alive","Dead or alive?"],["follow","Follow-ups"],["react","Reactions"],["build","Guided rally"],["free","Free rally"]];
+const nav=document.getElementById("steps");
+STEPS.forEach(([id,n],i)=>{const b=document.createElement("button");b.className="st";b.setAttribute("role","tab");b.id="n-"+id;b.innerHTML=`<span class="n">${i+1}</span>${n}`;b.onclick=()=>go(id);nav.appendChild(b)});
+function go(id){STEPS.forEach(([s])=>{document.getElementById("s-"+s).hidden=s!==id;const b=document.getElementById("n-"+s);if(b.getAttribute("aria-selected")==="true"&&s!==id)b.classList.add("done");b.setAttribute("aria-selected",s===id)});
+  try{if(location.hash!=="#"+id)history.replaceState(null,"","#"+id)}catch(e){}}
+const h0=location.hash.slice(1);go(STEPS.some(s=>s[0]===h0)?h0:"why");
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+let ac=null;function pong(hi){try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();const t=ac.currentTime,o=ac.createOscillator(),g=ac.createGain();o.type="sine";o.frequency.setValueAtTime(hi?1300:900,t);g.gain.setValueAtTime(.15,t);g.gain.exponentialRampToValueAtTime(.001,t+.09);o.connect(g).connect(ac.destination);o.start(t);o.stop(t+.1)}catch(e){}}
+
+/* rally table helper */
+function Table(ballId,scoreId){const ball=document.getElementById(ballId),sc=document.getElementById(scoreId);let n=0,side=0;
+  const place=()=>{const x=side?76+Math.random()*8:12+Math.random()*8,y=20+Math.random()*55;ball.style.left=x+"%";ball.style.top=y+"%"};
+  return{hit(){n++;side=1-side;place();sc.textContent=n;pong(side);return n},reset(){n=0;side=0;sc.textContent=0;place()},get n(){return n},get side(){return side}}}
+const hero=Table("heroBall","heroScore");let hk=0;const heroTimer=setInterval(()=>{if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;const b=document.getElementById("heroBall"),s=hk++%2;b.style.left=(s?78:14)+"%";b.style.top=(25+Math.random()*45)+"%";document.getElementById("heroScore").textContent=hk},900);
+
+/* 2 toolkit */
+const KIT=[["React","#ff5d8f",["Really?","No way!","That's amazing!","Oh no, I'm sorry to hear that.","Lucky you!","That sounds fun / awful."]],
+ ["Follow up","#ffd166",["What was it like?","Who did you go with?","Why did you decide to…?","How did you feel?","What happened next?","Tell me more!"]],
+ ["Send it back","#3ddc97",["What about you?","And you?","How about you?","Have you ever…?","Do you agree?","What do you think?"]],
+ ["Add details","#ff8a1f",["Actually,…","The best part was…","To be honest,…","Also,…","The thing is,…","For example,…"]],
+ ["Buy time","#8ab4ff",["Hmm, let me think…","That's a good question.","Well, actually…","How can I say it…","I'm not sure, but…","Good question! Maybe…"]],
+ ["Change the topic","#c792ea",["By the way,…","Speaking of…,","That reminds me,…","Oh, I wanted to ask you…","Anyway,…","Changing the subject,…"]]];
+document.getElementById("kit").innerHTML=KIT.map(([t,c,l])=>`<div style="--c:${c}"><h3>${t}</h3><ul>${l.map(x=>`<li>${x}</li>`).join("")}</ul></div>`).join("");
+
+/* 3 dead or alive */
+const AL=[["I went to a concert last weekend.",["OK.","Really? Who did you see?","I like music."],1,"React + follow-up question. 'OK' stops the ball."],
+ ["Do you like sport?",["No.","Not really. I prefer yoga. What about you?","Yes, sport."],1,"Answer + add + ask: the perfect shot."],
+ ["I've just started a new job!",["Good.","Congratulations! What do you do there?","I have a job too."],1,"React to good news, then ask about it."],
+ ["My cat is ill.",["Really? Cool!","Cats are nice.","Oh no, I'm sorry. What happened?"],2,"Match the reaction to the news. Bad news needs sympathy."],
+ ["What did you do at the weekend?",["Nothing.","I stayed at home and watched a series. And you?","Weekend."],1,"Even a boring answer works if you add and send it back."],
+ ["Have you ever been to St Petersburg?",["Yes.","Yes, I have! I went last summer. It was beautiful. Have you?","St Petersburg is a city."],1,"Answer, add a detail (past simple!) and ask back."],
+ ["I'm so tired today.",["OK.","I'm not.","Me too! Did you sleep badly?"],2,"'Me too!' connects you. Then ask a question."],
+ ["What's your dream job?",["I don't know.","Hmm, good question… Maybe a photographer, because I love travelling. What about you?","Job."],1,"Buy time instead of freezing, then answer and ask back."]];
+const alEl=document.getElementById("alive");
+AL.forEach(([s,opts,a,why],i)=>{const d=document.createElement("div");d.className="q";d.innerHTML=`<p class="s"><span>A:</span> "${s}"</p><div class="opts"></div><p class="why" hidden>${why}</p>`;
+  const o=d.querySelector(".opts");opts.forEach((t,k)=>{const b=document.createElement("button");b.className="opt";b.textContent="B: "+t;
+    b.onclick=()=>{if(k===a){b.classList.add("ok");d.querySelector(".why").hidden=false;pong(1)}else{b.classList.add("no");setTimeout(()=>b.classList.remove("no"),600)}};o.appendChild(b)});alEl.appendChild(d)});
+
+/* 4 follow-up machine */
+(function(){const S=["I went to a concert last weekend.","I've started learning to drive.","My sister has moved to another city.","I watched a really strange film yesterday.","I'm reading a great book at the moment.","I've never been on a plane.","We had a party on Saturday.","I'm thinking about getting a dog.","I lost my phone last week.","I've changed my hairstyle.","I've decided to start running.","I met an old school friend in the street."];
+  const W=["Who…?","What…?","Where…?","When…?","Why…?","How…?","What was it like?","Have you ever…?","Did you…?"];
+  let deck=shuffle(S),i=0,who=0,t=null,left=30;const dEl=document.getElementById("fDice");dEl.innerHTML=W.map(w=>`<span class="die">${w}</span>`).join("");
+  const tm=document.getElementById("fTimer");
+  function stop(){clearInterval(t);t=null}
+  document.getElementById("fNew").onclick=()=>{stop();left=30;tm.textContent=30;tm.classList.remove("out");if(i>=deck.length){deck=shuffle(S);i=0}
+    document.getElementById("fSay").textContent=deck[i++];document.getElementById("fWho").textContent=(who?"Diana":"Victoria")+" reads · "+(who?"Victoria":"Diana")+" asks";who=1-who;
+    dEl.querySelectorAll(".die").forEach(x=>x.classList.remove("on"));shuffle([...dEl.children]).slice(0,3).forEach(x=>x.classList.add("on"))};
+  document.getElementById("fStart").onclick=()=>{stop();left=30;tm.classList.remove("out");tm.textContent=left;t=setInterval(()=>{left--;tm.textContent=left;if(left<=0){stop();tm.classList.add("out");pong(0)}},1000)}})();
+
+/* 5 reactions */
+(function(){const N=[["I got the job!","good news: That's amazing! Congratulations! → What will you do there?"],["I broke my arm skiing.","bad news: Oh no, I'm sorry to hear that! → How did it happen?"],["I saw a famous actor in the supermarket.","surprising: No way! Really? → Who was it? What did you say?"],["I love pizza.","same: Me too! → What's your favourite kind?"],["I failed my driving test.","bad news: Oh no! That's a shame. → What went wrong?"],["We're going to Turkey next week!","good news: Lucky you! → Where are you staying?"],["I don't like coffee.","different: Really? Why not? → What do you drink in the morning?"],["My flight was cancelled.","bad news: Oh no, that's awful! → What did you do?"],["I won 5,000 roubles in a competition!","good news: No way! → What are you going to buy?"],["I've finished the book! I read it in one night.","surprising: Wow, really? → So how does it end? (No spoilers!)"],["I've never seen the sea.","surprising: Really? Never? → Where would you like to go?"],["My neighbour plays the drums at midnight.","bad news: That sounds awful! → Have you talked to him?"]];
+  let deck=shuffle(N),i=0,sc={V:0,D:0};
+  document.getElementById("rNext").onclick=()=>{if(i>=deck.length){deck=shuffle(N);i=0}document.getElementById("rSay").textContent=deck[i][0];document.getElementById("rHint").textContent="";i++};
+  document.getElementById("rShow").onclick=()=>{if(i)document.getElementById("rHint").textContent=deck[i-1][1]};
+  ["V","D"].forEach(k=>document.getElementById("r"+k).onclick=()=>{sc[k]++;document.getElementById("rs"+k).textContent=sc[k];pong(k==="D")})})();
+
+/* topics */
+const TOPICS=["The weekend","Sport","The Perks of Being a Wallflower","Holidays","Food","Music","School memories","Phones & social media","Dream trips","Pets"];
+function topics(elId,cb){const el=document.getElementById(elId);TOPICS.forEach(t=>{const b=document.createElement("button");b.className="chip";b.textContent=t;b.setAttribute("aria-pressed","false");
+  b.onclick=()=>{el.querySelectorAll(".chip").forEach(c=>c.setAttribute("aria-pressed",c===b));cb&&cb(t)};el.appendChild(b)})}
+
+/* 6 guided rally */
+(function(){const tb=Table("bBall","bScore");let topic="The weekend",step=0;
+  const SEQ=[["Start","Open with a question about the topic.","Did you…? / Have you ever…? / What do you think about…?"],
+    ["Answer + Add","Answer and add one or two details.","Yes, I… Actually,… The best part was…"],
+    ["React + Follow up","React, then ask a follow-up question.","Really? / No way! + What was it like? / Why…?"],
+    ["Answer + Add","Answer with details. Don't stop at one sentence!","To be honest,… For example,…"],
+    ["Send it back","Ask the same question back, or a new one.","What about you? / And you? / Have you ever…?"],
+    ["Answer + Add + Ask","The perfect shot: all three!","… … What about you?"],
+    ["Change the topic","Move smoothly to something connected.","By the way,… / Speaking of…, / That reminds me,…"]];
+  const pl=n=>n%2?"Diana":"Victoria",col=n=>n%2?"var(--d)":"var(--v)";
+  function draw(){const [w,what,help]=SEQ[step%SEQ.length];const who=pl(tb.n);
+    document.getElementById("bWho").innerHTML=`<span style="color:${col(tb.n)}">${who}</span> · ${w}`;document.getElementById("bWhat").textContent=step===0?`${what} Topic: ${topic}.`:what;document.getElementById("bHelp").textContent=help}
+  topics("bTopics",t=>{topic=t;tb.reset();step=0;draw()});
+  document.getElementById("bShot").onclick=()=>{tb.hit();step++;draw()};
+  document.getElementById("bReset").onclick=()=>{tb.reset();step=0;draw()};
+  tb.reset();draw()})();
+
+/* 7 free rally */
+(function(){const tb=Table("fBall","fScore");let best=store.get("rally-best",0),t=null,left=180;const tm=document.getElementById("frTimer"),ll=document.getElementById("frLL");
+  document.getElementById("frBest").textContent=best;topics("fTopics");
+  const LL=["Hmm, that's a good question…","What about you?","Really? Tell me more!","By the way, have you ever…?","Speaking of that, …","What was the best part?","How did you feel?","That reminds me of…","To be honest, I…","Why do you think that is?"];
+  const fmt=s=>`${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`;
+  document.getElementById("frStart").onclick=()=>{clearInterval(t);left=180;tm.classList.remove("out");tm.textContent=fmt(left);t=setInterval(()=>{left--;tm.textContent=fmt(left);if(left<=0){clearInterval(t);tm.classList.add("out");pong(0);pong(1)}},1000)};
+  document.getElementById("frHit").onclick=()=>{const n=tb.hit();ll.hidden=true;if(n>best){best=n;store.set("rally-best",best);document.getElementById("frBest").textContent=best}};
+  document.getElementById("frLife").onclick=()=>{ll.hidden=false;ll.textContent="🛟 "+pick(LL)};
+  document.getElementById("frReset").onclick=()=>{clearInterval(t);left=180;tm.textContent="3:00";tm.classList.remove("out");tb.reset();ll.hidden=true};
+  tb.reset()})();
+</script>
+</body>
+</html>
