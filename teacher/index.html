@@ -119,7 +119,7 @@ const URLSET={movement:"move",adverbs:"adv"};
 function guessSet(u){u=(u||"").split(/[?#]/)[0].replace(/\/index\.html$/,"").replace(/\/+$/,"");const seg=u.split("/").pop();
   if(ACT[seg])return seg;if(URLSET[seg]&&ACT[URLSET[seg]])return URLSET[seg];
   return Object.keys(ACT).find(k=>u.includes("/"+k+"/")||u.includes("/"+k+"-"))||null}
-async function repairSets(){const fix=M.filter(m=>!m.activity&&guessSet(m.url));for(const m of fix){m.activity=guessSet(m.url);try{await db.from("materials").update({activity:m.activity}).eq("id",m.id)}catch(e){}}}
+async function repairSets(){const fix=M.filter(m=>!(m.activity&&ACT[m.activity])&&guessSet(m.url));for(const m of fix){m.activity=guessSet(m.url);try{await db.from("materials").update({activity:m.activity}).eq("id",m.id)}catch(e){}}}
 function detail(x){
   $("detail").hidden=false;$("dName").textContent=`${x.name} · ${x.level||""}`;$("dLink").textContent=link(x.code);
   const mt=$("dMat");mt.innerHTML="";const mats=M.filter(m=>m.student_code===x.code);
@@ -168,7 +168,7 @@ function answers(x,m,s,rs){const r=rs.find(z=>z.details&&z.details.answers&&Obje
   $("ansRows").innerHTML=Object.entries(a).map(([k,v],n)=>`<tr><td>${n+1}</td><td style="white-space:normal;min-width:220px">${esc(v.q)}</td><td style="color:${v.ok?"var(--ok)":"var(--bad)"};font-weight:700">${esc(v.a)}</td><td>${v.ok?"":esc(v.c)}</td><td>${v.ok?"✓":"✗"}</td></tr>`).join("");
   $("ansBox").hidden=false;$("ansBox").scrollIntoView({behavior:"smooth"})}
 $("matForm").onsubmit=async e=>{e.preventDefault();
-  const row={student_code:$("mStudent").value,title:$("mTitle").value.trim(),url:$("mUrl").value.trim(),kind:$("mKind").value,activity:$("mAct").value.trim()||null,due:$("mDue").value||null,note:$("mNote").value.trim()||null};
+  const row={student_code:$("mStudent").value,title:$("mTitle").value.trim(),url:$("mUrl").value.trim(),kind:$("mKind").value,activity:(ACT[$("mAct").value.trim()]?$("mAct").value.trim():guessSet($("mUrl").value)),due:$("mDue").value||null,note:$("mNote").value.trim()||null};
   const {error}=await db.from("materials").insert(row);$("matMsg").textContent=error?"Error: "+error.message:`Added "${row.title}".`;
   if(!error){e.target.reset();await load()}};
 $("stForm").onsubmit=async e=>{e.preventDefault();const name=$("sName").value.trim();const code=slug(name)+"-"+rand();
