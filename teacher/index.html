@@ -66,7 +66,7 @@
         <label>Title<input id="mTitle" required></label>
         <label>Link<input id="mUrl" type="url" required placeholder="https://"></label>
         <label>Type<select id="mKind"><option value="homework">Homework</option><option value="vocabulary">Vocabulary</option><option value="lesson">Lesson</option><option value="grammar">Grammar</option><option value="practice">Practice</option></select></label>
-        <label>Exercise set<input id="mAct" placeholder="fills in automatically" list="actList"></label><datalist id="actList"></datalist>
+        <div style="grid-column:1/-1"><p class="muted" id="actInfo" aria-live="polite">Exercise set: paste a link and it will be detected automatically.</p><details><summary class="muted" style="cursor:pointer">Change exercise set (rarely needed)</summary><label>Exercise set<input id="mAct" placeholder="detected from the link" list="actList"></label></details></div><datalist id="actList"></datalist>
         <label>Due (optional)<input id="mDue" type="date"></label>
         <label style="grid-column:1/-1">Note (optional)<input id="mNote"></label>
         <button class="btn" type="submit">Add</button>
@@ -158,7 +158,13 @@ function detail(x){
   $("detail").scrollIntoView({behavior:"smooth"});
 }
 $("actList").innerHTML=Object.keys(ACT).map(k=>`<option value="${k}">`).join("");
-$("mUrl").addEventListener("input",()=>{const u=$("mUrl").value;if($("mAct").value)return;const k=guessSet(u);if(k)$("mAct").value=k});
+let actManual=false;
+function showAct(){const k=$("mAct").value.trim(),u=$("mUrl").value.trim();
+  $("actInfo").textContent=k&&ACT[k]?`Exercise set: ${k} ✓ (${Object.values(ACT[k]).join(", ")})`:u?"No exercise set for this link. That's fine for videos, documents and other pages without exercises.":"Exercise set: paste a link and it will be detected automatically."}
+function autoAct(){if(!actManual)$("mAct").value=guessSet($("mUrl").value)||"";showAct()}
+["input","change","paste","blur"].forEach(ev=>$("mUrl").addEventListener(ev,()=>setTimeout(autoAct,0)));
+$("mAct").addEventListener("input",()=>{actManual=!!$("mAct").value.trim();showAct()});
+$("matForm").addEventListener("reset",()=>{actManual=false;setTimeout(showAct,0)});
 $("dClose").onclick=()=>$("detail").hidden=true;
 $("ansClose").onclick=()=>$("ansBox").hidden=true;
 function answers(x,m,s,rs){const r=rs.find(z=>z.details&&z.details.answers&&Object.keys(z.details.answers).length);const a=r.details.answers;
