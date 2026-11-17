@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Return to Earth</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=IM+Fell+English:ital@0;1&family=Pinyon+Script&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap">
+<style>
+/* Layout: old ink-and-paper storybook page in a checkerboard frame; chapters numbered in blackletter */
+:root{
+  --paper:#ece4d6; --paper2:#e2d6c6; --ink:#1d1719; --muted:#5e5058;
+  --lilac:#a98fa6; --blood:#8e1b22; --gold:#b98a2e; --ok:#3f6b4a;
+  --display:"UnifrakturMaguntia","Cormorant Garamond",Georgia,serif;
+  --script:"Pinyon Script","Cormorant Garamond",cursive;
+  --body:"Cormorant Garamond","IM Fell English",Georgia,serif;
+  --fell:"IM Fell English",Georgia,serif;
+  color-scheme:light;
+}
+html,body{background:var(--ink);color:var(--ink)}
+body{font-family:var(--body);font-size:19px;line-height:1.5;padding-left:max(10px,env(safe-area-inset-left,0px));padding-right:max(10px,env(safe-area-inset-right,0px));padding-block:14px 40px}
+.frame{max-width:700px;margin:0 auto;padding:14px;
+  background:repeating-conic-gradient(var(--ink) 0 25%, var(--paper) 0 50%) 0 0/24px 24px}
+.wrap{background:
+   radial-gradient(ellipse at 50% 0%, rgba(169,143,166,.35), transparent 60%),
+   radial-gradient(ellipse at 50% 100%, rgba(29,23,25,.12), transparent 55%),
+   var(--paper);
+  padding:28px max(16px,4vw) 36px;display:flex;flex-direction:column;gap:26px;position:relative}
+.wrap::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.18;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0.1 0 0 0 0 0.08 0 0 0 0 0.09 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.wrap>*{position:relative}
+header{text-align:center}
+.eyebrow{font-family:var(--fell);font-style:italic;font-size:15px;color:var(--blood)}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(46px,13vw,76px);line-height:1;margin:6px 0 2px;color:var(--ink)}
+h1 .s{font-family:var(--script);color:var(--blood);font-size:.55em;display:block;margin-top:-4px}
+.stars{color:var(--gold);letter-spacing:.5em;font-size:14px}
+h2{font-family:var(--fell);font-weight:400;font-size:24px;margin:0 0 10px;color:var(--blood)}
+h2 .n{font-family:var(--fell);color:var(--ink);font-size:26px;margin-right:10px}
+.lede{color:var(--muted);margin:8px auto 0;max-width:34em;font-style:italic}
+.player{border:2px solid var(--ink);outline:1px solid var(--ink);outline-offset:4px;padding:20px;display:flex;flex-direction:column;gap:14px;background:rgba(169,143,166,.18)}
+.onair{display:flex;align-items:center;gap:10px;font-family:var(--fell);font-style:italic;color:var(--muted)}
+.dot{width:11px;height:11px;border-radius:50%;background:var(--paper2);border:1px solid var(--ink)}
+.playing .dot{background:var(--blood);box-shadow:0 0 10px var(--blood);animation:pulse 1.4s infinite}
+@keyframes pulse{50%{opacity:.35}}
+@media (prefers-reduced-motion:reduce){.playing .dot{animation:none}}
+.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+button{font:inherit;font-size:17px;cursor:pointer;border-radius:0;border:1.5px solid var(--ink);background:var(--paper);color:var(--ink);padding:8px 16px}
+button:hover{background:var(--paper2)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--blood);outline-offset:2px}
+.big{background:var(--ink);color:var(--paper);font-family:var(--fell);letter-spacing:.04em}
+.big:hover{background:var(--blood);border-color:var(--blood)}
+.speed{display:flex;gap:8px;align-items:center;font-size:16px;color:var(--muted)}
+.speed input{accent-color:var(--blood)}
+.listens{font-style:italic;color:var(--muted)}
+.card{padding-top:18px;border-top:1px solid var(--ink);position:relative}
+.card::before{content:"✦";position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--paper);color:var(--gold);padding:0 10px}
+.q{padding:14px 0;border-top:1px dashed rgba(29,23,25,.3)}
+.q:first-of-type{border-top:0;padding-top:0}
+.q p{margin:0 0 10px;font-weight:600}
+.opts{display:grid;gap:8px}
+.opt{text-align:left;padding:8px 14px;background:transparent}
+.opt.ok{border-color:var(--ok);color:var(--ok);background:rgba(63,107,74,.08)}
+.opt.no{border-color:var(--blood);color:var(--blood);text-decoration:line-through;opacity:.75}
+.why{font-style:italic;color:var(--muted);margin-top:8px}
+.score{font-family:var(--script);font-size:28px;color:var(--blood);margin-top:10px}
+.gap{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px;padding:6px 0}
+.gap input{font:inherit;background:transparent;color:var(--ink);border:0;border-bottom:1.5px solid var(--ink);border-radius:0;padding:2px 6px;width:8em}
+.gap input.ok{border-color:var(--ok);color:var(--ok)} .gap input.no{border-color:var(--blood);color:var(--blood)}
+.gap input::placeholder{color:var(--blood);opacity:.7}
+.hint{color:var(--muted);font-style:italic;margin-top:0}
+.script{white-space:pre-line;margin-top:12px}
+.script mark{background:transparent;color:var(--blood);font-weight:600}
+.script::first-letter{font-family:var(--display);font-size:3.2em;float:left;line-height:.8;margin:6px 8px 0 0;color:var(--blood)}
+.speak ol{padding-left:1.3em}
+.speak li{margin-bottom:8px}
+.speak b{color:var(--blood)}
+.note{font-size:16px;color:var(--muted);font-style:italic}
+footer{text-align:center;font-family:var(--script);font-size:24px;color:var(--muted)}
+</style>
+<style>
+.chip{display:inline-block;border:1px solid var(--ink);padding:2px 10px;margin:3px 4px 3px 0;font-style:italic;font-size:16px}
+.bank{margin:4px 0 12px}
+select{font:inherit;font-size:17px;background:transparent;color:var(--ink);border:0;border-bottom:1.5px solid var(--ink);border-radius:0;padding:2px 4px;max-width:100%}
+select.ok,.ti.ok{border-color:var(--ok);color:var(--ok)} select.no,.ti.no{border-color:var(--blood);color:var(--blood)}
+.line{padding:8px 0;border-top:1px dashed rgba(29,23,25,.25)}
+.line:first-child{border-top:0}
+.ti{font:inherit;font-size:17px;background:transparent;color:var(--ink);border:0;border-bottom:1.5px solid var(--ink);border-radius:0;padding:2px 6px;width:100%;margin-top:4px}
+.root{font-family:var(--fell);color:var(--blood);letter-spacing:.06em}
+.key{font-size:15px;color:var(--blood);font-style:italic;display:block;margin-top:2px}
+.kw{font-family:var(--fell);color:var(--paper);background:var(--ink);padding:0 8px;letter-spacing:.08em}
+textarea{font:inherit;font-size:17px;width:100%;min-height:9em;background:rgba(255,255,255,.25);color:var(--ink);border:1.5px solid var(--ink);border-radius:0;padding:10px;box-sizing:border-box}
+.notes .line label{font-weight:600}
+.listen-box{border:2px solid var(--ink);outline:1px solid var(--ink);outline-offset:4px;padding:18px 20px;background:rgba(169,143,166,.18);display:flex;flex-direction:column;gap:8px}
+.listen-box a{color:var(--blood);font-family:var(--fell);font-size:21px}
+.meta{font-style:italic;color:var(--muted);font-size:16px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:12px}
+</style>
+
+</head>
+<body>
+<div class="frame"><div class="wrap">
+  <header>
+    <div class="eyebrow">A surprise lesson · listening, vocabulary, Use of English, speaking, writing · about 50 min</div>
+    <h1>Return to Earth<span class="s">on dying, soil and saying goodbye</span></h1>
+    <div class="stars">✦ ✦ ✦</div>
+    <p class="lede">A designer asks a strange question: what if, when we die, we simply became soil? A real talk, a little macabre, and surprisingly gentle.</p>
+  </header>
+
+  <section class="card">
+    <h2><span class="n">I</span>Before you listen</h2>
+    <p class="hint">Say your answers out loud, about 30 seconds each.</p>
+    <ol>
+      <li>What usually happens to people's bodies after death where you grew up? Has it changed in your lifetime?</li>
+      <li>Why do you think channels like <i>Dark History</i> are so popular? Why are we drawn to death and the macabre?</li>
+      <li>The talk is called <i>“When I die, recompose me.”</i> Guess: what could <b>recompose</b> mean here?</li>
+    </ol>
+  </section>
+
+  <section class="listen-box">
+    <div class="eyebrow">The recording</div>
+    <a href="https://www.ted.com/talks/katrina_spade_when_i_die_recompose_me" target="_blank" rel="noopener">Katrina Spade: When I die, recompose me ↗</a>
+    <div class="meta">TEDxOrcasIsland · 12 min 47 s · a real human voice, no robots ✦ Turn subtitles OFF.</div>
+  </section>
+
+  <section class="card notes">
+    <h2><span class="n">II</span>Listen and take notes</h2>
+    <p class="hint">Listen once all the way through. Make notes under each heading, in English, short phrases only. Then listen a second time and fill the gaps. Finally, open <b>Read transcript</b> on the TED page and check yourself.</p>
+    <div id="notes"></div>
+  </section>
+
+  <section class="card">
+    <h2><span class="n">III</span>The vocabulary of endings</h2>
+    <p class="hint">Choose the word that fits each sentence. One word in the bank is not needed.</p>
+    <div class="bank" id="vbank"></div>
+    <div id="vocab"></div>
+    <div class="row"><button id="vCheck">Check</button></div>
+    <div class="score" id="vScore"></div>
+  </section>
+
+  <section class="card">
+    <h2><span class="n">IV</span>Word formation</h2>
+    <p class="hint">CPE Part 3 style: change the word in capitals so it fits the gap.</p>
+    <div id="wf"></div>
+    <div class="row"><button id="wfCheck">Check</button></div>
+    <div class="score" id="wfScore"></div>
+  </section>
+
+  <section class="card">
+    <h2><span class="n">V</span>Last night's phrases, returning</h2>
+    <p class="hint">Key word transformations. Use the word given, do not change it, and use 3 to 8 words.</p>
+    <div id="kwt"></div>
+    <div class="row"><button id="kCheck">Check</button></div>
+    <div class="score" id="kScore"></div>
+  </section>
+
+  <section class="card speak">
+    <h2><span class="n">VI</span>Speak</h2>
+    <ol>
+      <li>Would you choose to be composted? Why, or why not?</li>
+      <li>Is turning a body into soil <b>disrespectful</b>, or rather beautiful? Argue <i>both</i> sides, then give your view.</li>
+      <li>How should we <b>make allowances for</b> people who are grieving: at work, at university, among friends?</li>
+    </ol>
+  </section>
+
+  <section class="card">
+    <h2><span class="n">VII</span>Write</h2>
+    <p class="hint">Your university magazine wants articles on the theme <i>“Should we rethink how we say goodbye?”</i> Write the <b>opening paragraph</b> only (100–140 words). Hook the reader, then show your angle. Use at least two words from part III.</p>
+    <textarea id="draft" placeholder="Begin here…"></textarea>
+    <div class="row"><span class="meta" id="wc">0 words</span></div>
+    <p class="note">Paste it into our chat when you're done and I'll mark it like a CPE examiner.</p>
+  </section>
+
+  <footer>memento mori, Polina</footer>
+</div></div>
+
+<script src="../../assets/config.js?v=13"></script>
+<script src="../../assets/portal.js?v=2"></script>
+<script>
+const $=id=>document.getElementById(id);
+const norm=s=>s.toLowerCase().replace(/[’']/g,"'").replace(/[.,!?]/g,'').replace(/\s+/g,' ').trim();
+function save(k,v){try{localStorage.setItem('rte-'+k,v)}catch(e){}}
+function logR(ex,score,total,wrong){try{if(window.Portal)Portal.log('rte/'+ex,score,total,{wrong})}catch(e){}}
+function load(k){try{return localStorage.getItem('rte-'+k)}catch(e){return null}}
+
+const NOTES=["Who is she, and where did the idea come from?","What problems does she see with burial and cremation?","How does the process work: what goes in, what comes out?","Where does the science behind it come from?","What does she want mourners to feel or do?","One sentence from the talk you'd like to remember"];
+NOTES.forEach((n,i)=>{const d=document.createElement('div');d.className='line';d.innerHTML='<label for="n'+i+'">'+(i+1)+'. '+n+'</label><input class="ti" id="n'+i+'" autocomplete="off">';$('notes').appendChild(d);
+  const el=d.querySelector('input');el.value=load('n'+i)||'';el.oninput=()=>save('n'+i,el.value)});
+
+const BANK=["bereaved","pay their respects","embalmed","decomposes","laid to rest","morbid","cremation","mourned","macabre"];
+const VOC=[["The ___ family asked for privacy after the funeral.","bereaved"],
+ ["Thousands of people queued for hours to ___ to the late writer.","pay their respects"],
+ ["The body had been ___ so that it would look peaceful at the open-casket service.","embalmed"],
+ ["Without oxygen, organic matter ___ far more slowly.","decomposes"],
+ ["The poet was ___ in a quiet churchyard overlooking the sea.","laid to rest"],
+ ["She has a slightly ___ fascination with old graveyards and Victorian death photos.","morbid"],
+ ["In many countries, ___ is now more common than a traditional burial.","cremation"],
+ ["The whole village ___ the loss of the doctor who had cared for them for forty years.","mourned"]];
+BANK.forEach(w=>{const c=document.createElement('span');c.className='chip';c.textContent=w;$('vbank').appendChild(c)});
+VOC.forEach(([s,a],i)=>{const d=document.createElement('div');d.className='line';
+  const opts='<option value="">…</option>'+BANK.map(w=>'<option>'+w+'</option>').join('');
+  d.innerHTML=(i+1)+'. '+s.replace('___','<select id="v'+i+'" aria-label="gap '+(i+1)+'">'+opts+'</select>');$('vocab').appendChild(d)});
+$('vCheck').onclick=()=>{let n=0;VOC.forEach(([s,a],i)=>{const el=$('v'+i),ok=el.value===a;el.classList.toggle('ok',ok);el.classList.toggle('no',!ok);if(ok)n++});
+  logR('vocab',n,VOC.length,VOC.filter((x,i)=>$('v'+i).value!==x[1]).map(x=>x[1]));$('vScore').textContent=n+' / '+VOC.length+(n===VOC.length?'  ✦ the odd one out was “macabre”':'')};
+
+const WF=[["Many people find the idea of human composting ___ at first.","SETTLE",["unsettling"]],
+ ["She presents it as a ___ alternative to burial and cremation.","SUSTAIN",["sustainable"]],
+ ["The process of ___ takes several weeks.","DECOMPOSE",["decomposition"]],
+ ["There is something deeply ___ about the thought of returning to the earth.","COMFORT",["comforting"]],
+ ["Grief affects people in ___ ways, so there is no correct way to mourn.","PREDICT",["unpredictable"]],
+ ["As city cemeteries run out of space, burial is becoming ___ for ordinary families.","AFFORD",["unaffordable"]]];
+WF.forEach(([s,r],i)=>{const d=document.createElement('div');d.className='line';d.innerHTML=(i+1)+'. '+s.replace('___','<b>_____</b>')+' <span class="root">'+r+'</span><input class="ti" id="w'+i+'" autocomplete="off" autocapitalize="off" spellcheck="false"><span class="key" id="wk'+i+'" hidden></span>';$('wf').appendChild(d)});
+$('wfCheck').onclick=()=>{let n=0;WF.forEach(([s,r,acc],i)=>{const el=$('w'+i),ok=acc.includes(norm(el.value));el.classList.toggle('ok',ok);el.classList.toggle('no',!ok);if(ok)n++;const k=$('wk'+i);k.hidden=ok;k.textContent='→ '+acc[0]});logR('wf',n,WF.length,WF.filter((x,i)=>!x[2].includes(norm($('w'+i).value))).map(x=>x[2][0]));$('wfScore').textContent=n+' / '+WF.length};
+
+const KWT=[["Finding an affordable plot in a city cemetery is very difficult.","COME","An affordable plot in a city cemetery ___ .",["is hard to come by","is very hard to come by","is difficult to come by"]],
+ ["Years of grief had damaged her health.","TOLL","Years of grief ___ health.",["had taken a toll on her","had taken its toll on her","had taken their toll on her","had taken a heavy toll on her"]],
+ ["People are saying the company may open a facility in Europe.","TALK","There ___ opening a facility in Europe.",["is talk of the company","is some talk of the company","is talk of the company's","has been talk of the company","has been some talk of the company"]],
+ ["We should be more lenient with people who are grieving.","ALLOWANCES","We should ___ people who are grieving.",["make allowances for","make more allowances for"]]];
+KWT.forEach(([a,kw,b],i)=>{const d=document.createElement('div');d.className='line';d.innerHTML='<div>'+(i+1)+'. '+a+'</div><div style="margin:6px 0"><span class="kw">'+kw+'</span></div><div>'+b.replace('___','<b>_____</b>')+'</div><input class="ti" id="k'+i+'" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="answer '+(i+1)+'"><span class="key" id="kk'+i+'" hidden></span>';$('kwt').appendChild(d)});
+$('kCheck').onclick=()=>{let n=0;KWT.forEach(([a,kw,b,acc],i)=>{const el=$('k'+i),ok=acc.map(norm).includes(norm(el.value));el.classList.toggle('ok',ok);el.classList.toggle('no',!ok);if(ok)n++;const k=$('kk'+i);k.hidden=ok;k.textContent='→ '+acc[0]});logR('kwt',n,KWT.length,KWT.filter((x,i)=>!x[3].map(norm).includes(norm($('k'+i).value))).map(x=>x[3][0]));$('kScore').textContent=n+' / '+KWT.length};
+
+const dr=$('draft');dr.value=load('draft')||'';const wc=()=>{const n=(dr.value.trim().match(/\S+/g)||[]).length;$('wc').textContent=n+' words'+(n>=100&&n<=140?' ✦ perfect length':'')};wc();dr.oninput=()=>{save('draft',dr.value);wc()};
+</script>
+</body>
+</html>
