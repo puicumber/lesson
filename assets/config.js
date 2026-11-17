@@ -15,5 +15,6 @@ window.PORTAL_ACTIVITIES = {
   lives: { cards: "Life events", order: "Order", words: "Which word?", sound: "Horse or bird?", tense: "Finished or not?", bio: "Rosa & Mia", write: "Your story" },
   adv: { adjadv: "Adjective or adverb?", pairs: "Tricky pairs", confusing: "Confusing adverbs", cmatch: "Comment adverbs: meanings", comment: "Comment adverbs: use", types: "Types", place: "Position", fix: "Final check" },
   move: { walk: "The walk", tricky: "Tricky pairs", sports: "Play, go, do", stress: "Stress", match: "The big match", verbs: "Which verb?" },
+  necklace: { words: "Words from the story", lend: "Borrow or lend?", vuln: "Vulnerable", use: "Story and surgery" },
   ppps: { signals: "Signal words", forms: "Participles", choose: "Which tense?", words: "ever, just, yet…", dialogue: "Conversation", rw: "Right or wrong?" }
 };

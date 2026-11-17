@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>The Jewellery Box</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=Mulish:wght@400;700;800&display=swap">
+<script src="../../assets/config.js?v=12"></script>
+<script src="../../assets/portal.js?v=3"></script>
+<script src="../../assets/track.js?v=2"></script>
+<style>
+/* Belle Époque jewellery box: velvet navy, gold trim, pearl progress dots. */
+:root{
+  --bg:#f6f1e7; --card:#fffdf8; --ink:#1b2340; --muted:#5d6278; --line:#e2d8c3;
+  --navy:#1f2b5c; --gold:#a87b1e; --gold-soft:#a87b1e1c; --rose:#a8325a;
+  --ok:#1d7a52; --ok-soft:#1d7a521c; --bad:#b83a32; --bad-soft:#b83a321a;
+  --display:"Cormorant Garamond",Georgia,serif; --body:"Mulish","Segoe UI",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0e1226; --card:#161c38; --ink:#efe9da; --muted:#a9acc2; --line:#2c3460;
+  --navy:#c7cff5; --gold:#e3b75a; --gold-soft:#e3b75a22; --rose:#ef8fae;
+  --ok:#7fcf9f; --ok-soft:#7fcf9f22; --bad:#f2877e; --bad-soft:#f2877e22; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e1226; --card:#161c38; --ink:#efe9da; --muted:#a9acc2; --line:#2c3460;
+  --navy:#c7cff5; --gold:#e3b75a; --gold-soft:#e3b75a22; --rose:#ef8fae;
+  --ok:#7fcf9f; --ok-soft:#7fcf9f22; --bad:#f2877e; --bad-soft:#f2877e22; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55;
+  padding:28px max(16px,env(safe-area-inset-right,0px)) 64px max(16px,env(safe-area-inset-left,0px))}
+.wrap{max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+h1,h2{font-family:var(--display);margin:0;line-height:1.05;text-wrap:balance;color:var(--navy)}
+h1{font-size:clamp(44px,8vw,72px);font-weight:700}
+h2{font-size:clamp(30px,5vw,40px);font-weight:700}
+p{margin:0}
+.eyebrow{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);font-weight:800}
+.lede{color:var(--muted);max-width:62ch}
+.tip{font-size:14px;color:var(--muted);font-style:italic}
+
+header.box{position:relative;background:var(--card);border:1px solid var(--line);border-radius:22px;padding:34px clamp(20px,5vw,44px) 28px;display:flex;flex-direction:column;gap:10px;overflow:hidden;
+  box-shadow:inset 0 0 0 6px var(--card),inset 0 0 0 7px var(--gold)}
+.pearls{display:flex;gap:7px;align-items:center;margin-bottom:4px}
+.pearls i{width:11px;height:11px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#e9e2d3 55%,#bfb59f);box-shadow:0 1px 2px #0003}
+.pearls i.gem{width:18px;height:18px;transform:rotate(45deg);border-radius:3px;background:linear-gradient(135deg,#e8f4ff,#9fc3e8 50%,#5f86b8)}
+
+nav.tabs{display:flex;flex-wrap:wrap;gap:8px}
+.tab{appearance:none;cursor:pointer;font:inherit;font-weight:700;font-size:15px;border-radius:999px;padding:8px 16px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+.tab:hover{border-color:var(--gold)}
+.tab[aria-selected="true"]{background:var(--navy);border-color:var(--navy);color:var(--card)}
+.tab.done::after{content:" ◆";color:var(--gold)}
+button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+
+section.panel{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:clamp(20px,4vw,34px);display:flex;flex-direction:column;gap:20px}
+.head{display:flex;flex-direction:column;gap:8px}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+.score{font-weight:800;color:var(--gold);font-variant-numeric:tabular-nums}
+.btn{appearance:none;cursor:pointer;font:inherit;font-weight:700;font-size:15px;border-radius:999px;padding:8px 18px;border:1px solid var(--navy);background:transparent;color:var(--navy)}
+.btn:hover{background:var(--gold-soft)}
+
+.rule{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+.rule div{background:var(--bg);border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:4px}
+.rule strong{font-family:var(--display);font-size:26px;color:var(--navy)}
+.rule span{font-size:15px}
+
+.qs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:700px){.qs{grid-template-columns:1fr}}
+.q{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.q.ok{border-color:var(--ok)}.q.no{border-color:var(--bad)}
+.q .n{font-family:var(--display);font-size:20px;color:var(--gold);font-weight:700;line-height:1}
+.q .s{font-weight:700}
+.q .s u{text-decoration:none;border-bottom:2px solid var(--gold);padding:0 4px}
+.opts{display:flex;gap:6px;flex-wrap:wrap}
+.opt{appearance:none;cursor:pointer;font:inherit;font-size:15px;border-radius:8px;padding:6px 12px;background:var(--card);color:var(--ink);border:1px solid var(--line)}
+.opt:hover{border-color:var(--gold)}
+.opt.ok{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.opt.no{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.why{font-size:14px;color:var(--muted)}
+.gloss{font-size:13px;color:var(--muted);border-top:1px dashed var(--line);padding-top:8px}
+.gloss b{color:var(--rose)}
+
+.match{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:10px 16px}
+@media (max-width:600px){.match{grid-template-columns:1fr}}
+.col{display:flex;flex-direction:column;gap:8px}
+.chip{appearance:none;cursor:pointer;font:inherit;text-align:left;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+.chip.word{font-family:var(--display);font-size:22px;font-weight:700;color:var(--navy);padding:6px 14px}
+.chip:hover{border-color:var(--gold)}
+.chip.sel{border-color:var(--gold);background:var(--gold-soft)}
+.chip.ok{border-color:var(--ok);background:var(--ok-soft);cursor:default}
+.chip.no{border-color:var(--bad);animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+
+.talk{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.talk div{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:16px;font-size:16px}
+.talk div::before{content:"◆ ";color:var(--gold)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="box">
+    <div class="pearls" aria-hidden="true"><i></i><i></i><i></i><i></i><i class="gem"></i><i></i><i></i><i></i><i></i></div>
+    <span class="eyebrow">Homework · The Necklace</span>
+    <h1>The Jewellery Box</h1>
+    <p class="lede">Words from Maupassant's story, plus <b>borrow / lend</b> and <b>vulnerable</b>, in Paris in the 1880s and in a dental clinic today. Just click: no writing.</p>
+    <p class="tip" id="saveState"></p>
+  </header>
+
+  <nav class="tabs" role="tablist" id="tabs"></nav>
+
+  <section class="panel" id="p-words" role="tabpanel">
+    <div class="head"><span class="eyebrow">Step 1</span><h2>Words from the story</h2>
+      <p class="lede">Click a word, then click its meaning.</p></div>
+    <div class="match"><div class="col" id="wW"></div><div class="col" id="wD"></div></div>
+    <div class="row"><span class="score" id="s-words"></span><button class="btn" id="r-words">Reset</button></div>
+  </section>
+
+  <section class="panel" id="p-lend" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Step 2</span><h2>Borrow or lend?</h2></div>
+    <div class="rule">
+      <div><strong>lend</strong><span>give something to someone for a while (→)</span><span class="tip">lend <b>sb</b> sth · lend sth <b>to</b> sb · lend – lent – lent</span></div>
+      <div><strong>borrow</strong><span>take something from someone for a while (←)</span><span class="tip">borrow sth <b>from</b> sb · borrow – borrowed – borrowed</span></div>
+      <div><strong>careful!</strong><span>✗ Can you borrow me your pen?</span><span class="tip">✓ Can you lend me your pen? · ✓ Can I borrow your pen?</span></div>
+    </div>
+    <div class="qs" id="lend"></div>
+    <div class="row"><span class="score" id="s-lend"></span><button class="btn" id="r-lend">Reset</button></div>
+  </section>
+
+  <section class="panel" id="p-vuln" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Step 3</span><h2>Vulnerable</h2></div>
+    <div class="rule">
+      <div><strong>vulnerable</strong><span>easily hurt or harmed, physically or emotionally</span><span class="tip">/ˈvʌl.nər.ə.bəl/ · stress on VUL, and say the L</span></div>
+      <div><strong>vulnerable to</strong><span>vulnerable <b>to</b> infection / decay / attack</span><span class="tip">noun: vulnerability</span></div>
+      <div><strong>≠ valuable</strong><span>valuable = worth a lot of money</span><span class="tip">a valuable necklace, a vulnerable patient</span></div>
+    </div>
+    <div class="qs" id="vuln"></div>
+    <div class="row"><span class="score" id="s-vuln"></span><button class="btn" id="r-vuln">Reset</button></div>
+  </section>
+
+  <section class="panel" id="p-use" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Step 4</span><h2>Story and surgery</h2>
+      <p class="lede">The same words from Step 1, now in sentences.</p></div>
+    <div class="qs" id="use"></div>
+    <div class="row"><span class="score" id="s-use"></span><button class="btn" id="r-use">Reset</button></div>
+  </section>
+
+  <section class="panel" id="p-talk" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">For our next lesson</span><h2>Think about it</h2>
+      <p class="lede">Nothing to write. Just think about these so you're ready to talk.</p></div>
+    <div class="talk">
+      <div>Have you ever borrowed something valuable and lost or broken it? What happened?</div>
+      <div>Would you lend something expensive to a friend? To a colleague?</div>
+      <div>When do patients feel most vulnerable in your chair? What do you do to help them?</div>
+      <div>Mathilde was ashamed of her circumstances. Did she deserve what happened to her?</div>
+      <div>Madame Forestier knew the truth all along, or did she? What should she do now?</div>
+      <div>What is the story really about: pride, bad luck, or something else?</div>
+    </div>
+  </section>
+</div>
+
+<script>
+const TABS=[["words","Words"],["lend","Borrow or lend?"],["vuln","Vulnerable"],["use","Story and surgery"],["talk","Think about it"]];
+const tabsEl=document.getElementById("tabs");
+TABS.forEach(([id,name])=>{const b=document.createElement("button");b.className="tab";b.setAttribute("role","tab");b.id="t-"+id;b.textContent=name;b.onclick=()=>show(id);tabsEl.appendChild(b)});
+function show(id){TABS.forEach(([t])=>{document.getElementById("p-"+t).hidden=t!==id;document.getElementById("t-"+t).setAttribute("aria-selected",t===id)});
+  try{if(location.hash!=="#"+id)history.replaceState(null,"","#"+id)}catch(e){}}
+const h0=location.hash.slice(1);show(TABS.some(t=>t[0]===h0)?h0:"words");
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const mark=(id,on=true)=>document.getElementById("t-"+id).classList.toggle("done",on);
+const TR=window.Track;const canSave=TR.online;const RESTORE=[];
+TR.onStatus(st=>{document.getElementById("saveState").textContent=!canSave?"Tip: open this page from your personal portal link to save your progress.":st==="saving"?"Saving…":st==="offline"?"No connection right now: your answers are kept on this device and will be sent later.":"Your progress saves automatically after every answer."});
+
+/* multiple choice: [sentence, options, answer, why, gloss?] */
+function choose(act,data){const el=document.getElementById(act);let ok,tried,apply;
+  const upd=()=>{document.getElementById("s-"+act).textContent=`First-try answers: ${ok} / ${tried}`;mark(act,tried===data.length)};
+  function build(){el.innerHTML="";ok=0;tried=0;apply=[];upd();
+    data.forEach(([s,opts,ans,why,gl],i)=>{const d=document.createElement("div");d.className="q";
+      d.innerHTML=`<span class="n">${i+1}</span><p class="s">${s.replace("___","<u>&nbsp;?&nbsp;</u>")}</p><div class="opts"></div><p class="why" hidden></p>${gl?`<p class="gloss">${gl}</p>`:""}`;
+      const o=d.querySelector(".opts"),w=d.querySelector(".why");let answered=false;
+      const reveal=()=>{w.hidden=false;w.textContent=why;d.querySelector(".s u").innerHTML=`&nbsp;${ans}&nbsp;`};
+      shuffle(opts).forEach(t=>{const b=document.createElement("button");b.className="opt";b.textContent=t;
+        b.onclick=()=>{if(d.classList.contains("ok"))return;o.querySelectorAll(".opt").forEach(x=>x.classList.remove("no"));const first=!answered;
+          if(t===ans){b.classList.add("ok");reveal();d.classList.remove("no");d.classList.add("ok");if(first){ok++}}
+          else{b.classList.add("no");if(first)d.classList.add("no")}
+          if(first){answered=true;tried++;TR.answer(act,i,s,t,ans,t===ans,ok,data.length);if(tried===data.length)TR.finish(act,ok,data.length)}
+          upd()};o.appendChild(b)});
+      apply[i]=rec=>{if(answered)return;answered=true;tried++;if(rec.ok)ok++;d.classList.add(rec.ok?"ok":"no");
+        o.querySelectorAll(".opt").forEach(x=>{if(x.textContent===ans)x.classList.add("ok");else if(!rec.ok&&x.textContent===rec.a)x.classList.add("no")});
+        reveal()};
+      el.appendChild(d)})}
+  build();
+  document.getElementById("r-"+act).onclick=()=>{TR.reset(act);build()};
+  RESTORE.push(S=>{const a=S[act]&&S[act].answers;if(!a)return;Object.entries(a).forEach(([i,r])=>apply[i]&&apply[i](r));upd()})}
+
+/* 1. match */
+const WD=[["circumstances","the conditions of your life, especially how much money you have"],["ashamed","feeling bad about who you are or what you have done"],["deserve","to have earned something, good or bad"],["distress","great worry, fear or unhappiness"],["hesitate","to stop for a moment because you are not sure"],["dismiss","to tell someone they no longer have a job"],["bargain","to argue about a price to make it lower"],["admire","to look at someone or something with pleasure and respect"]];
+function buildW(prev){prev=prev||{};let sel=null,ok=0,clean=0;const wrong=new Set();const W=document.getElementById("wW"),D=document.getElementById("wD"),S=document.getElementById("s-words");W.innerHTML="";D.innerHTML="";
+  const upd=()=>{S.textContent=`${ok} / ${WD.length}`;mark("words",ok===WD.length)};
+  shuffle(WD).forEach(([w])=>{const b=document.createElement("button");b.className="chip word";b.textContent=w;b.dataset.k=w;if(prev[w])b.classList.add("ok");
+    b.onclick=()=>{if(b.classList.contains("ok"))return;W.querySelectorAll(".sel").forEach(x=>x.classList.remove("sel"));b.classList.add("sel");sel=b};W.appendChild(b)});
+  shuffle(WD).forEach(([w,d])=>{const b=document.createElement("button");b.className="chip";b.textContent=d;if(prev[w]){b.classList.add("ok");ok++;if(prev[w].ok)clean++}
+    b.onclick=()=>{if(!sel||b.classList.contains("ok"))return;
+      if(sel.dataset.k===w){sel.classList.remove("sel");sel.classList.add("ok");b.classList.add("ok");sel=null;ok++;if(!wrong.has(w))clean++;upd();
+        TR.answer("words",w,w,wrong.has(w)?"mismatched first":d,d,!wrong.has(w),clean,WD.length);if(ok===WD.length)TR.finish("words",clean,WD.length)}
+      else{wrong.add(sel.dataset.k);b.classList.add("no");setTimeout(()=>b.classList.remove("no"),400)}};D.appendChild(b)});
+  upd()}
+buildW();document.getElementById("r-words").onclick=()=>{TR.reset("words");buildW()};
+RESTORE.push(S=>{const a=S.words&&S.words.answers;if(a&&Object.keys(a).length)buildW(a)});
+
+/* 2. borrow / lend */
+choose("lend",[
+ ["Mathilde's husband suggested that she ask her friend to ___ her some jewellery.",["lend","borrow"],"lend","Madame Forestier gives it for a while: lend sb sth."],
+ ["Madame Forestier let Mathilde ___ a diamond necklace.",["borrow","lend"],"borrow","Mathilde takes it for a while: borrow."],
+ ["The necklace that Madame Forestier ___ to Mathilde turned out to be fake.",["lent","borrowed"],"lent","lend sth to sb. Past: lent."],
+ ["To buy a new necklace, the Loisels ___ money from moneylenders and friends.",["borrowed","lent"],"borrowed","borrow sth from sb."],
+ ["\"Could you ___ me your curette for a second? Mine's in the steriliser.\"",["lend","borrow"],"lend","Could you lend me…? = please give it to me for a while.","<b>curette</b>: a small spoon-shaped instrument for scraping tissue or decay"],
+ ["\"I ___ a scaler from the hygienist because mine was broken.\"",["borrowed","lent"],"borrowed","I took it for a while: borrowed.","<b>scaler</b>: an instrument for removing tartar (calculus) from teeth"],
+ ["\"Can I ___ your pen? I need to sign this consent form.\"",["borrow","lend"],"borrow","Can I borrow…? You take it.","<b>consent form</b>: a document a patient signs to agree to a treatment"],
+ ["We lent our old intraoral camera ___ the clinic next door.",["to","from"],"to","lend sth TO sb."],
+ ["The new nurse borrowed a textbook on oral surgery ___ me.",["from","to"],"from","borrow sth FROM sb."],
+ ["The bank ___ the clinic the money for two new dental chairs.",["lent","borrowed"],"lent","The bank gives the money: lend sb sth."]
+]);
+
+/* 3. vulnerable */
+choose("vuln",[
+ ["Elderly patients are more vulnerable ___ infection after surgery.",["to","for","of"],"to","vulnerable TO sth."],
+ ["The diamond necklace looked extremely ___.",["valuable","vulnerable"],"valuable","valuable = worth a lot of money."],
+ ["Lying back in the chair with their mouth open, many patients feel ___.",["vulnerable","valuable"],"vulnerable","They feel they can't protect themselves."],
+ ["After losing everything, the Loisels were poor and ___.",["vulnerable","valuable"],"vulnerable","Without money or help, they could easily be hurt."],
+ ["Smoking makes the gums much more ___ to disease.",["vulnerable","resistant"],"vulnerable","more easily harmed. (resistant = not easily harmed)"],
+ ["Thin, worn ___ leaves a tooth vulnerable to decay.",["enamel","necklace","circumstances"],"enamel","Thin enamel = less protection.","<b>enamel</b>: the hard outer layer of a tooth"],
+ ["Showing your ___ can make a doctor seem more human.",["vulnerability","vulnerableness","vulnerable"],"vulnerability","The noun is vulnerability."],
+ ["Patients having chemotherapy are a ___ group, so we check their mouths very carefully.",["vulnerable","valuable"],"vulnerable","a vulnerable group = people who can easily be harmed.","<b>chemotherapy</b>: drug treatment for cancer, which often causes mouth ulcers and infections"]
+]);
+
+/* 4. words in use */
+choose("use",[
+ ["Mathilde felt that she ___ a life of luxury.",["deserved","admired","dismissed"],"deserved","deserve = have a right to something."],
+ ["Because of her ___, she couldn't afford a new dress.",["circumstances","distress","bargains"],"circumstances","her circumstances = her (poor) situation."],
+ ["When she asked what to wear, her husband ___ for a moment.",["hesitated","bargained","admired"],"hesitated","hesitate = stop because you aren't sure."],
+ ["At the party, everyone ___ her beauty.",["admired","deserved","dismissed"],"admired","admire = look at with pleasure and respect."],
+ ["To save money, they ___ their servant and moved to a tiny attic.",["dismissed","hesitated","deserved"],"dismissed","dismiss = tell someone they no longer have a job."],
+ ["Some patients are so ___ of their teeth that they never smile in photos.",["ashamed","distressed","admired"],"ashamed","ashamed of sth."],
+ ["A bride called in great ___: her crown had come off the night before the wedding.",["distress","circumstances","luxury"],"distress","in distress = very worried or upset.","<b>crown</b>: a cap that covers a damaged tooth"],
+ ["Some patients try to ___ over the price of implants, as if they were at a market.",["bargain","hesitate","dismiss"],"bargain","bargain (over sth) = argue to get a lower price.","<b>implant</b>: an artificial tooth root placed in the jawbone"]
+]);
+
+TR.init("necklace").then(S=>RESTORE.forEach(f=>{try{f(S)}catch(e){console.error(e)}}));
+</script>
+</body>
+</html>
