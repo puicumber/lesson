@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Wardrobe Talk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=Instrument+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one screen at a time on a denim ground; white woven "care labels" carry the content; stitched dashes mark progress. Single deliberate dark look. */
+:root{
+  --denim:#1d2a4a; --denim-2:#26375f; --label:#f6f4ee; --ink:#18213a;
+  --thread:#e9b43c; --tag:#e2483d; --muted:#a9b6d6; --stitch:rgba(233,180,60,.55);
+  --display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
+  --body:"Instrument Sans",ui-sans-serif,system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  color-scheme:dark;
+}
+html,body{height:100%}
+body{background:var(--denim);color:var(--label);font-family:var(--body);font-size:18px;line-height:1.45;
+  background-image:repeating-linear-gradient(135deg,rgba(255,255,255,.025) 0 2px,transparent 2px 6px);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0}
+.wrap{max-width:1100px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;gap:20px;padding-block:20px}
+header{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.brand{font-family:var(--mono);font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--thread)}
+.stitches{display:flex;gap:6px;flex:1;min-width:160px}
+.stitches button{flex:1;height:6px;border:0;border-radius:3px;background:rgba(255,255,255,.15);cursor:pointer;padding:0}
+.stitches button.on{background:var(--thread)}
+.stitches button:focus-visible{outline:2px solid var(--label);outline-offset:3px}
+main{flex:1}
+section{display:flex;flex-direction:column;gap:20px}
+h1,h2{font-family:var(--display);font-weight:800;line-height:1.05;margin:0;text-wrap:balance}
+h1{font-size:clamp(40px,7vw,84px)}
+h2{font-size:clamp(28px,4.4vw,48px)}
+.eyebrow{font-family:var(--mono);font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.speak{display:flex;gap:14px;align-items:flex-start;background:var(--thread);color:var(--ink);border-radius:6px;padding:14px 18px;font-size:clamp(18px,2.1vw,22px);font-weight:600}
+.speak b{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;background:var(--ink);color:var(--thread);padding:4px 8px;border-radius:3px;white-space:nowrap;margin-top:3px}
+.label{background:var(--label);color:var(--ink);border-radius:4px;padding:18px 20px;position:relative;
+  box-shadow:0 0 0 1px rgba(0,0,0,.1),0 10px 24px rgba(0,0,0,.25)}
+.label::after{content:"";position:absolute;inset:6px;border:1.5px dashed rgba(24,33,58,.22);border-radius:2px;pointer-events:none}
+.grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.grid>*{min-width:0}
+.card-q{font-size:clamp(18px,2vw,22px);font-weight:600}
+.small{font-size:15px;color:var(--muted)}
+.label .small{color:#5a6584}
+.btn{font:600 16px var(--body);background:var(--denim-2);color:var(--label);border:1.5px dashed var(--stitch);border-radius:6px;padding:10px 16px;cursor:pointer}
+.btn:hover{border-color:var(--thread)}
+.btn.primary{background:var(--tag);border:0;color:#fff}
+.btn:focus-visible,.pick:focus-visible{outline:3px solid var(--thread);outline-offset:3px}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+footer{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.count{font-family:var(--mono);font-size:14px;color:var(--muted)}
+/* order strip */
+.order{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.order span{font-family:var(--mono);font-size:14px;background:var(--label);color:var(--ink);padding:6px 10px;border-radius:3px}
+.order span.hot{background:var(--tag);color:#fff}
+.order i{color:var(--thread);font-style:normal}
+/* generator */
+.gen{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:20px;align-items:stretch}
+@media (max-width:720px){.gen{grid-template-columns:1fr}}
+.stage{background:var(--denim-2);border-radius:8px;display:grid;place-items:center;padding:16px;position:relative;min-height:280px}
+.stage svg{width:100%;max-width:300px;height:auto}
+.hangtag{position:absolute;top:14px;right:14px;background:var(--label);color:var(--ink);font-family:var(--mono);font-size:13px;padding:8px 10px;border-radius:3px;line-height:1.35;max-width:46%}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-family:var(--mono);font-size:17px;background:var(--denim);color:var(--label);padding:8px 12px;border-radius:4px}
+.answer{font-family:var(--display);font-weight:800;font-size:clamp(22px,3vw,32px);color:var(--tag);min-height:1.3em}
+/* traps */
+.pick{display:block;width:100%;text-align:left;font:600 clamp(18px,2vw,22px) var(--body);background:var(--label);color:var(--ink);border:2px solid transparent;border-radius:4px;padding:14px 16px;cursor:pointer}
+.pick.ok{border-color:#2f9e63;background:#e3f4ea}
+.pick.no{opacity:.45;text-decoration:line-through}
+.why{font-size:17px;color:var(--label)}
+.phrases{display:flex;flex-wrap:wrap;gap:8px}
+.phrases span{border:1.5px dashed var(--stitch);border-radius:20px;padding:6px 12px;font-size:16px}
+.statement{font-family:var(--display);font-weight:800;font-size:clamp(26px,4vw,44px);line-height:1.15;text-wrap:balance}
+.listing{display:grid;grid-template-columns:120px minmax(0,1fr);gap:10px 16px;font-size:17px}
+.listing dt{font-family:var(--mono);font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:#5a6584;padding-top:3px}
+.listing dd{margin:0;border-bottom:1.5px dashed rgba(24,33,58,.25);min-height:1.5em}
+@media (max-width:500px){.listing{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:no-preference){section.enter{animation:in .35s ease-out}@keyframes in{from{transform:translateY(8px);opacity:.4}to{transform:none;opacity:1}}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <span class="brand">Wardrobe Talk</span>
+    <nav class="stitches" id="dots" aria-label="Screens"></nav>
+  </header>
+  <main id="main"></main>
+  <footer>
+    <button class="btn" id="prev">← Back</button>
+    <span class="count" id="count"></span>
+    <button class="btn primary" id="next">Next →</button>
+  </footer>
+</div>
+
+<script>
+const $=s=>document.querySelector(s);
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+
+/* ---------- garment generator ---------- */
+const COLOURS={navy:"#2b3f78",red:"#c8352c",green:"#3f8a5a",black:"#22252b",mustard:"#d9a227",grey:"#8a909c",pink:"#e07aa0",cream:"#efe6cf"};
+const ITEMS={
+  "T-shirt":{shape:"tee",mat:["cotton","linen","lycra"],style:["V-neck","short-sleeved","long-sleeved","sleeveless"]},
+  "jacket":{shape:"jacket",mat:["wool","denim","velvet","leather","linen"],style:["hooded","cropped"]},
+  "skirt":{shape:"skirt",mat:["denim","leather","velvet","wool","silk"],style:[]},
+  "dress":{shape:"dress",mat:["silk","cotton","linen","velvet"],style:["sleeveless","long-sleeved"]},
+  "sweater":{shape:"jumper",mat:["wool","cotton"],style:["polo-neck","V-neck","hooded"]}
+};
+const OPIN=["gorgeous","scruffy","smart","ugly","stylish","old-fashioned","lovely","awful"];
+const FIT=["loose","tight","cropped"];
+const AGE=["old","new","vintage"];
+const PAT=["striped","checked","spotted","plain","patterned"];
+function patDef(p,c){
+  const light="rgba(255,255,255,.75)";
+  if(p==="striped")return `<pattern id="pt" width="16" height="16" patternUnits="userSpaceOnUse"><rect width="16" height="16" fill="${c}"/><rect width="16" height="6" fill="${light}"/></pattern>`;
+  if(p==="checked")return `<pattern id="pt" width="24" height="24" patternUnits="userSpaceOnUse"><rect width="24" height="24" fill="${c}"/><rect width="12" height="24" fill="rgba(0,0,0,.28)"/><rect width="24" height="12" fill="rgba(0,0,0,.28)"/><rect width="12" height="12" fill="rgba(255,255,255,.18)"/></pattern>`;
+  if(p==="spotted")return `<pattern id="pt" width="20" height="20" patternUnits="userSpaceOnUse"><rect width="20" height="20" fill="${c}"/><circle cx="6" cy="6" r="3.2" fill="${light}"/><circle cx="16" cy="16" r="3.2" fill="${light}"/></pattern>`;
+  if(p==="patterned")return `<pattern id="pt" width="34" height="34" patternUnits="userSpaceOnUse"><rect width="34" height="34" fill="${c}"/><g fill="${light}"><circle cx="9" cy="9" r="3"/><circle cx="14" cy="9" r="3"/><circle cx="11.5" cy="5" r="3"/><circle cx="11.5" cy="12" r="3"/></g><circle cx="11.5" cy="8.5" r="2" fill="#e9b43c"/><path d="M24 22 q6 -6 8 4" stroke="${light}" stroke-width="2" fill="none"/></pattern>`;
+  return `<pattern id="pt" width="10" height="10" patternUnits="userSpaceOnUse"><rect width="10" height="10" fill="${c}"/></pattern>`;
+}
+const SHAPES={
+  tee:`<path d="M70 30 L110 18 Q130 38 150 18 L190 30 L232 70 L205 100 L188 86 L188 250 L72 250 L72 86 L55 100 L28 70 Z"/>`,
+  jacket:`<path d="M80 26 L112 16 L130 70 L148 16 L180 26 L222 60 L232 230 L200 232 L196 110 L194 252 L66 252 L64 110 L60 232 L28 230 L38 60 Z"/><path d="M130 70 L130 252" stroke="rgba(0,0,0,.35)" stroke-width="3" fill="none"/>`,
+  skirt:`<path d="M84 40 L176 40 L176 62 L224 240 L36 240 L84 62 Z"/><rect x="84" y="40" width="92" height="22" fill="rgba(0,0,0,.25)"/>`,
+  dress:`<path d="M98 18 Q130 44 162 18 L172 30 L160 110 L222 252 L38 252 L100 110 L88 30 Z"/>`,
+  jumper:`<path d="M96 24 L164 24 L190 34 L230 120 L232 236 L206 238 L196 120 L192 250 L68 250 L64 120 L54 238 L28 236 L30 120 L70 34 Z"/><rect x="104" y="12" width="52" height="22" rx="4" fill="rgba(0,0,0,.25)"/>`
+};
+function garmentSVG(shape,pat,colour){
+  return `<svg viewBox="0 0 260 270" role="img" aria-label="garment"><defs>${patDef(pat,COLOURS[colour])}</defs><g fill="url(#pt)" stroke="rgba(0,0,0,.45)" stroke-width="2.5" stroke-linejoin="round">${SHAPES[shape]}</g></svg>`;
+}
+function newGarment(){
+  const name=pick(Object.keys(ITEMS)), it=ITEMS[name];
+  const colourName=pick(Object.keys(COLOURS)), pat=pick(PAT), mat=pick(it.mat);
+  const style=it.style.length&&Math.random()<.5?pick(it.style):null;
+  const o=pick(OPIN), a=pick(AGE);
+  const fit=Math.random()<.35?pick(FIT):null;
+  // Order: opinion, fit, age, colour, pattern, material, style, noun. Keep it to 4-5 words so it's sayable.
+  let parts=[["opinion",o]];
+  if(fit)parts.push(["fit",fit]);
+  parts.push(["age",a]);
+  const extras=[["colour",colourName],["pattern",pat],["material",mat]];
+  shuffle(extras).slice(0,fit?1:2).forEach(e=>parts.push(e));
+  if(style&&parts.length<5)parts.push(["style",style]);
+  const rank={opinion:1,fit:2,age:3,colour:4,pattern:5,material:6,style:7};
+  parts.sort((x,y)=>rank[x[0]]-rank[y[0]]);
+  const words=parts.map(p=>p[1]);
+  const art=/^[aeiou]/i.test(words[0])?"an":"a";
+  const phrase=`${art} ${words.join(" ")} ${name}`;
+  return {name,shape:it.shape,pat,colourName,mat,style,o,a,fit,words:shuffle(words),phrase};
+}
+function renderGarment(){
+  const g=newGarment();
+  $("#g-stage").innerHTML=garmentSVG(g.shape,g.pat,g.colourName)+
+    `<div class="hangtag">100% ${g.mat}<br>${g.a==="vintage"?"vintage · 1978":g.a==="old"?"bought 2015":"brand new"}<br>verdict: ${g.o}</div>`;
+  $("#g-chips").innerHTML=g.words.map(w=>`<span class="chip">${w}</span>`).join("")+`<span class="chip" style="background:#e2483d">${g.name}</span>`;
+  $("#g-ans").textContent="";
+  $("#g-ans").dataset.a=g.phrase;
+}
+
+/* ---------- content ---------- */
+const TRAPS=[
+  {a:"scruffy old jeans",b:"old scruffy jeans",why:"Scruffy is your judgement of how they look, even if it's about their condition. Opinion first, then age."},
+  {a:"dirty old shoes",b:"old dirty shoes",why:"Same pattern: dirty, scruffy, worn-out, shabby all behave like opinion words and come before old."},
+  {a:"a lovely new leather jacket",b:"a new lovely leather jacket",why:"Lovely is pure opinion, so it opens the phrase. New is age, leather is material."},
+  {a:"an old-fashioned woollen cardigan",b:"a woollen old-fashioned cardigan",why:"Old-fashioned is an opinion (out of style), not age. Material always sits right next to the noun."},
+  {a:"a smart new navy suit",b:"a new smart navy suit",why:"Smart is opinion. Age, then colour. Try saying the wrong one aloud: it sounds like 'a new type of smart suit'."},
+  {a:"a gorgeous vintage silk scarf",b:"a vintage gorgeous silk scarf",why:"Vintage acts like age here, so it goes after gorgeous and before the material."},
+  {a:"a tight black lycra top",b:"a black tight lycra top",why:"Fit (tight, loose) is like size: it comes before colour."},
+  {a:"a cheap old checked shirt",b:"an old cheap checked shirt",why:"Cheap is opinion. Old, then pattern, then the noun."}
+];
+const SCENES=[
+  {s:"You spill coffee on your white shirt ten minutes before a video call with a client.",h:"get changed · go with"},
+  {s:"Your friend tries on a mustard dress in a shop. It is perfect on her.",h:"suit · look great in"},
+  {s:"You order jeans online. They arrive and you can't even close them.",h:"fit · be too small"},
+  {s:"A colleague arrives in a green tie and an orange checked shirt.",h:"go with · match"},
+  {s:"The invitation to the company party says: smart dress code.",h:"dress up · smart · casual"},
+  {s:"You come home after a twelve-hour day and your partner says dinner is in two minutes.",h:"get changed · hang up · get undressed"},
+  {s:"Your bag and your shoes are almost exactly the same red.",h:"match · go with"},
+  {s:"It's 7 a.m., you overslept, and the taxi is outside.",h:"get dressed · scruffy · whatever is clean"}
+];
+const PLACES=[
+  ["a job interview at a big bank","Would your usual work clothes be OK? What would you change?"],
+  ["a tech conference where you're giving a talk","Smart, casual, or something in between?"],
+  ["a video call with a new client","Only the top half matters. True or not?"],
+  ["a friend's wedding","Describe the outfit with at least three adjectives in order."],
+  ["sightseeing in a hot city","Comfort or style? What would you never wear?"],
+  ["a weekend hackathon","What's the unofficial uniform? Do you follow it?"]
+];
+const HOT=[
+  "Second-hand clothes are for students. Grown-ups buy new.",
+  "Men care about shopping just as much as women. They just pretend they don't.",
+  "If you want to look good, you have to suffer a bit. Comfort is boring.",
+  "You can tell everything about someone from their shoes.",
+  "Cheap fashion isn't our problem. Shoppers shouldn't feel guilty.",
+  "Developers dress badly because they don't care what anyone thinks.",
+  "After 35, nobody should wear a hoodie in public.",
+  "Mothers and daughters shouldn't share clothes. It's a bit weird."
+];
+const WARM=[
+  "The oldest thing in your wardrobe that you still wear.",
+  "Something you bought and wore only once. What went wrong?",
+  "Something you borrowed from family or a friend and never gave back.",
+  "Your 'work from home' uniform, honestly.",
+  "A piece of clothing that totally suits you, and why."
+];
+
+let ti=0,si=0,pi=0,hi=0;
+const SCREENS=[
+ {t:"Can the same clothes work for all ages?",r:()=>`
+   <span class="eyebrow">Today</span>
+   <h1>Can the same clothes work for all ages?</h1>
+   <div class="speak"><b>Speak</b><span>Give your verdict first, then three reasons. Use one example: a person you know, a celebrity, or yourself.</span></div>
+   <div class="grid">
+     <div class="label"><div class="card-q">54% of British women borrow clothes from their mothers.</div><p class="small">Surprised? Would that work in your family?</p></div>
+     <div class="label"><div class="card-q">"It's not about what you should wear when you're young or old."</div><p class="small">Agree completely, or only up to a point?</p></div>
+   </div>`},
+ {t:"Warm-up: your wardrobe",r:()=>`
+   <span class="eyebrow">Warm-up</span>
+   <h2>Open your wardrobe</h2>
+   <div class="speak"><b>Speak</b><span>Pick two. Describe the item first (what it looks like), then tell its story.</span></div>
+   <div class="grid">${WARM.map(w=>`<div class="label card-q">${w}</div>`).join("")}</div>`},
+ {t:"Adjective order",r:()=>`
+   <span class="eyebrow">The order on the label</span>
+   <h2>Describe it like a shop assistant</h2>
+   <div class="order"><span class="hot">opinion</span><i>→</i><span>fit</span><i>→</i><span class="hot">age</span><i>→</i><span>colour</span><i>→</i><span>pattern</span><i>→</i><span>material</span><i>→</i><span>style</span><i>→</i><span>noun</span></div>
+   <div class="gen">
+     <div class="stage" id="g-stage"></div>
+     <div class="label" style="display:flex;flex-direction:column;gap:14px">
+       <div class="small">Put these in the right order</div>
+       <div class="chips" id="g-chips"></div>
+       <div class="answer" id="g-ans" aria-live="polite"></div>
+       <div class="row"><button class="btn primary" id="g-rev">Show the answer</button><button class="btn" id="g-new" style="color:var(--ink);background:transparent;border-color:rgba(24,33,58,.4)">New item</button></div>
+     </div>
+   </div>
+   <div class="speak"><b>Speak</b><span>Say the full phrase, then one more sentence: who would wear it, and where?</span></div>`,
+   init(){renderGarment();$("#g-rev").onclick=()=>{$("#g-ans").textContent=$("#g-ans").dataset.a};$("#g-new").onclick=renderGarment}},
+ {t:"Opinion or age?",r:()=>{const t=TRAPS[ti];const opts=shuffle([t.a,t.b]);return `
+   <span class="eyebrow">Trap ${ti+1} of ${TRAPS.length}</span>
+   <h2>Which one sounds natural?</h2>
+   <div class="speak"><b>Speak</b><span>Choose one and defend it before we check. "Both are possible" is not allowed.</span></div>
+   <div class="grid" id="trap">${opts.map(o=>`<button class="pick" data-o="${o}">${o}</button>`).join("")}</div>
+   <p class="why" id="why" hidden>${t.why}</p>
+   <div class="row"><button class="btn" id="t-next">Next trap</button></div>`},
+   init(){document.querySelectorAll("#trap .pick").forEach(b=>b.onclick=()=>{
+       document.querySelectorAll("#trap .pick").forEach(x=>x.classList.add(x.dataset.o===TRAPS[ti].a?"ok":"no"));$("#why").hidden=false});
+     $("#t-next").onclick=()=>{ti=(ti+1)%TRAPS.length;show(cur)}}},
+ {t:"What would you do?",r:()=>{const s=SCENES[si];return `
+   <span class="eyebrow">Situation ${si+1} of ${SCENES.length}</span>
+   <h2>Tell me what happens next</h2>
+   <div class="label"><div class="statement">${s.s}</div></div>
+   <div class="speak"><b>Speak</b><span>What do you say, and what do you do? Use at least one phrase from the bank.</span></div>
+   <div class="row"><button class="btn" id="s-hint">Phrase bank</button><span id="s-h" class="phrases" hidden><span>${s.h.split(" · ").join("</span><span>")}</span></span></div>
+   <div class="row"><button class="btn" id="s-next">Next situation</button></div>`},
+   init(){$("#s-hint").onclick=()=>{$("#s-h").hidden=false};$("#s-next").onclick=()=>{si=(si+1)%SCENES.length;show(cur)}}},
+ {t:"Dress code",r:()=>`
+   <span class="eyebrow">Dress code</span>
+   <h2>What would you wear, and what would you never wear?</h2>
+   <div class="speak"><b>Speak</b><span>For each place: one item you'd wear and one you wouldn't. Describe both with adjectives in order.</span></div>
+   <div class="grid">${PLACES.map(p=>`<div class="label"><div class="card-q">to ${p[0]}</div><p class="small">${p[1]}</p></div>`).join("")}</div>`},
+ {t:"Hot takes",r:()=>`
+   <span class="eyebrow">Hot take ${hi+1} of ${HOT.length}</span>
+   <h2>Polina says…</h2>
+   <div class="label"><div class="statement">"${HOT[hi]}"</div></div>
+   <div class="speak"><b>Speak</b><span>Push back. Give a reason and an example. Finish the round with "So, to sum up…"</span></div>
+   <div class="phrases"><span>Sorry, but I don't agree.</span><span>True, but…</span><span>I'm not sure about that.</span><span>I agree up to a point, but…</span><span>Let's go back to…</span><span>So, to sum up…</span></div>
+   <div class="row"><button class="btn" id="h-next">Next hot take</button></div>`,
+   init(){$("#h-next").onclick=()=>{hi=(hi+1)%HOT.length;show(cur)}}},
+ {t:"Sell it",r:()=>`
+   <span class="eyebrow">Last round</span>
+   <h2>Sell something from your wardrobe</h2>
+   <div class="speak"><b>Speak</b><span>Pick a real item and sell it out loud, like a live online auction. Polina is the buyer.</span></div>
+   <div class="label">
+     <dl class="listing">
+       <dt>Title</dt><dd>three adjectives in the right order + the item</dd>
+       <dt>Size &amp; fit</dt><dd>loose? tight? does it fit you?</dd>
+       <dt>Condition</dt><dd>new with tags, worn twice, a bit scruffy…</dd>
+       <dt>Goes with</dt><dd>what would it match, who would it suit?</dd>
+       <dt>Why sell</dt><dd>be honest, or creative</dd>
+       <dt>Starting price</dt><dd>and why it's a bargain</dd>
+     </dl>
+   </div>`}
+];
+let cur=0;
+function show(i){
+  cur=Math.max(0,Math.min(SCREENS.length-1,i));
+  const sc=SCREENS[cur];
+  $("#main").innerHTML=`<section class="enter">${sc.r()}</section>`;
+  sc.init&&sc.init();
+  $("#count").textContent=`${cur+1} / ${SCREENS.length}`;
+  $("#prev").disabled=cur===0;$("#next").disabled=cur===SCREENS.length-1;
+  document.querySelectorAll("#dots button").forEach((b,k)=>b.classList.toggle("on",k<=cur));
+}
+$("#dots").innerHTML=SCREENS.map((s,k)=>`<button aria-label="${s.t}" title="${s.t}"></button>`).join("");
+document.querySelectorAll("#dots button").forEach((b,k)=>b.onclick=()=>show(k));
+$("#prev").onclick=()=>show(cur-1);$("#next").onclick=()=>show(cur+1);
+document.addEventListener("keydown",e=>{if(e.target.closest("input,textarea"))return;if(e.key==="ArrowRight")show(cur+1);if(e.key==="ArrowLeft")show(cur-1)});
+show(0);
+</script>
+</body>
+</html>

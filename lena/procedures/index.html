@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Before We Begin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;800&family=Nunito+Sans:ital,wght@0,400;0,700;0,800;1,400&display=swap">
+<script src="../../assets/config.js?v=16"></script>
+<script src="../../assets/portal.js?v=3"></script>
+<script src="../../assets/track.js?v=2"></script>
+<style>
+/* Calm consultation room: soft mint, deep teal, a coral heartbeat line. */
+:root{
+  --bg:#eef6f3; --card:#ffffff; --ink:#12302c; --muted:#557069; --line:#cfe3dc;
+  --teal:#0f6b5f; --teal-soft:#0f6b5f14; --coral:#d4573f; --coral-soft:#d4573f1c;
+  --ok:#1b7f4b; --ok-soft:#1b7f4b1c; --bad:#c03b33; --bad-soft:#c03b331a;
+  --display:"Sora","Trebuchet MS",system-ui,sans-serif; --body:"Nunito Sans","Segoe UI",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0b1a18; --card:#12261f; --ink:#e3f2ed; --muted:#9dbab1; --line:#24443c;
+  --teal:#6fd3bf; --teal-soft:#6fd3bf1c; --coral:#ff9a83; --coral-soft:#ff9a8322;
+  --ok:#7fd6a0; --ok-soft:#7fd6a022; --bad:#f48a80; --bad-soft:#f48a8022; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0b1a18; --card:#12261f; --ink:#e3f2ed; --muted:#9dbab1; --line:#24443c;
+  --teal:#6fd3bf; --teal-soft:#6fd3bf1c; --coral:#ff9a83; --coral-soft:#ff9a8322;
+  --ok:#7fd6a0; --ok-soft:#7fd6a022; --bad:#f48a80; --bad-soft:#f48a8022; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55;
+  padding:28px max(16px,env(safe-area-inset-right,0px)) 64px max(16px,env(safe-area-inset-left,0px))}
+.wrap{max-width:920px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+h1,h2{font-family:var(--display);margin:0;line-height:1.08;text-wrap:balance;color:var(--teal)}
+h1{font-size:clamp(38px,7vw,62px);font-weight:800;letter-spacing:-.02em}
+h2{font-size:clamp(26px,4vw,34px);font-weight:800;letter-spacing:-.01em}
+p{margin:0}
+.eyebrow{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--coral);font-weight:800}
+.lede{color:var(--muted);max-width:64ch}
+.tip{font-size:14px;color:var(--muted);font-style:italic}
+
+header.room{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:30px clamp(20px,5vw,44px) 26px;display:flex;flex-direction:column;gap:10px;overflow:hidden}
+.pulse{width:100%;max-width:420px;height:46px;color:var(--coral)}
+.pulse path{stroke-dasharray:600;stroke-dashoffset:600;animation:beat 2.4s ease-out forwards}
+@keyframes beat{to{stroke-dashoffset:0}}
+
+nav.tabs{display:flex;flex-wrap:wrap;gap:8px}
+.tab{appearance:none;cursor:pointer;font:inherit;font-weight:800;font-size:15px;border-radius:12px;padding:8px 14px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+.tab:hover{border-color:var(--teal)}
+.tab[aria-selected="true"]{background:var(--teal);border-color:var(--teal);color:var(--card)}
+.tab.done::after{content:" ✓"}
+button:focus-visible{outline:3px solid var(--coral);outline-offset:2px}
+
+section.panel{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:clamp(20px,4vw,34px);display:flex;flex-direction:column;gap:20px}
+.head{display:flex;flex-direction:column;gap:8px}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+.score{font-weight:800;color:var(--teal);font-variant-numeric:tabular-nums}
+.btn{appearance:none;cursor:pointer;font:inherit;font-weight:800;font-size:15px;border-radius:12px;padding:8px 18px;border:1px solid var(--teal);background:transparent;color:var(--teal)}
+.btn:hover{background:var(--teal-soft)}
+
+.rule{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.rule div{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:4px}
+.rule strong{font-family:var(--display);font-size:18px;color:var(--teal)}
+.rule span{font-size:15px}
+
+.qs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.qs.one{grid-template-columns:1fr}
+@media (max-width:700px){.qs{grid-template-columns:1fr}}
+.q{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.q.ok{border-color:var(--ok)}.q.no{border-color:var(--bad)}
+.q .n{font-family:var(--display);font-size:14px;color:var(--coral);font-weight:800}
+.q .s{font-weight:700}
+.q .s u{text-decoration:none;border-bottom:2px solid var(--coral);padding:0 4px}
+.q .s mark{background:var(--coral-soft);color:inherit;border-radius:4px;padding:0 4px}
+.opts{display:flex;gap:6px;flex-wrap:wrap}
+.qs.one .opts{flex-direction:column;align-items:stretch}
+.qs.one .opt{text-align:left}
+.opt{appearance:none;cursor:pointer;font:inherit;font-size:15px;border-radius:10px;padding:7px 12px;background:var(--card);color:var(--ink);border:1px solid var(--line)}
+.opt:hover{border-color:var(--teal)}
+.opt.ok{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.opt.no{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.why{font-size:14px;color:var(--muted)}
+
+.match{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:10px 16px}
+@media (max-width:600px){.match{grid-template-columns:1fr}}
+.col{display:flex;flex-direction:column;gap:8px}
+.chip{appearance:none;cursor:pointer;font:inherit;text-align:left;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+.chip.word{font-family:var(--display);font-weight:800;color:var(--teal);font-size:16px}
+.chip:hover{border-color:var(--teal)}
+.chip.sel{border-color:var(--coral);background:var(--coral-soft)}
+.chip.ok{border-color:var(--ok);background:var(--ok-soft);cursor:default}
+.chip.no{border-color:var(--bad);animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+
+.steps{counter-reset:s;display:flex;flex-direction:column;gap:10px;padding:0;margin:0}
+.steps li{list-style:none;counter-increment:s;background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:14px 16px 14px 56px;position:relative}
+.steps li::before{content:counter(s);position:absolute;left:16px;top:12px;width:28px;height:28px;border-radius:50%;background:var(--teal);color:var(--card);font-weight:800;display:grid;place-items:center;font-size:14px}
+.steps .tip{display:block;margin-top:4px}
+.toolbox{display:flex;flex-wrap:wrap;gap:8px}
+.toolbox span{background:var(--coral-soft);border-radius:999px;padding:4px 12px;font-size:15px;font-weight:700}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.pulse path{stroke-dashoffset:0}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="room">
+    <svg class="pulse" viewBox="0 0 420 46" aria-hidden="true"><path d="M0 23 H150 L162 23 L172 6 L184 40 L196 14 L206 23 H420" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span class="eyebrow">Homework · Explaining procedures</span>
+    <h1>Before We Begin</h1>
+    <p class="lede">How to explain a procedure so the patient understands it and stays calm: plain words, <b>be going to</b>, <b>What…</b> sentences and reassuring language. Just click: no writing.</p>
+    <p class="tip" id="saveState"></p>
+  </header>
+
+  <nav class="tabs" role="tablist" id="tabs"></nav>
+
+  <section class="panel" id="p-procs" role="tabpanel">
+    <div class="head"><span class="eyebrow">Step 1</span><h2>Which procedure?</h2>
+      <p class="lede">Click a procedure, then click what happens during it.</p></div>
+    <div class="match"><div class="col" id="pW"></div><div class="col" id="pD"></div></div>
+    <div class="row"><span class="score" id="s-procs"></span><button class="btn" id="r-procs">Reset</button></div>
+  </section>
+
+  <section class="panel" id="p-plain" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Step 2</span><h2>Say it simply</h2>
+      <p class="lede">Patients don't speak Latin. Which word would you use with a patient?</p></div>
+    <div class="qs" id="plain"></div>
+    <div class="row"><span class="score" id="s-plain"></span><button class="btn" id="r-plain">Reset</button></div>
+  </section>
+
+  <section class="panel" id="p-calm" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Step 3</span><h2>Reassuring or not?</h2>
+      <p class="lede">Would this sentence calm a nervous patient down?</p></div>
+    <div class="qs" id="calm"></div>
+    <div class="row"><span class="score" id="s-calm"></span><button class="btn" id="r-calm">Reset</button></div>
+  </section>
+
+  <section class="panel" id="p-soften" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Step 4</span><h2>Softer words</h2>
+      <p class="lede">Which word can replace the <mark style="background:var(--coral-soft);color:inherit;border-radius:4px;padding:0 4px">highlighted</mark> one without changing the meaning?</p></div>
+    <div class="toolbox" aria-label="Words to use"><span>a little bit</span><span>a little</span><span>small</span><span>just</span><span>barely</span><span>pinprick</span><span>straightforward</span></div>
+    <div class="qs" id="soften"></div>
+    <div class="row"><span class="score" id="s-soften"></span><button class="btn" id="r-soften">Reset</button></div>
+  </section>
+
+  <section class="panel" id="p-going" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Step 5</span><h2>Tell the patient</h2>
+      <p class="lede">The textbook sentence is passive and full of jargon. Which version would you actually say to the patient?</p></div>
+    <div class="rule">
+      <div><strong>be going to</strong><span>The clearest way to explain a procedure, even before the patient has agreed.</span><span class="tip">We're going to give you a mild sedative.</span></div>
+      <div><strong>we, not "it is done"</strong><span>Say who does it. Passive sounds cold and distant.</span><span class="tip">✗ The tooth is extracted. ✓ We're going to take the tooth out.</span></div>
+    </div>
+    <div class="qs one" id="going"></div>
+    <div class="row"><span class="score" id="s-going"></span><button class="btn" id="r-going">Reset</button></div>
+  </section>
+
+  <section class="panel" id="p-what" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Step 6</span><h2>What we're going to do is…</h2></div>
+    <div class="rule">
+      <div><strong>What + subject + verb + is + infinitive</strong><span>What we're going to do <b>is</b> take a tiny sample.</span><span class="tip">Usually no "to" after is (is to take is also OK). Never "-ing".</span></div>
+      <div><strong>What happens + is that + clause</strong><span>What happens next <b>is that</b> we numb the area.</span><span class="tip">Also: What happens then is that…</span></div>
+    </div>
+    <div class="qs" id="what"></div>
+    <div class="row"><span class="score" id="s-what"></span><button class="btn" id="r-what">Reset</button></div>
+  </section>
+
+  <section class="panel" id="p-talk" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Your turn: out loud</span><h2>Talk me through it</h2>
+      <p class="lede">A nervous patient needs a wisdom tooth out. Explain the procedure out loud, one step at a time. Use <b>be going to</b>, a <b>What…</b> sentence and at least two softer words. No writing: just say it, and we'll do it together in the next lesson.</p></div>
+    <ol class="steps">
+      <li>Say what the procedure is and why the patient needs it. <span class="tip">It's a very straightforward procedure. What we're going to do is…</span></li>
+      <li>Explain the anaesthetic. <span class="tip">All you'll feel is a little pinprick…</span></li>
+      <li>Explain how the tooth comes out. <span class="tip">What happens next is that… You might feel a little bit of pressure, but…</span></li>
+      <li>Explain the stitches. <span class="tip">After that, we're going to… You'll barely notice them.</span></li>
+      <li>Say what happens afterwards and how long it takes. <span class="tip">It just takes… You'll feel a little sore for a day or two.</span></li>
+    </ol>
+  </section>
+</div>
+
+<script>
+const TABS=[["procs","Procedures"],["plain","Say it simply"],["calm","Reassuring?"],["soften","Softer words"],["going","Tell the patient"],["what","What…"],["talk","Your turn"]];
+const tabsEl=document.getElementById("tabs");
+TABS.forEach(([id,name])=>{const b=document.createElement("button");b.className="tab";b.setAttribute("role","tab");b.id="t-"+id;b.textContent=name;b.onclick=()=>show(id);tabsEl.appendChild(b)});
+function show(id){TABS.forEach(([t])=>{document.getElementById("p-"+t).hidden=t!==id;document.getElementById("t-"+t).setAttribute("aria-selected",t===id)});
+  try{if(location.hash!=="#"+id)history.replaceState(null,"","#"+id)}catch(e){}}
+const h0=location.hash.slice(1);show(TABS.some(t=>t[0]===h0)?h0:"procs");
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const mark=(id,on=true)=>document.getElementById("t-"+id).classList.toggle("done",on);
+const TR=window.Track;const canSave=TR.online;const RESTORE=[];
+TR.onStatus(st=>{document.getElementById("saveState").textContent=!canSave?"Tip: open this page from your personal portal link to save your progress.":st==="saving"?"Saving…":st==="offline"?"No connection right now: your answers are kept on this device and will be sent later.":"Your progress saves automatically after every answer."});
+
+/* multiple choice: [sentence, options, answer, why, keepOrder?] */
+function choose(act,data){const el=document.getElementById(act);let ok,tried,apply;
+  const upd=()=>{document.getElementById("s-"+act).textContent=`First-try answers: ${ok} / ${tried}`;mark(act,tried===data.length)};
+  function build(){el.innerHTML="";ok=0;tried=0;apply=[];upd();
+    data.forEach(([s,opts,ans,why,keep],i)=>{const d=document.createElement("div");d.className="q";
+      d.innerHTML=`<span class="n">${i+1}</span><p class="s">${s.replace("___","<u>&nbsp;?&nbsp;</u>")}</p><div class="opts"></div><p class="why" hidden></p>`;
+      const o=d.querySelector(".opts"),w=d.querySelector(".why"),u=d.querySelector(".s u");let answered=false;
+      const reveal=()=>{w.hidden=false;w.textContent=why;if(u)u.innerHTML=`&nbsp;${ans}&nbsp;`};
+      (keep?opts:shuffle(opts)).forEach(t=>{const b=document.createElement("button");b.className="opt";b.textContent=t;
+        b.onclick=()=>{if(d.classList.contains("ok"))return;o.querySelectorAll(".opt").forEach(x=>x.classList.remove("no"));const first=!answered;
+          if(t===ans){b.classList.add("ok");reveal();d.classList.remove("no");d.classList.add("ok");if(first)ok++}
+          else{b.classList.add("no");if(first)d.classList.add("no")}
+          if(first){answered=true;tried++;TR.answer(act,i,s.replace(/<[^>]+>/g,""),t,ans,t===ans,ok,data.length);if(tried===data.length)TR.finish(act,ok,data.length)}
+          upd()};o.appendChild(b)});
+      apply[i]=rec=>{if(answered)return;answered=true;tried++;if(rec.ok)ok++;d.classList.add(rec.ok?"ok":"no");
+        o.querySelectorAll(".opt").forEach(x=>{if(x.textContent===ans)x.classList.add("ok");else if(!rec.ok&&x.textContent===rec.a)x.classList.add("no")});
+        reveal()};
+      el.appendChild(d)})}
+  build();
+  document.getElementById("r-"+act).onclick=()=>{TR.reset(act);build()};
+  RESTORE.push(S=>{const a=S[act]&&S[act].answers;if(!a)return;Object.entries(a).forEach(([i,r])=>apply[i]&&apply[i](r));upd()})}
+
+/* 1. match procedures */
+const PR=[["cystoscopy","A thin tube with a camera goes past the prostate into the bladder."],["catheterization","A thin tube is passed through the urethra to drain urine."],["colonoscopy","A camera looks inside the large bowel, and a small sample may be taken."],["colostomy","The end of the bowel is attached to an opening in the tummy."],["colposcopy","The doctor looks closely at the neck of the womb and takes a sample."],["bronchoscopy","A tube goes down into the airways and a sample is taken from the lung."],["ERCP","Dye is injected into the pancreatic and bile ducts so they show on an X-ray."],["radical mastectomy","The breast is removed, and the glands in the armpit too."],["herniorrhaphy","A weak muscle wall is repaired with a mesh."]];
+function buildP(prev){prev=prev||{};let sel=null,ok=0,clean=0;const wrong=new Set();const W=document.getElementById("pW"),D=document.getElementById("pD"),S=document.getElementById("s-procs");W.innerHTML="";D.innerHTML="";
+  const upd=()=>{S.textContent=`${ok} / ${PR.length}`;mark("procs",ok===PR.length)};
+  shuffle(PR).forEach(([w])=>{const b=document.createElement("button");b.className="chip word";b.textContent=w;b.dataset.k=w;if(prev[w])b.classList.add("ok");
+    b.onclick=()=>{if(b.classList.contains("ok"))return;W.querySelectorAll(".sel").forEach(x=>x.classList.remove("sel"));b.classList.add("sel");sel=b};W.appendChild(b)});
+  shuffle(PR).forEach(([w,d])=>{const b=document.createElement("button");b.className="chip";b.textContent=d;if(prev[w]){b.classList.add("ok");ok++;if(prev[w].ok)clean++}
+    b.onclick=()=>{if(!sel||b.classList.contains("ok"))return;
+      if(sel.dataset.k===w){sel.classList.remove("sel");sel.classList.add("ok");b.classList.add("ok");sel=null;ok++;if(!wrong.has(w))clean++;upd();
+        TR.answer("procs",w,w,wrong.has(w)?"mismatched first":d,d,!wrong.has(w),clean,PR.length);if(ok===PR.length)TR.finish("procs",clean,PR.length)}
+      else{wrong.add(sel.dataset.k);b.classList.add("no");setTimeout(()=>b.classList.remove("no"),400)}};D.appendChild(b)});
+  upd()}
+buildP();document.getElementById("r-procs").onclick=()=>{TR.reset("procs");buildP()};
+RESTORE.push(S=>{const a=S.procs&&S.procs.answers;if(a&&Object.keys(a).length)buildP(a)});
+
+/* 2. plain words */
+choose("plain",[
+ ["<mark>bowel</mark>",["gut","armpit","gum"],"gut","Bowel is fine with many patients too, but gut is the everyday word."],
+ ["<mark>axilla</mark>",["armpit","jaw","tummy"],"armpit","axilla = armpit."],
+ ["<mark>abdomen</mark>",["tummy","chest","back"],"tummy","abdomen = tummy (or stomach, in everyday speech)."],
+ ["<mark>cervix</mark>",["the neck of the womb","the neck","the throat"],"the neck of the womb","cervix = the neck of the womb."],
+ ["<mark>sutures</mark>",["stitches","plasters","needles"],"stitches","sutures = stitches."],
+ ["<mark>mandible</mark>",["lower jaw","upper jaw","cheekbone"],"lower jaw","mandible = lower jaw; maxilla = upper jaw."],
+ ["<mark>gingiva</mark>",["gum","tongue","lip"],"gum","gingiva = gum."],
+ ["<mark>analgesic</mark>",["painkiller","sedative","antibiotic"],"painkiller","analgesic = painkiller."]
+]);
+
+/* 3. reassuring or not */
+const RN=["reassuring","not reassuring"];
+choose("calm",[
+ ["It's a routine procedure. We do it every day.",RN,"reassuring","routine = normal and common.",1],
+ ["It'll take forty minutes.",RN,"not reassuring","Just a fact with nothing to soften it. Better: It only takes about forty minutes.",1],
+ ["You'll barely feel a thing.",RN,"reassuring","barely = almost not.",1],
+ ["It's not a pleasant procedure.",RN,"not reassuring","Honest, but it makes the patient more afraid.",1],
+ ["You might feel a little bit of pressure, nothing more.",RN,"reassuring","a little bit + nothing more make it sound small.",1],
+ ["There's going to be quite a lot of blood.",RN,"not reassuring","Focuses on the scary part.",1],
+ ["All you'll feel is a small pinprick.",RN,"reassuring","All you'll feel is… + small + pinprick.",1],
+ ["Try not to move, or I might damage the nerve.",RN,"not reassuring","Better: Just keep still for me, you're doing really well.",1]
+]);
+
+/* 4. softer words */
+choose("soften",[
+ ["It's a very <mark>simple</mark> extraction.",["straightforward","small","barely"],"straightforward","simple → straightforward (easy, with no problems)."],
+ ["We're going to take <mark>some</mark> tissue from your gum.",["a little","barely","pinprick"],"a little","some → a little (+ uncountable noun)."],
+ ["Your jaw will feel <mark>slightly</mark> stiff tomorrow.",["a little bit","small","just"],"a little bit","slightly → a little bit (+ adjective)."],
+ ["We'll put a <mark>tiny</mark> camera in your mouth.",["small","a little bit","barely"],"small","tiny → small."],
+ ["All you'll feel is a <mark>scratch</mark>.",["pinprick","straightforward","a little"],"pinprick","scratch → pinprick (the feeling of a needle)."],
+ ["It <mark>only</mark> takes five minutes.",["just","barely","small"],"just","only → just."],
+ ["You'll <mark>hardly</mark> notice the stitches.",["barely","just","a little"],"barely","hardly → barely (almost not)."]
+]);
+
+/* 5. be going to + plain words */
+choose("going",[
+ ["The tooth is extracted under local anaesthetic.",["We're going to numb the area and then take the tooth out.","The tooth is going to be extracted under local anaesthetic.","We will extracting the tooth when the area is numb."],"We're going to numb the area and then take the tooth out.","be going to + we + plain words. The passive version sounds cold, and 'will extracting' is wrong."],
+ ["An incision is made in the gingiva.",["We're going to make an incision in the gingiva.","We're going to make a small cut in your gum.","A small cut is going to be made in the gum."],"We're going to make a small cut in your gum.","incision → small cut, gingiva → gum."],
+ ["The implant is placed into the mandible.",["Next, we're going to put the implant into your lower jaw.","Next, the implant is placed into your lower jaw.","Next, we're going to place the implant into the mandible."],"Next, we're going to put the implant into your lower jaw.","be going to + plain words."],
+ ["A biopsy of the lesion is performed.",["We're going to perform a biopsy of the lesion.","We're going to take a tiny sample from the sore area.","A tiny sample is going to be taken."],"We're going to take a tiny sample from the sore area.","biopsy → tiny sample, lesion → sore area."],
+ ["The root canal is debrided and obturated.",["We're going to clean the inside of the tooth and then fill it.","We're going to debride and obturate the root canal.","The inside of the tooth is cleaned and filled."],"We're going to clean the inside of the tooth and then fill it.","No patient knows debride and obturate!"],
+ ["The wound is sutured.",["After that, the wound is going to be sutured.","After that, we're going to close it with a couple of stitches.","After that, we going to put some stitches."],"After that, we're going to close it with a couple of stitches.","The passive version is cold and full of jargon, and 'we going to' is missing 'are'."]
+]);
+
+/* 6. What… */
+choose("what",[
+ ["___ is numb the area so you don't feel anything.",["What we're going to do","What are we going to do","That we're going to do"],"What we're going to do","Statement word order: What we're going to do is…"],
+ ["What happens next ___ we take a quick X-ray.",["is that","that is","it is"],"is that","What happens next is that + clause."],
+ ["What we need to do after that is ___ the gum.",["stitch","stitching","to stitching"],"stitch","is + bare infinitive: is stitch."],
+ ["What you'll feel ___ a little pressure, nothing more.",["is","are","it is"],"is","What… is: singular, and no extra 'it'."],
+ ["___ we're going to do first is remove the old filling.",["What","That","It"],"What","What we're going to do first is…"],
+ ["What happens then is that we ___ give you a mild sedative.",["are going to","going to","are go to"],"are going to","we are going to + verb."]
+]);
+
+TR.init("procedures").then(S=>RESTORE.forEach(f=>{try{f(S)}catch(e){console.error(e)}}));
+</script>
+</body>
+</html>

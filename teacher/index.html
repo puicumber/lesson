@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
 <link rel="stylesheet" href="../assets/portal.css?v=2">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.js"></script>
-<script src="../assets/config.js?v=13"></script>
+<script src="../assets/config.js?v=16"></script>
 <script src="../assets/portal.js?v=3"></script>
 </head>
 <body>
@@ -66,7 +66,7 @@
         <label>Title<input id="mTitle" required></label>
         <label>Link<input id="mUrl" type="url" required placeholder="https://"></label>
         <label>Type<select id="mKind"><option value="homework">Homework</option><option value="vocabulary">Vocabulary</option><option value="lesson">Lesson</option><option value="grammar">Grammar</option><option value="practice">Practice</option></select></label>
-        <div style="grid-column:1/-1"><p class="muted" id="actInfo" aria-live="polite">Exercise set: paste a link and it will be detected automatically.</p><details><summary class="muted" style="cursor:pointer">Change exercise set (rarely needed)</summary><label>Exercise set<input id="mAct" placeholder="detected from the link" list="actList"></label></details></div><datalist id="actList"></datalist>
+        <div style="grid-column:1/-1"><p class="muted" id="actInfo" aria-live="polite">Exercise set: paste a link and it will be detected automatically.</p><div class="notice" id="linkWarn" hidden style="margin:6px 0;font-size:14px"></div><details id="actDetails"><summary class="muted" style="cursor:pointer">Change exercise set (rarely needed)</summary><label>Exercise set<input id="mAct" placeholder="detected from the link" list="actList"></label></details></div><datalist id="actList"></datalist>
         <label>Due (optional)<input id="mDue" type="date"></label>
         <label style="grid-column:1/-1">Note (optional)<input id="mNote"></label>
         <button class="btn" type="submit">Add</button>
@@ -120,12 +120,21 @@ function guessSet(u){u=(u||"").split(/[?#]/)[0].replace(/\/index\.html$/,"").rep
   if(ACT[seg])return seg;if(URLSET[seg]&&ACT[URLSET[seg]])return URLSET[seg];
   return Object.keys(ACT).find(k=>u.includes("/"+k+"/")||u.includes("/"+k+"-"))||null}
 async function repairSets(){const fix=M.filter(m=>!(m.activity&&ACT[m.activity])&&guessSet(m.url));for(const m of fix){m.activity=guessSet(m.url);try{await db.from("materials").update({activity:m.activity}).eq("id",m.id)}catch(e){}}}
+function alertMsg(t){$("msg").hidden=false;$("msg").textContent=t}
 function detail(x){
   $("detail").hidden=false;$("dName").textContent=`${x.name} · ${x.level||""}`;$("dLink").textContent=link(x.code);
   const mt=$("dMat");mt.innerHTML="";const mats=M.filter(m=>m.student_code===x.code);
   if(!mats.length)mt.innerHTML='<tr><td colspan="6" class="muted">No materials yet.</td></tr>';
   mats.forEach(m=>{const tr=document.createElement("tr");
-    tr.innerHTML=`<td><a href="${m.url}" target="_blank" rel="noopener">${m.title}</a></td><td>${m.kind||""}</td><td>${m.activity||"–"}</td><td>${m.due?new Date(m.due).toLocaleDateString("en-GB",{day:"numeric",month:"short"}):"–"}</td><td>${when(m.created_at)}</td><td></td>`;
+    tr.innerHTML=`<td><a href="${m.url}" target="_blank" rel="noopener">${m.title}</a></td><td>${m.kind||""}</td><td class="setcell"></td><td>${m.due?new Date(m.due).toLocaleDateString("en-GB",{day:"numeric",month:"short"}):"–"}</td><td>${when(m.created_at)}</td><td></td>`;
+    {const sel=document.createElement("select");sel.setAttribute("aria-label","Exercise set for "+m.title);sel.style.cssText="font:inherit;font-size:14px;max-width:150px";
+      sel.innerHTML='<option value="">none</option>'+Object.keys(ACT).map(k=>`<option value="${k}"${k===m.activity?" selected":""}>${k}</option>`).join("");
+      if(m.activity&&!ACT[m.activity])sel.insertAdjacentHTML("beforeend",`<option selected>${m.activity}</option>`);
+      sel.title=m.url;
+      sel.onchange=async()=>{sel.disabled=true;const v=sel.value||null;const {error}=await db.from("materials").update({activity:v}).eq("id",m.id);sel.disabled=false;
+        if(error){alertMsg("Couldn't change the set: "+error.message);return}m.activity=v;detail(x)};
+      tr.querySelector(".setcell").appendChild(sel);
+      if(!/puicumber\.github\.io\/lesson\//.test(m.url||""))tr.querySelector(".setcell").insertAdjacentHTML("beforeend",'<div class="muted" style="font-size:12px">not a site link</div>');}
     const b=document.createElement("button");b.className="btn ghost small del";b.textContent="Delete";let armed=null;
     b.onclick=async()=>{if(!armed){b.textContent="Sure? Click again";b.classList.add("armed");armed=setTimeout(()=>{armed=null;b.textContent="Delete";b.classList.remove("armed")},3000);return}
       clearTimeout(armed);b.disabled=true;b.textContent="Deleting…";
@@ -159,8 +168,24 @@ function detail(x){
 }
 $("actList").innerHTML=Object.keys(ACT).map(k=>`<option value="${k}">`).join("");
 let actManual=false;
+const SITE=/^https:\/\/puicumber\.github\.io\/lesson\//;
+// github.com/puicumber/lesson/(blob|tree)/main/x/y[/index.html] -> site link
+function siteLink(u){const m=(u||"").match(/^https?:\/\/(?:www\.)?github\.com\/puicumber\/lesson\/(?:blob|tree)\/[^/]+\/(.*?)(?:\/?index\.html)?\/?(?:[?#].*)?$/i);
+  return m?"https://puicumber.github.io/lesson/"+(m[1]?m[1]+"/":""):null}
+let warnArmed=false,warnSig="";
+function linkProblem(){const k=$("mAct").value.trim(),u=$("mUrl").value.trim();if(!u)return null;
+  if(!SITE.test(u))return{site:false,set:!!(k&&ACT[k])};
+  if(!(k&&ACT[k]))return{site:true,set:false};return null}
 function showAct(){const k=$("mAct").value.trim(),u=$("mUrl").value.trim();
-  $("actInfo").textContent=k&&ACT[k]?`Exercise set: ${k} ✓ (${Object.values(ACT[k]).join(", ")})`:u?"No exercise set for this link. That's fine for videos, documents and other pages without exercises.":"Exercise set: paste a link and it will be detected automatically."}
+  $("actInfo").textContent=k&&ACT[k]?`Exercise set: ${k} ✓ (${Object.values(ACT[k]).join(", ")})`:u?"No exercise set for this link.":"Exercise set: paste a link and it will be detected automatically.";
+  const w=$("linkWarn"),p=linkProblem(),sig=u+"|"+k;if(sig!==warnSig){warnSig=sig;warnArmed=false;$("matForm").querySelector("button[type=submit]").textContent="Add"}
+  if(!p){w.hidden=true;w.innerHTML="";return}
+  const fix=siteLink(u);
+  w.innerHTML=!p.site
+    ?`⚠ <b>Not a site link.</b> Progress is saved only when students open a <i>puicumber.github.io/lesson/…</i> link, so this material won't show results.`+(fix?` <button type="button" class="btn small" id="fixLink">Use ${fix.replace("https://","")}</button>`:" Fine for videos, documents and outside pages.")
+    :`⚠ <b>No exercise set found</b> for this site page. If the page has exercises, choose the set below, otherwise progress won't show. Pages without exercises are fine.`;
+  w.hidden=false;if(p.site)$("actDetails").open=true;
+  const b=$("fixLink");if(b)b.onclick=()=>{$("mUrl").value=fix;actManual=false;autoAct()}}
 function autoAct(){if(!actManual)$("mAct").value=guessSet($("mUrl").value)||"";showAct()}
 ["input","change","paste","blur"].forEach(ev=>$("mUrl").addEventListener(ev,()=>setTimeout(autoAct,0)));
 $("mAct").addEventListener("input",()=>{actManual=!!$("mAct").value.trim();showAct()});
@@ -174,8 +199,9 @@ function answers(x,m,s,rs){const r=rs.find(z=>z.details&&z.details.answers&&Obje
   $("ansRows").innerHTML=Object.entries(a).map(([k,v],n)=>`<tr><td>${n+1}</td><td style="white-space:normal;min-width:220px">${esc(v.q)}</td><td style="color:${v.ok?"var(--ok)":"var(--bad)"};font-weight:700">${esc(v.a)}</td><td>${v.ok?"":esc(v.c)}</td><td>${v.ok?"✓":"✗"}</td></tr>`).join("");
   $("ansBox").hidden=false;$("ansBox").scrollIntoView({behavior:"smooth"})}
 $("matForm").onsubmit=async e=>{e.preventDefault();
+  if(linkProblem()&&!warnArmed){warnArmed=true;$("matForm").querySelector("button[type=submit]").textContent="Add anyway";$("linkWarn").scrollIntoView({behavior:"smooth",block:"center"});return}
   const row={student_code:$("mStudent").value,title:$("mTitle").value.trim(),url:$("mUrl").value.trim(),kind:$("mKind").value,activity:(ACT[$("mAct").value.trim()]?$("mAct").value.trim():guessSet($("mUrl").value)),due:$("mDue").value||null,note:$("mNote").value.trim()||null};
-  const {error}=await db.from("materials").insert(row);$("matMsg").textContent=error?"Error: "+error.message:`Added "${row.title}".`;
+  const {error}=await db.from("materials").insert(row);$("matMsg").textContent=error?"Error: "+error.message:`Added "${row.title}".`+(!SITE.test(row.url)?" ⚠ Not a site link: no progress will be tracked.":!row.activity?" ⚠ No exercise set.":"");
   if(!error){e.target.reset();await load()}};
 $("stForm").onsubmit=async e=>{e.preventDefault();const name=$("sName").value.trim();const code=slug(name)+"-"+rand();
   const {error}=await db.from("students").insert({code,name,level:$("sLevel").value.trim()||null});

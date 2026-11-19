@@ -1,0 +1,446 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Rise and Shine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Space+Mono:wght@700&display=swap">
+<script src="../../assets/config.js?v=16"></script>
+<script src="../../assets/portal.js?v=3"></script>
+<script src="../../assets/track.js?v=2"></script>
+<style>
+/* Sunrise and alarm clocks: warm peach sky, tangerine sun, sky-blue morning, digital-clock numbers. */
+:root{
+  --bg:#fff4ea; --card:#fffdfa; --ink:#2a1a2e; --muted:#6c5a66; --line:#f1dccb;
+  --sun:#ff7a1a; --sun-soft:#ff7a1a1f; --sky:#2f7fd8; --sky-soft:#2f7fd81c; --plum:#7a2e6b;
+  --t1:#2f7fd8; --t2:#e0457b; --t3:#1f9a6a;
+  --ok:#1d8452; --ok-soft:#1d84521f; --bad:#c43c2f; --bad-soft:#c43c2f1a;
+  --display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif; --mono:"Space Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#1a1022; --card:#251832; --ink:#fbeee4; --muted:#c3aebb; --line:#3d2a4a;
+  --sun:#ffa057; --sun-soft:#ffa05726; --sky:#7ab6ff; --sky-soft:#7ab6ff22; --plum:#f0a3dc;
+  --t1:#7ab6ff; --t2:#ff8fb3; --t3:#6fd6a8;
+  --ok:#78d3a0; --ok-soft:#78d3a024; --bad:#ff8b7e; --bad-soft:#ff8b7e22; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#1a1022; --card:#251832; --ink:#fbeee4; --muted:#c3aebb; --line:#3d2a4a;
+  --sun:#ffa057; --sun-soft:#ffa05726; --sky:#7ab6ff; --sky-soft:#7ab6ff22; --plum:#f0a3dc;
+  --t1:#7ab6ff; --t2:#ff8fb3; --t3:#6fd6a8;
+  --ok:#78d3a0; --ok-soft:#78d3a024; --bad:#ff8b7e; --bad-soft:#ff8b7e22; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--display);font-size:17px;line-height:1.55;
+  padding:24px max(16px,env(safe-area-inset-right,0px)) 72px max(16px,env(safe-area-inset-left,0px))}
+.wrap{max-width:880px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+h1,h2,h3{margin:0;line-height:1.05;text-wrap:balance}
+h1{font-size:clamp(44px,9vw,78px);font-weight:800;letter-spacing:-.02em}
+h2{font-size:clamp(26px,5vw,36px);font-weight:800;letter-spacing:-.01em}
+p{margin:0}
+.lede{color:var(--muted);max-width:60ch}
+.muted{color:var(--muted)}
+button,input,select{font:inherit;color:inherit}
+button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
+
+/* header */
+header.hero{position:relative;overflow:hidden;border-radius:28px;padding:36px clamp(20px,5vw,44px) 30px;
+  background:linear-gradient(180deg,#ffd7b0 0%,#ffb88a 55%,#ff9a6b 100%);color:#3a1630;display:flex;flex-direction:column;gap:12px}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) header.hero{background:linear-gradient(180deg,#3b2257 0%,#7a3a62 60%,#c25a52 100%);color:#fff2e6}}
+:root[data-theme="dark"] header.hero{background:linear-gradient(180deg,#3b2257 0%,#7a3a62 60%,#c25a52 100%);color:#fff2e6}
+.hero .clock{font-family:var(--mono);font-size:15px;letter-spacing:.12em;background:#2a1a2e;color:#ffb36b;padding:6px 12px;border-radius:10px;align-self:flex-start}
+.hero .sun{position:absolute;right:-30px;bottom:-70px;width:220px;height:220px;pointer-events:none;opacity:.95}
+.hero .sun circle{fill:#ffd23f}
+.hero .sun .rays{transform-origin:110px 110px;animation:spin 40s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.hero p{max-width:52ch;position:relative}
+.save{font-size:14px;font-weight:700;position:relative}
+
+nav.jump{display:flex;flex-wrap:wrap;gap:8px}
+nav.jump a{text-decoration:none;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-weight:700;font-size:15px}
+nav.jump a .tm{font-family:var(--mono);color:var(--sun);margin-right:6px}
+
+/* cheat sheet */
+.types{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.type{background:var(--card);border:1px solid var(--line);border-top:6px solid var(--c);border-radius:18px;padding:16px 18px;display:flex;flex-direction:column;gap:6px}
+.type h3{font-size:20px;color:var(--c)}
+.type .ex{font-size:15px}
+.type .ex s{color:var(--bad)}
+
+/* sections */
+section.ex{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:24px clamp(16px,4vw,32px);display:flex;flex-direction:column;gap:16px;scroll-margin-top:16px}
+.exhead{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px}
+.tm-big{font-family:var(--mono);background:#2a1a2e;color:#ffb36b;border-radius:10px;padding:4px 10px;font-size:16px}
+.exhead .count{margin-left:auto;font-family:var(--mono);font-size:15px;color:var(--muted)}
+.how{color:var(--muted)}
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.reset{background:transparent;border:1.5px solid var(--line);border-radius:999px;padding:6px 14px;cursor:pointer;font-weight:700;font-size:14px;color:var(--muted)}
+.reset:hover{border-color:var(--sun);color:var(--sun)}
+.finish{background:var(--sun-soft);border-radius:14px;padding:12px 16px;font-weight:700}
+
+.q{display:flex;flex-direction:column;gap:8px;padding:12px 0;border-top:1px dashed var(--line)}
+.q:first-child{border-top:0}
+.qt b{font-size:19px}
+.ctx{color:var(--muted)}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opt{border:1.5px solid var(--line);background:var(--bg);border-radius:12px;padding:8px 14px;cursor:pointer;text-align:left;font-weight:500}
+.opt:hover:not(:disabled){border-color:var(--sun)}
+.opt:disabled{cursor:default}
+.opt.right{background:var(--ok-soft);border-color:var(--ok);color:var(--ok);font-weight:700}
+.opt.wrong{background:var(--bad-soft);border-color:var(--bad);color:var(--bad);text-decoration:line-through}
+.fb{font-size:15px}
+.fb.ok{color:var(--ok)} .fb.bad{color:var(--bad)}
+
+/* sort */
+.sortgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.sortgrid .q{border:1px solid var(--line);border-radius:16px;padding:12px 14px;background:var(--bg)}
+.sortgrid .opts .opt{padding:6px 10px;font-size:15px}
+.opt.t1.right{color:var(--t1);border-color:var(--t1);background:color-mix(in srgb,var(--t1) 14%,transparent)}
+.opt.t2.right{color:var(--t2);border-color:var(--t2);background:color-mix(in srgb,var(--t2) 14%,transparent)}
+.opt.t3.right{color:var(--t3);border-color:var(--t3);background:color-mix(in srgb,var(--t3) 14%,transparent)}
+
+/* gap fills */
+.sent{font-size:18px;line-height:2.1}
+.sent select{border:2px solid var(--sun);border-radius:10px;background:var(--bg);padding:3px 6px;font-weight:700;max-width:100%}
+.sent select.ok{border-color:var(--ok);color:var(--ok);background:var(--ok-soft)}
+.sent select.bad{border-color:var(--bad);color:var(--bad);background:var(--bad-soft)}
+.sent input{border:none;border-bottom:2px solid var(--sun);background:var(--sun-soft);border-radius:6px 6px 0 0;padding:2px 8px;width:11em;max-width:100%;font-weight:700}
+.sent input.ok{border-color:var(--ok);background:var(--ok-soft);color:var(--ok)}
+.sent input.bad{border-color:var(--bad);background:var(--bad-soft);color:var(--bad)}
+.hint{white-space:nowrap;font-family:var(--mono);font-size:14px;color:var(--plum)}
+.chk{border:0;background:var(--sun);color:#fff;border-radius:10px;padding:5px 14px;font-weight:800;cursor:pointer}
+.chk:disabled{opacity:.4;cursor:default}
+
+/* talk */
+.talk{display:flex;flex-direction:column;gap:10px;padding:16px;border:1px solid var(--line);border-radius:18px;background:var(--bg)}
+.talk .prompt{font-weight:800;font-size:19px}
+.talk label{display:flex;flex-direction:column;gap:4px;font-size:14px;font-weight:700}
+.talk label span{color:var(--c)}
+.talk input{border:1.5px solid var(--line);border-radius:10px;padding:8px 12px;background:var(--card);width:100%}
+.talk.done{border-color:var(--ok)}
+.model{background:var(--sky-soft);border-radius:16px;padding:14px 18px;display:flex;flex-direction:column;gap:4px}
+.model b{color:var(--sky)}
+.rally{display:flex;flex-wrap:wrap;gap:8px}
+.rally span{font-weight:800;border-radius:999px;padding:4px 12px;color:#fff}
+footer{text-align:center;color:var(--muted);font-size:15px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}html{scroll-behavior:auto}}
+html{scroll-behavior:smooth}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="hero">
+  <svg class="sun" viewBox="0 0 220 220" aria-hidden="true">
+    <g class="rays" stroke="#ffd23f" stroke-width="8" stroke-linecap="round">
+      <line x1="110" y1="6" x2="110" y2="30"/><line x1="110" y1="190" x2="110" y2="214"/>
+      <line x1="6" y1="110" x2="30" y2="110"/><line x1="190" y1="110" x2="214" y2="110"/>
+      <line x1="36" y1="36" x2="53" y2="53"/><line x1="167" y1="167" x2="184" y2="184"/>
+      <line x1="36" y1="184" x2="53" y2="167"/><line x1="167" y1="53" x2="184" y2="36"/>
+    </g>
+    <circle cx="110" cy="110" r="62"/>
+  </svg>
+  <div class="clock">06:00 · ALARM ON</div>
+  <h1>Rise and Shine</h1>
+  <p>Phrasal verbs from our lesson: what they mean, where the little word goes, and how to use them when you talk to each other.</p>
+  <p class="save" id="saveState" role="status"></p>
+</header>
+
+<nav class="jump" aria-label="Exercises">
+  <a href="#meaning"><span class="tm">06:30</span>Meanings</a>
+  <a href="#particle"><span class="tm">07:15</span>Little words</a>
+  <a href="#types"><span class="tm">09:00</span>Types</a>
+  <a href="#order"><span class="tm">12:30</span>Right or wrong?</a>
+  <a href="#pron"><span class="tm">15:00</span>it, them, her</a>
+  <a href="#story"><span class="tm">18:00</span>Concert day</a>
+  <a href="#talk"><span class="tm">21:00</span>Talk to each other</a>
+</nav>
+
+<div class="types">
+  <div class="type" style="--c:var(--t1)"><h3>Type 1 · no object</h3><p>Never split.</p><p class="ex">I <b>get up</b> at 7. Please <b>sit down</b>.</p></div>
+  <div class="type" style="--c:var(--t2)"><h3>Type 2 · + object, can split</h3><p>A noun can go in the middle or after. A pronoun (it, them, her…) <b>must</b> go in the middle.</p><p class="ex"><b>Turn off</b> the TV. <b>Turn</b> the TV <b>off</b>. <b>Turn</b> it <b>off</b>. <s>Turn off it.</s></p></div>
+  <div class="type" style="--c:var(--t3)"><h3>Type 3 · + object, never split</h3><p>The object always goes after the whole verb.</p><p class="ex"><b>Look for</b> your keys. <b>Look for</b> them. <s>Look them for.</s></p></div>
+</div>
+
+<section class="ex" id="meaning">
+  <div class="exhead"><span class="tm-big">06:30</span><h2>What does it mean?</h2><span class="count" id="c-meaning"></span></div>
+  <p class="how">Choose the right meaning.</p>
+  <div id="b-meaning"></div>
+  <p class="finish" id="f-meaning" hidden></p>
+  <div class="bar"><button class="reset" id="r-meaning" type="button">Start again</button></div>
+</section>
+
+<section class="ex" id="particle">
+  <div class="exhead"><span class="tm-big">07:15</span><h2>The little word</h2><span class="count" id="c-particle"></span></div>
+  <p class="how">Choose the missing word (or words).</p>
+  <div id="b-particle"></div>
+  <p class="finish" id="f-particle" hidden></p>
+  <div class="bar"><button class="reset" id="r-particle" type="button">Start again</button></div>
+</section>
+
+<section class="ex" id="types">
+  <div class="exhead"><span class="tm-big">09:00</span><h2>Which type?</h2><span class="count" id="c-types"></span></div>
+  <p class="how">Type 1, 2 or 3? Look at the cards above if you need help.</p>
+  <div class="sortgrid" id="b-types"></div>
+  <p class="finish" id="f-types" hidden></p>
+  <div class="bar"><button class="reset" id="r-types" type="button">Start again</button></div>
+</section>
+
+<section class="ex" id="order">
+  <div class="exhead"><span class="tm-big">12:30</span><h2>Right or wrong?</h2><span class="count" id="c-order"></span></div>
+  <p class="how">Is the word order correct?</p>
+  <div id="b-order"></div>
+  <p class="finish" id="f-order" hidden></p>
+  <div class="bar"><button class="reset" id="r-order" type="button">Start again</button></div>
+</section>
+
+<section class="ex" id="pron">
+  <div class="exhead"><span class="tm-big">15:00</span><h2>it, them, her</h2><span class="count" id="c-pron"></span></div>
+  <p class="how">Say it again with a pronoun (it, them, her, him, me). Type the missing part, then press Check. Careful with Type 3!</p>
+  <div id="b-pron"></div>
+  <p class="finish" id="f-pron" hidden></p>
+  <div class="bar"><button class="reset" id="r-pron" type="button">Start again</button></div>
+</section>
+
+<section class="ex" id="story">
+  <div class="exhead"><span class="tm-big">18:00</span><h2>Concert day</h2><span class="count" id="c-story"></span></div>
+  <p class="how">Victoria and Diana are going to see Stray Kids. Complete the story with phrasal verbs in the right form. The first letters help you.</p>
+  <div id="b-story"></div>
+  <p class="finish" id="f-story" hidden></p>
+  <div class="bar"><button class="reset" id="r-story" type="button">Start again</button></div>
+</section>
+
+<section class="ex" id="talk">
+  <div class="exhead"><span class="tm-big">21:00</span><h2>Talk to each other</h2><span class="count" id="c-talk"></span></div>
+  <p class="how">In the next lesson you will ask <b>each other</b> these questions. Get ready: for each one, write your answer, one more detail, and a question to ask your partner back.</p>
+  <div class="rally"><span style="background:var(--t1)">1 · Answer</span><span style="background:var(--t2)">2 · Add</span><span style="background:var(--t3)">3 · Ask</span></div>
+  <div class="model">
+    <p class="muted">Example</p>
+    <p><b>Answer:</b> My alarm goes off at seven, but I don't get up until half past.</p>
+    <p><b>Add:</b> I'm definitely not an early bird.</p>
+    <p><b>Ask:</b> What about you? Do you get up as soon as you wake up?</p>
+  </div>
+  <div id="b-talk" style="display:flex;flex-direction:column;gap:12px"></div>
+  <p class="finish" id="f-talk" hidden></p>
+  <div class="bar"><button class="reset" id="r-talk" type="button">Clear my notes</button></div>
+</section>
+
+<footer>See you in class. Keep the rally going! 🏓</footer>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const el=(t,c)=>{const e=document.createElement(t);if(c)e.className=c;return e};
+const esc=s=>String(s).replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]));
+const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const norm=s=>String(s||"").toLowerCase().replace(/[’']/g,"'").replace(/[.,!?;:]/g,"").replace(/\s+/g," ").trim();
+const TR=window.Track;const canSave=TR.online;const RESTORE=[];
+TR.onStatus(st=>{$("saveState").textContent=!canSave?"Tip: open this page from your personal portal link to save your progress.":st==="saving"?"Saving…":st==="offline"?"No connection right now: your answers are kept on this device and will be sent later.":"Your progress saves automatically after every answer."});
+
+const PRAISE=(s,t)=>s===t?`Perfect: ${s} out of ${t}! ☀️`:s>=t*0.8?`Great: ${s} out of ${t}. Look at the red ones again.`:`${s} out of ${t}. Press "Start again" and try once more.`;
+
+// Generic exercise wrapper. buildFn(saved, done) draws the items; done(i,q,a,c,ok,live) records one answer.
+function exercise(name,total,buildFn){
+  const st={};
+  function upd(){const sc=Object.values(st).filter(x=>x.ok).length,n=Object.keys(st).length;
+    $("c-"+name).textContent=`${sc} / ${total}`;const f=$("f-"+name);
+    if(n===total){f.hidden=false;f.textContent=PRAISE(sc,total)}else f.hidden=true;return [sc,n]}
+  function done(i,q,a,c,ok,live){st[i]={ok};const [sc,n]=upd();
+    if(live){TR.answer(name,i,q,a,c,ok,sc,total);if(n===total)TR.finish(name,sc,total)}}
+  function build(saved){Object.keys(st).forEach(k=>delete st[k]);$("b-"+name).innerHTML="";upd();buildFn(saved||{},done)}
+  $("r-"+name).onclick=()=>{TR.reset(name);build()};
+  build();
+  RESTORE.push(S=>{const a=S[name]&&S[name].answers;if(a&&Object.keys(a).length)build(a)});
+}
+
+// Buttons: items {q, ctx, a:[correct, ...others], why}. fixed = keep option order.
+function choiceEx(name,items,opt={}){
+  exercise(name,items.length,(saved,done)=>{
+    const box=$("b-"+name);
+    items.forEach((it,i)=>{
+      const d=el("div","q");d.innerHTML=`<p class="qt"><b>${esc(it.q)}</b>${it.ctx?` <span class="ctx">${esc(it.ctx)}</span>`:""}</p>`;
+      const row=el("div","opts");row.setAttribute("role","group");row.setAttribute("aria-label",it.q);
+      const os=opt.fixed?opt.fixed.slice():shuffle(it.a.slice());
+      const right=opt.fixed?it.r:it.a[0];
+      let locked=false;
+      const btns=os.map((o,k)=>{const b=el("button","opt"+(opt.cls?" "+opt.cls[k]:""));b.type="button";b.textContent=o;b.onclick=()=>pick(o,true);row.append(b);return b});
+      const fb=el("p","fb");d.append(row,fb);box.append(d);
+      function pick(o,live){if(locked)return;locked=true;const ok=o===right;
+        btns.forEach(b=>{b.disabled=true;if(b.textContent===right)b.classList.add("right");else if(b.textContent===o)b.classList.add("wrong")});
+        fb.className="fb "+(ok?"ok":"bad");fb.textContent=(ok?"✓ ":"✗ ")+(it.why||(ok?"":"The answer is: "+right));
+        done(i,it.q,o,right,ok,live)}
+      if(saved[i]&&saved[i].a!=null)pick(saved[i].a,false);
+    });
+  });
+}
+
+/* 1. Meanings */
+choiceEx("meaning",[
+ {q:"go away",ctx:"(for the weekend)",a:["leave home for a short holiday","come back home","leave your job"]},
+ {q:"drop off",ctx:"(somebody at the airport)",a:["take somebody in your car and leave them there","collect somebody in your car","wait for somebody"]},
+ {q:"pick up",ctx:"(somebody from the station)",a:["go and collect somebody in your car","leave somebody somewhere","phone somebody"]},
+ {q:"pay back",ctx:"(money)",a:["give back money you borrowed","spend all your money","lend money to a friend"]},
+ {q:"send back",ctx:"(something you ordered)",a:["return it by post because you don't want it","order it again","give it to a friend"]},
+ {q:"try on",ctx:"(a jacket)",a:["put it on in a shop to see if it is the right size","buy it without looking","take it back to the shop"]},
+ {q:"run out of",ctx:"(milk, petrol, battery)",a:["have no more of it","buy more of it","have too much of it"]},
+ {q:"look round",ctx:"(a museum, a city)",a:["walk around and see different parts of it","try to find something you lost","take care of it"]},
+ {q:"get on with",ctx:"(a person)",a:["have a friendly relationship with them","get on a bus with them","argue with them"]},
+ {q:"go on",ctx:"(doing something)",a:["continue","stop","start again tomorrow"]},
+ {q:"call back",ctx:"(later)",a:["phone somebody again","shout at somebody","come back home"]},
+ {q:"put away",ctx:"(clothes)",a:["put them in the place where you keep them","put them on","throw them away"]},
+ {q:"give up",ctx:"(chocolate)",a:["stop eating or doing something","eat a lot of it","give it to somebody"]},
+ {q:"go off",ctx:"(my alarm)",a:["start ringing","stop working","get louder"]}
+]);
+
+/* 2. Particles */
+const PART=[
+ ["My alarm went"," at 6.15, but I stayed in bed for another ten minutes.",["off","up","out","down"],"off"],
+ ["Could you turn the music","? I'm trying to sleep.",["down","up","out","away"],"down"],
+ ["We're going"," for the weekend. The sea, finally!",["away","out","back","round"],"away"],
+ ["These jeans are too small. I need to take them"," to the shop.",["back","out","away","off"],"back"],
+ ["Can I try"," this jacket, please?",["on","in","up","for"],"on"],
+ ["Oh no, we've run"," coffee!",["out of","out with","off of","away from"],"out of"],
+ ["Diana gets"," her cousin really well. They're best friends.",["on with","on for","off with","up with"],"on with"],
+ ["I'm looking"," my phone. Have you seen it?",["for","after","round","up"],"for"],
+ ["Don't stop! Go"," reading, the next letter is really good.",["on","off","up","back"],"on"],
+ ["Please write"," these new words in your notebook.",["down","up","off","in"],"down"],
+ ["Could you pick me"," from the station at eight?",["up","on","off","out"],"up"],
+ ["I borrowed some money from my sister and paid her"," yesterday.",["back","off","up","out"],"back"],
+ ["We had a free afternoon in Seoul, so we just looked"," the city.",["round","for","after","out"],"round"],
+ ["Your room is a mess! Put your clothes",", please.",["away","off","out","down"],"away"],
+ ["Hurry up! We need to get"," the bus, it's leaving!",["on","in","up","with"],"on"],
+ ["It's your turn to take"," the rubbish.",["out","off","away","up"],"out"]
+];
+exercise("particle",PART.length,(saved,done)=>{
+  const box=$("b-particle");
+  PART.forEach(([a,b,opts,right],i)=>{
+    const d=el("div","q");const p=el("p","sent");
+    const s=el("select");s.setAttribute("aria-label","Missing word in: "+a+" … "+b);
+    s.innerHTML=`<option value="">choose…</option>`+shuffle(opts.slice()).map(o=>`<option>${esc(o)}</option>`).join("");
+    p.append(a+" ",s," "+b.trimStart());const fb=el("p","fb");d.append(p,fb);box.append(d);
+    const q=a+" ___"+b;
+    function pick(v,live){s.value=v;s.disabled=true;const ok=v===right;s.className=ok?"ok":"bad";
+      fb.className="fb "+(ok?"ok":"bad");fb.textContent=ok?"✓":"✗ The answer is: "+right;done(i,q,v,right,ok,live)}
+    s.onchange=()=>{if(s.value)pick(s.value,true)};
+    if(saved[i]&&saved[i].a)pick(saved[i].a,false);
+  });
+});
+
+/* 3. Types */
+const TY=[["wake up",1],["look for",3],["turn off",2],["get up",1],["try on",2],["run out of",3],["go out",1],["pick up",2],["get on with",3],["sit down",1],["write down",2],["look round",3],["check in",1],["give back",2],["get off (a bus)",3],["put away",2]];
+const TYWHY={"wake up":"Type 1 here: I wake up at 7. (With an object it splits: wake me up.)","check in":"Type 1 here: We checked in at 3. (With luggage it can split: check your bags in.)"};
+choiceEx("types",TY.map(([v,t])=>({q:v,r:"Type "+t,why:TYWHY[v]||(t===1?"Type 1: no object.":t===2?"Type 2: you can split it (turn it off).":"Type 3: never split (look for it).")})),{fixed:["Type 1","Type 2","Type 3"],cls:["t1","t2","t3"]});
+// show sort cards in a grid: move each .q into the grid container (already there)
+
+/* 4. Right or wrong */
+const RW=[
+ ["Turn it off, please.",1,"Type 2: the pronoun goes in the middle."],
+ ["Turn off it, please.",0,"With a pronoun, say: Turn it off."],
+ ["Turn the TV off, please.",1,"Type 2 + noun: you can split it."],
+ ["I'm looking my keys for.",0,"Look for is Type 3: I'm looking for my keys."],
+ ["I'm looking for them.",1,"Type 3: the object goes after the whole verb."],
+ ["Can you pick up me at six?",0,"Pronoun in the middle: pick me up."],
+ ["I got up really early today.",1,"Type 1: get up stays together."],
+ ["She tried on it, but it was too big.",0,"She tried it on."],
+ ["I get on with my sister very well.",1,"Type 3: never split."],
+ ["We've run petrol out of.",0,"Type 3: We've run out of petrol."],
+ ["Write the new words down.",1,"Type 2 + noun: you can split it."],
+ ["Can you give back it to me tomorrow?",0,"Can you give it back to me tomorrow?"]
+];
+choiceEx("order",RW.map(([s,r,why])=>({q:s,r:r?"Right":"Wrong",why})),{fixed:["Right","Wrong"]});
+
+/* typing helper: items {pre, post, hint, ans:[...], full} */
+function typeEx(name,items){
+  exercise(name,items.length,(saved,done)=>{
+    const box=$("b-"+name);
+    items.forEach((it,i)=>{
+      const d=el("div","q");
+      if(it.src){const s=el("p","muted");s.textContent=it.src;d.append(s)}
+      const p=el("p","sent");const inp=el("input");inp.type="text";inp.autocomplete="off";inp.spellcheck=false;inp.setAttribute("autocapitalize","off");
+      inp.setAttribute("aria-label",(it.src?it.src+" ":"")+it.pre+" … "+it.post);
+      const b=el("button","chk");b.type="button";b.textContent="Check";
+      p.append(it.pre+" ",inp," "+it.post+" ");
+      if(it.hint){const h=el("span","hint");h.textContent="("+it.hint+")";p.append(h," ")}
+      p.append(b);
+      const fb=el("p","fb");d.append(p,fb);box.append(d);
+      const q=(it.src?it.src+" → ":"")+it.pre+" ___ "+it.post;
+      function check(v,live){if(!norm(v))return;inp.value=v;inp.disabled=true;b.disabled=true;
+        const ok=it.ans.some(x=>norm(x)===norm(v));inp.className=ok?"ok":"bad";
+        fb.className="fb "+(ok?"ok":"bad");fb.textContent=ok?"✓":"✗ The answer is: "+it.ans[0]+(it.why?". "+it.why:"");
+        done(i,q,v,it.ans[0],ok,live)}
+      b.onclick=()=>check(inp.value,true);
+      inp.onkeydown=e=>{if(e.key==="Enter")check(inp.value,true)};
+      if(saved[i]&&saved[i].a)check(saved[i].a,false);
+    });
+  });
+}
+
+/* 5. Pronouns */
+typeEx("pron",[
+ {src:"Turn off the lights.",pre:"Turn",post:".",ans:["them off"]},
+ {src:"Pick up your bag.",pre:"Pick",post:".",ans:["it up"]},
+ {src:"I tried on the shoes.",pre:"I tried",post:".",ans:["them on"]},
+ {src:"Write down the address.",pre:"Write",post:".",ans:["it down"]},
+ {src:"Can you call back Diana?",pre:"Can you call",post:"?",ans:["her back"]},
+ {src:"Look for your keys.",pre:"Look",post:".",ans:["for them"],why:"Look for is Type 3"},
+ {src:"Take out the rubbish.",pre:"Take",post:".",ans:["it out"]},
+ {src:"I get on with Victoria.",pre:"I get",post:".",ans:["on with her"],why:"Get on with is Type 3"},
+ {src:"Put away your clothes.",pre:"Put",post:".",ans:["them away"]},
+ {src:"He gave back the money.",pre:"He gave",post:".",ans:["it back"]}
+]);
+
+/* 6. Story */
+typeEx("story",[
+ {pre:"On Saturday, Diana's alarm",post:"at 5.30.",hint:"w… o…",ans:["went off"]},
+ {pre:"She",post:"immediately: no snooze today!",hint:"g… u…",ans:["got up"]},
+ {pre:"She",post:"three T-shirts and chose the green one.",hint:"t… o…",ans:["tried on"]},
+ {pre:"Victoria's dad",post:"at the station.",hint:"d… them o…",ans:["dropped them off"]},
+ {pre:"On the train they",post:"their tickets for ten minutes. They were in Diana's pocket!",hint:"l… f…",ans:["looked for"]},
+ {pre:"Then Victoria's phone",post:"battery.",hint:"r… o… o…",ans:["ran out of"]},
+ {pre:"Before the show they",post:"the merch shop and bought two light sticks.",hint:"l… r…",ans:["looked round","looked around"]},
+ {pre:"When Han came on stage, everybody",post:"and screamed.",hint:"s… u…",ans:["stood up"]},
+ {pre:"After the concert they",post:"for pizza.",hint:"w… o…",ans:["went out"]},
+ {pre:"They",post:"home after midnight, very tired and very happy.",hint:"w… b…",ans:["went back","got back"]},
+ {pre:"\"Next time, let's",post:"for the whole weekend!\" said Victoria.",hint:"g… a…",ans:["go away"]}
+]);
+
+/* 7. Talk to each other (notes, not scored) */
+const TALK=[
+ "What time does your alarm go off on weekdays? Do you get up immediately?",
+ "Is there something you want to give up? Why?",
+ "When did you last go away for the weekend? Where did you go?",
+ "Who do you get on with best in your family?",
+ "Do you like trying on clothes in shops, or do you buy online and send things back?",
+ "What do you do when your phone runs out of battery and you're not at home?"
+];
+(function(){
+  const name="talk",total=TALK.length,F=[["Answer","var(--t1)"],["Add","var(--t2)"],["Ask","var(--t3)"]];
+  let rows=[];
+  function upd(){const n=rows.filter(r=>r.full()).length;$("c-talk").textContent=`${n} / ${total} ready`;
+    const f=$("f-talk");if(n===total){f.hidden=false;f.textContent="All ready! Bring these to the lesson and ask each other. 🏓"}else f.hidden=true;return n}
+  function build(saved){
+    saved=saved||{};const box=$("b-talk");box.innerHTML="";
+    rows=TALK.map((q,i)=>{
+      const d=el("div","talk");const h=el("p","prompt");h.textContent=(i+1)+". "+q;d.append(h);
+      const prev=(saved[i]&&saved[i].a)||"";const parts=prev.split("\n");
+      const ins=F.map(([lab,c],k)=>{const l=el("label");l.style.setProperty("--c",c);
+        const sp=el("span");sp.textContent=lab;const inp=el("input");inp.type="text";
+        inp.placeholder=k===0?"My answer…":k===1?"One more detail…":"A question for my partner…";
+        const m=parts.find(x=>x.startsWith(lab+": "));if(m)inp.value=m.slice(lab.length+2);
+        inp.oninput=()=>save(i);l.append(sp,inp);d.append(l);return inp});
+      box.append(d);
+      const r={ins,d,full:()=>ins.every(x=>x.value.trim())};r.d.classList.toggle("done",r.full());return r;
+    });
+    upd();
+  }
+  function save(i){const r=rows[i];r.d.classList.toggle("done",r.full());const n=upd();
+    const a=F.map(([lab],k)=>lab+": "+r.ins[k].value.trim()).join("\n");
+    TR.answer(name,i,TALK[i],a,"",r.full()?true:null,n,total);if(n===total)TR.finish(name,n,total)}
+  $("r-talk").onclick=()=>{TR.reset(name);build()};
+  build();
+  RESTORE.push(S=>{const a=S[name]&&S[name].answers;if(a&&Object.keys(a).length)build(a)});
+})();
+
+TR.init("phrasal").then(S=>RESTORE.forEach(f=>{try{f(S)}catch(e){console.error(e)}}));
+</script>
+</body>
+</html>
