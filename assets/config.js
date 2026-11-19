@@ -18,5 +18,6 @@ window.PORTAL_ACTIVITIES = {
   necklace: { words: "Words from the story", lend: "Borrow or lend?", vuln: "Vulnerable", use: "Story and surgery" },
   clothes: { cards: "Flashcards", which: "Which word?", verbs: "Fit, suit, match", order: "Adjective order", listen: "Listening 5c–e", ebay: "Writing 6a", video: "Video 7" },
   procedures: { procs: "Which procedure?", plain: "Say it simply", calm: "Reassuring or not?", soften: "Softer words", going: "Tell the patient", what: "What… sentences" },
+  phrasal: { meaning: "Meanings", particle: "The little word", types: "Which type?", order: "Right or wrong?", pron: "it, them, her", story: "Concert day", talk: "Talk to each other" },
   ppps: { signals: "Signal words", forms: "Participles", choose: "Which tense?", words: "ever, just, yet…", dialogue: "Conversation", rw: "Right or wrong?" }
 };
