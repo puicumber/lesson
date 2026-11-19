@@ -9,6 +9,7 @@
 <link rel="stylesheet" href="../assets/portal.css?v=2">
 <script src="../assets/config.js?v=17"></script>
 <script src="../assets/portal.js?v=3"></script>
+<script src="../assets/auto-materials.js?v=1"></script>
 </head>
 <body>
 <div class="wrap">
@@ -63,7 +64,11 @@ function card(m,results){
     if(!d||!d.student){msg.hidden=false;msg.textContent="This link doesn't work. Please ask Polina for your personal link.";document.getElementById("sub").textContent="";return}
     document.title=`${d.student.name}'s English`;
     document.getElementById("hello").innerHTML=`Hello, <span>${d.student.name}</span>!`;
-    const res=d.results||[],mats=d.materials||[];
+    const res=d.results||[];
+    const key=u=>String(u||"").split(/[?#]/)[0].replace(/\/+$/,"").replace(/^https?:\/\/[^/]+/,"");
+    const saved=d.materials||[],have=new Set(saved.map(m=>key(m.url)));
+    const auto=((window.AUTO_MATERIALS||{})[String(d.student.name||"").trim().toLowerCase()]||[]).filter(m=>!have.has(key(m.url)));
+    const mats=[...auto,...saved];
     const todo=mats.filter(m=>!status(m,res).complete&&(m.activity||(m.kind==="homework"&&(!m.due||new Date(m.due)>=new Date(new Date().toDateString())))));
     const tracked=mats.filter(m=>m.activity);
     document.getElementById("sub").textContent=todo.length?`You have ${todo.length} thing${todo.length>1?"s":""} to do. Your progress saves automatically.`:tracked.length?"Everything is done. Great job!":"Here are your materials.";
