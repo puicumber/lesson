@@ -1,0 +1,493 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>The Fitting Room</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@600;800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@500&display=swap">
+<script src="../../assets/config.js?v=13"></script>
+<script src="../../assets/portal.js?v=3"></script>
+<script src="../../assets/track.js?v=2"></script>
+<style>
+/* Layout: a boutique fitting room. Header like a shop sign, pill tabs per task, one panel at a time; price-tag stickers for scores. */
+:root{
+  --bg:#f4f1f8; --card:#fffdfd; --ink:#1c1630; --muted:#5f5875; --line:#ddd5ea;
+  --pink:#c81d6b; --pink-soft:#c81d6b17; --teal:#0d7f86; --teal-soft:#0d7f8617; --tag:#f2c14e;
+  --ok:#1f8a5b; --ok-soft:#1f8a5b1c; --bad:#c2453d; --bad-soft:#c2453d1a;
+  --display:"Syne","Trebuchet MS",system-ui,sans-serif;
+  --body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#141120; --card:#1d192c; --ink:#ece8f6; --muted:#a8a0bf; --line:#352f4a;
+  --pink:#f0679f; --pink-soft:#f0679f22; --teal:#4fc3c9; --teal-soft:#4fc3c922; --tag:#f2c14e;
+  --ok:#7cc88f; --ok-soft:#7cc88f22; --bad:#ef7d74; --bad-soft:#ef7d7422; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141120; --card:#1d192c; --ink:#ece8f6; --muted:#a8a0bf; --line:#352f4a;
+  --pink:#f0679f; --pink-soft:#f0679f22; --teal:#4fc3c9; --teal-soft:#4fc3c922; --tag:#f2c14e;
+  --ok:#7cc88f; --ok-soft:#7cc88f22; --bad:#ef7d74; --bad-soft:#ef7d7422; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 64px}
+.wrap{max-width:960px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+h1,h2,h3{font-family:var(--display);margin:0;line-height:1.05;text-wrap:balance}
+h1{font-size:clamp(40px,7vw,68px);font-weight:800;letter-spacing:-.02em}
+h2{font-size:clamp(26px,4vw,34px);font-weight:800}
+h3{font-size:19px;font-weight:600}
+p{margin:0}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.lede{color:var(--muted);max-width:66ch}
+.tip{font-size:14px;color:var(--muted);font-style:italic}
+.guide{position:relative;border-radius:22px;padding:28px clamp(20px,4vw,38px);background:var(--ink);color:var(--card);display:flex;flex-direction:column;gap:10px;overflow:hidden}
+.guide h1{color:var(--card)}
+.guide h1 em{font-style:normal;color:var(--tag)}
+.guide .lede,.guide .tip,.guide .eyebrow{color:color-mix(in srgb,var(--card) 72%,transparent)}
+.guide::after{content:"";position:absolute;right:-30px;top:-30px;width:170px;height:170px;border-radius:50%;border:14px dashed var(--pink);opacity:.55}
+nav.tabs{display:flex;flex-wrap:wrap;gap:8px}
+.tab{appearance:none;cursor:pointer;font:inherit;font-weight:700;font-size:15px;border-radius:999px;padding:8px 16px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+.tab:hover{border-color:var(--pink)}
+.tab[aria-selected="true"]{background:var(--pink);border-color:var(--pink);color:#fff}
+.tab.done::after{content:" ✓"}
+.tab .grp{font-family:var(--mono);font-size:11px;opacity:.7;margin-right:6px}
+:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+section.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:clamp(20px,4vw,34px);display:flex;flex-direction:column;gap:22px}
+.head{display:flex;flex-direction:column;gap:8px}
+.btn{appearance:none;cursor:pointer;font:inherit;font-weight:700;font-size:16px;border-radius:999px;padding:10px 20px;border:1px solid var(--pink);background:var(--pink);color:#fff}
+.btn.ghost{background:transparent;color:var(--pink)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.score{font-family:var(--mono);font-weight:500;background:var(--tag);color:#1c1630;border-radius:4px 14px 14px 4px;padding:3px 12px 3px 10px;font-variant-numeric:tabular-nums}
+.score:empty{display:none}
+.msg{font-weight:700;color:var(--teal)}
+.bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden}
+.bar span{display:block;height:100%;background:var(--pink);transition:width .3s}
+/* flashcards */
+.filters{display:flex;gap:6px;flex-wrap:wrap}
+.filter{appearance:none;cursor:pointer;font:inherit;font-size:14px;border-radius:8px;padding:5px 12px;border:1px solid var(--line);background:transparent;color:var(--muted)}
+.filter[aria-pressed="true"]{border-color:var(--pink);background:var(--pink-soft);color:var(--ink)}
+.flash{appearance:none;cursor:pointer;font:inherit;color:var(--ink);width:100%;min-height:240px;border-radius:18px;border:2px solid var(--line);background:var(--bg);padding:24px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center}
+.flash .w{font-family:var(--display);font-size:clamp(30px,6vw,46px);font-weight:800;color:var(--pink);line-height:1.05}
+.flash .t{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.flash .d{font-size:18px;max-width:46ch}
+.flash .x{font-style:italic;color:var(--muted);max-width:46ch}
+.flash.back{border-color:var(--pink)}
+/* choose */
+.qs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:700px){.qs{grid-template-columns:1fr}}
+.q{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.q .n{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.q .s{font-weight:700}
+.opts{display:flex;gap:6px;flex-wrap:wrap}
+.opt{appearance:none;cursor:pointer;font:inherit;font-size:15px;border-radius:8px;padding:6px 12px;background:var(--card);color:var(--ink);border:1px solid var(--line)}
+.opt:hover{border-color:var(--pink)}
+.opt.ok{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.opt.no{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.why{font-size:14px;color:var(--muted)}
+/* order builder */
+.build{display:flex;flex-direction:column;gap:10px;background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:16px}
+.build.ok{border-color:var(--ok)}
+.slot{min-height:46px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;border-bottom:2px dashed var(--line);padding-bottom:8px;font-size:18px}
+.word{appearance:none;cursor:pointer;font:inherit;font-weight:700;border-radius:8px;padding:6px 12px;border:1px solid var(--teal);background:var(--teal-soft);color:var(--ink)}
+.noun{font-weight:700;color:var(--pink)}
+.ladder{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-family:var(--mono);font-size:13px}
+.ladder span{background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:4px 8px}
+.ladder span.hot{background:var(--pink);border-color:var(--pink);color:#fff}
+/* listening */
+audio,video{width:100%;max-width:100%;border-radius:12px}
+.media-note{background:var(--teal-soft);border:1px dashed var(--teal);border-radius:12px;padding:12px 16px;font-size:15px}
+.task{display:flex;flex-direction:column;gap:12px;border-top:1px solid var(--line);padding-top:18px}
+.task:first-of-type{border-top:0;padding-top:0}
+.tf{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 12px;align-items:center;background:var(--bg);border-radius:12px;padding:12px 14px}
+.tf .done{font-family:var(--mono);font-size:13px;color:var(--muted)}
+.tf .fix{grid-column:1/-1}
+.seg{display:flex;gap:4px}
+.seg button{appearance:none;cursor:pointer;font:inherit;font-weight:700;width:42px;border-radius:8px;padding:5px 0;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+.seg button[aria-pressed="true"]{background:var(--teal);border-color:var(--teal);color:#fff}
+.rulebox{background:var(--bg);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:10px;font-size:18px}
+.rulebox b{font-family:var(--display)}
+input[type=text]{font:inherit;font-size:16px;color:var(--ink);background:var(--card);border:1px solid var(--line);border-bottom:2px solid var(--teal);border-radius:6px;padding:6px 10px;width:100%}
+.inline input[type=text]{width:auto;min-width:9em;flex:1}
+.inline{display:flex;flex-wrap:wrap;gap:6px;align-items:baseline}
+textarea{width:100%;min-height:120px;font:inherit;font-size:17px;line-height:1.55;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;resize:vertical}
+label.lab{font-weight:700}
+/* discussion */
+.topics{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.topic{display:flex;flex-direction:column;gap:10px;background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:16px;min-width:0}
+.topic .claim{font-family:var(--display);font-weight:600;font-size:19px}
+.topic .opp{border-left:3px solid var(--pink);padding-left:10px;font-style:italic;color:var(--muted);font-size:15px}
+.phrases{display:flex;flex-wrap:wrap;gap:6px}
+.phrases span{border:1px dashed var(--pink);border-radius:999px;padding:4px 10px;font-size:14px}
+/* ebay */
+.listing-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px}
+@media (max-width:760px){.listing-grid{grid-template-columns:1fr}}
+.fields{display:flex;flex-direction:column;gap:8px}
+.preview{border:1px solid var(--line);border-radius:12px;padding:16px;background:var(--bg);display:flex;flex-direction:column;gap:6px}
+.preview .pt{font-size:20px;font-weight:700}
+.preview .pc{font-size:13px;color:var(--muted)}
+.preview .pq{font-style:italic}
+.preview .pp{font-family:var(--mono);font-size:20px;color:var(--pink)}
+.model{font-size:15px;border:1px dashed var(--line);border-radius:12px;padding:12px 14px;color:var(--muted)}
+/* notes table */
+.notes{display:grid;grid-template-columns:minmax(0,220px) minmax(0,1fr);gap:8px 14px;align-items:start}
+@media (max-width:600px){.notes{grid-template-columns:1fr}}
+.notes .sec{grid-column:1/-1;font-family:var(--display);font-weight:800;color:var(--teal);margin-top:6px}
+.notes .k{font-weight:700;padding-top:6px}
+.notes textarea{min-height:60px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="guide">
+    <span class="eyebrow">Homework · Clothes and fashion</span>
+    <h1>The Fitting <em>Room</em></h1>
+    <p class="lede">First, the clothes words from the Vocabulary Bank. Then finish the listening, the writing and the video from your book.</p>
+    <p class="tip" id="saveState"></p>
+  </header>
+
+  <nav class="tabs" role="tablist" id="tabs"></nav>
+
+  <section class="panel" id="p-cards" role="tabpanel">
+    <div class="head"><span class="eyebrow">Words 1</span><h2>Flashcards</h2>
+      <p class="lede">Look at the word and say what it means. Click to check. "Got it" removes the card, "Again" keeps it in the pile.</p></div>
+    <div class="filters" id="filters"></div>
+    <div class="bar"><span id="bar" style="width:0"></span></div>
+    <button class="flash" id="flash"></button>
+    <div class="row"><button class="btn ghost" id="again">Again</button><button class="btn" id="gotit">Got it</button><span class="score" id="fCount"></span><button class="btn ghost" id="fReset" style="margin-left:auto">Start again</button></div>
+  </section>
+
+  <section class="panel" id="p-which" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Words 2</span><h2>Which word?</h2>
+      <p class="lede">Read the description and choose the word. You can try again until you get it right.</p></div>
+    <div class="qs" id="which"></div>
+    <div class="row"><span class="score" id="whichScore"></span></div>
+  </section>
+
+  <section class="panel" id="p-verbs" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Words 3</span><h2>Fit, suit or match?</h2>
+      <p class="lede">Choose the right verb or phrase for each sentence.</p></div>
+    <div class="qs" id="verbs"></div>
+    <div class="row"><span class="score" id="verbsScore"></span></div>
+  </section>
+
+  <section class="panel" id="p-order" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Words 4</span><h2>Put it in order</h2>
+      <p class="lede">Click the adjectives in the right order. Click a word in the line to send it back.</p></div>
+    <div class="ladder"><span class="hot">opinion</span>→<span>size / fit</span>→<span class="hot">age</span>→<span>colour</span>→<span>pattern</span>→<span>material</span>→<span>style</span>→<span>noun</span></div>
+    <p class="tip">Watch out: words like scruffy, dirty, smart and old-fashioned are opinions, so they come before old and new.</p>
+    <div class="col" id="order" style="display:flex;flex-direction:column;gap:12px"></div>
+    <div class="row"><span class="score" id="orderScore"></span></div>
+  </section>
+
+  <section class="panel" id="p-listen" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Book · page 23 · 5c–e</span><h2>Dressing your age</h2>
+      <p class="lede">Finish the radio discussion tasks from your book. Press "Check and send" at the end to see the answers. Polina sees your work too.</p></div>
+    <div class="task">
+      <h3>2.23 · Listen again</h3>
+      <div id="a223"></div>
+      <p class="lede">5c. Mark the opinions T or F and correct the F ones. You already did 1–5 in class, so they're here for reference. Do number 6, and write corrections for every F.</p>
+      <div class="col" id="tf" style="display:flex;flex-direction:column;gap:8px"></div>
+    </div>
+    <div class="task">
+      <h3>5d · Their fashion rules</h3>
+      <p class="lede">Think about what Liza and Adrian said and complete their rules.</p>
+      <div class="rulebox">
+        <div class="inline"><b>Liza:</b> Wear whatever you think <input type="text" id="r1" aria-label="Liza gap 1"> and makes you <input type="text" id="r2" aria-label="Liza gap 2">.</div>
+        <div class="inline"><b>Adrian:</b> Dress for the age <input type="text" id="r3" aria-label="Adrian gap 1">, not for the age <input type="text" id="r4" aria-label="Adrian gap 2">.</div>
+      </div>
+    </div>
+    <div class="task">
+      <h3>2.24 · The end of the discussion</h3>
+      <div id="a224"></div>
+      <p class="lede">5e. Listen and check your rules in 5d. Then: who do you agree with more, Liza or Adrian? Why? Write 3–5 sentences.</p>
+      <textarea id="agree" placeholder="I agree more with… because…"></textarea>
+    </div>
+    <div class="row"><button class="btn" id="sendListen">Check and send</button><span class="msg" id="listenMsg"></span></div>
+  </section>
+
+  <section class="panel" id="p-debate" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Book · page 23 · 5f</span><h2>Take a side</h2>
+      <p class="lede">Choose three topics. For each one, say your opinion out loud first, then write it: your view, a reason and an example. Then answer the other person's comment, starting with one of the phrases.</p></div>
+    <div class="phrases"><span>Sorry, but I don't agree.</span><span>True, but…</span><span>I'm not sure about that.</span><span>I agree up to a point, but…</span><span>So, to sum up…</span></div>
+    <div class="topics" id="topics"></div>
+    <div class="row"><button class="btn" id="sendDebate">Send to Polina</button><span class="msg" id="debateMsg"></span></div>
+  </section>
+
+  <section class="panel" id="p-ebay" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Book · page 23 · 6a</span><h2>Sell two things online</h2>
+      <p class="lede">Imagine you have decided to sell two items of clothing online. Write detailed descriptions, like the model, and set a starting price. The preview updates as you type.</p></div>
+    <div class="model"><b>Model:</b> Blue and white striped cotton shirt – Size M · Condition: New without tags · "Never worn! Would look great with jeans. Perfect for the summer." · £4.50</div>
+    <div id="listings" style="display:flex;flex-direction:column;gap:22px"></div>
+    <div class="row"><button class="btn" id="sendEbay">Send to Polina</button><span class="msg" id="ebayMsg"></span></div>
+  </section>
+
+  <section class="panel" id="p-video" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Book · page 23 · 7</span><h2>Video: the Hiut jeans company</h2>
+      <p class="lede">Watch the interview and answer the questions from your book.</p></div>
+    <div id="vid"></div>
+    <div class="task">
+      <label class="lab" for="usp">7a. What do you think is the unique selling point (USP) of their jeans?</label>
+      <textarea id="usp" style="min-height:70px"></textarea>
+    </div>
+    <div class="task">
+      <h3>7b. Watch again and make notes</h3>
+      <div class="notes" id="notes"></div>
+    </div>
+    <div class="task">
+      <label class="lab" for="nowash">7c. Would you like to have a pair of Hiut jeans? Would you be prepared to join the no-wash club? Why (not)?</label>
+      <textarea id="nowash"></textarea>
+    </div>
+    <div class="row"><button class="btn" id="sendVideo">Check and send</button><span class="msg" id="videoMsg"></span></div>
+  </section>
+</div>
+
+<script>
+/* Media files. Leave null to show a note instead of a player. */
+const MEDIA={a223:"media/2.23.mp3",a224:"media/2.24.mp3",video:"media/jeans.mp4"};
+
+const TABS=[["cards","Flashcards","words"],["which","Which word?","words"],["verbs","Fit, suit, match","words"],["order","Order","words"],["listen","Listening","book"],["debate","Take a side","book"],["ebay","Writing","book"],["video","Video","book"]];
+const $=id=>document.getElementById(id);
+const tabsEl=$("tabs");
+TABS.forEach(([id,name])=>{const b=document.createElement("button");b.className="tab";b.setAttribute("role","tab");b.id="t-"+id;b.textContent=name;b.onclick=()=>show(id);tabsEl.appendChild(b)});
+function show(id){TABS.forEach(([t])=>{$("p-"+t).hidden=t!==id;$("t-"+t).setAttribute("aria-selected",t===id)});
+  try{if(location.hash!=="#"+id)history.replaceState(null,"","#"+id)}catch(e){}}
+const h0=location.hash.slice(1);show(TABS.some(t=>t[0]===h0)?h0:"cards");
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const mark=id=>$("t-"+id).classList.add("done");
+const TR=window.Track;const canSave=TR.online;const RESTORE=[];
+TR.onStatus(st=>{$("saveState").textContent=!canSave?"Tip: open this page from your personal portal link so your answers reach Polina.":st==="saving"?"Saving…":st==="offline"?"No connection right now: your answers are kept on this device and will be sent later.":"Your progress saves automatically."});
+
+/* media */
+function mediaBlock(el,src,kind,label){
+  if(src){el.innerHTML=kind==="video"?`<video controls preload="metadata" src="${src}"></video>`:`<audio controls preload="none" src="${src}"></audio>`;
+    el.firstChild.addEventListener("error",()=>{el.innerHTML=`<div class="media-note">${label}: the file didn't load. Use the recording Polina sent you.</div>`});}
+  else el.innerHTML=`<div class="media-note">${label}: use the recording Polina sent you.</div>`;
+}
+mediaBlock($("a223"),MEDIA.a223,"audio","Audio 2.23");
+mediaBlock($("a224"),MEDIA.a224,"audio","Audio 2.24");
+mediaBlock($("vid"),MEDIA.video,"video","The video");
+
+/* 1 flashcards */
+const V=[
+ ["Fit","loose","not tight; there is space between the clothes and your body","My favourite hoodie is really loose and comfortable."],
+ ["Fit","tight","fitting very close to your body","These jeans are so tight I can't sit down."],
+ ["Style","hooded","with a hood, a part that covers your head","I always wear a hooded jacket when it rains."],
+ ["Style","long-sleeved / short-sleeved","with long or short sleeves (the parts that cover your arms)","A long-sleeved T-shirt is perfect for autumn."],
+ ["Style","polo neck","a high collar that folds over and covers your neck","He wore a black polo neck sweater with a grey suit."],
+ ["Style","sleeveless","with no sleeves","It was so hot that I put on a sleeveless dress."],
+ ["Style","V-neck","with a neck opening in the shape of a V","A V-neck sweater looks good over a shirt."],
+ ["Pattern","checked","with a pattern of squares","Lumberjacks always wear red checked shirts."],
+ ["Pattern","patterned","with a design on it, for example flowers","She bought a patterned skirt for the holiday."],
+ ["Pattern","plain","one colour, with no pattern","I prefer plain T-shirts, they go with everything."],
+ ["Pattern","spotted","with a pattern of round dots","A spotted tie looks a bit old-fashioned."],
+ ["Pattern","striped","with a pattern of lines","Sailors wear blue and white striped tops."],
+ ["Materials","cotton","light natural material from a plant; easy to wash","Cotton is the best material for summer."],
+ ["Materials","denim","thick cotton material, usually blue, used for jeans","She wore a denim waistcoat over her dress."],
+ ["Materials","fur","the soft hair of an animal (or a copy of it)","The coat has a fur collar."],
+ ["Materials","lace","delicate material with a pattern of holes","She wore a lace top to the wedding."],
+ ["Materials","linen","natural material that is cool to wear but creases easily","A linen suit is smart but you need to iron it."],
+ ["Materials","lycra","stretchy material, used for sports clothes and swimsuits","Cyclists wear lycra shorts."],
+ ["Materials","silk","very soft, smooth, shiny material","Her silk scarf was a present from Italy."],
+ ["Materials","velvet","soft thick material with a surface like short fur","A velvet bow tie looks great with a dinner jacket."],
+ ["Materials","wool / woollen","material from sheep; keeps you warm","My grandmother knitted me a woollen cardigan."],
+ ["Materials","leather","material made from animal skin, smooth and strong","Leather sandals last for years."],
+ ["Materials","suede","leather with a soft, rough surface","Don't wear suede boots in the rain!"],
+ ["Clothes","vest","(British English) a piece of underwear without sleeves, worn on the top half of your body","Wear a vest under your shirt, it's cold outside."],
+ ["Clothes","waistcoat","a short jacket with no sleeves, often worn over a shirt","He wore a waistcoat with his suit."],
+ ["Clothes","cardigan","a knitted jacket with buttons at the front","Take a cardigan in case it gets cold."],
+ ["Adjectives","casual","comfortable, not formal","On Fridays everybody wears casual clothes to work."],
+ ["Adjectives","classic","a traditional style that never goes out of fashion","A white shirt is a classic item."],
+ ["Adjectives","old-fashioned","not modern any more; out of fashion","That jacket looks really old-fashioned now."],
+ ["Adjectives","scruffy","untidy and dirty; looks old and worn","He went to the interview in scruffy jeans."],
+ ["Adjectives","smart","clean, elegant, quite formal","You look very smart in that suit!"],
+ ["Verbs","dress up","put on smart or special clothes for an occasion","We always dress up for New Year."],
+ ["Verbs","hang up","put clothes on a hanger or a hook","Hang up your jacket, don't throw it on the bed."],
+ ["Verbs","fit","be the right size for you","These shoes don't fit me. They're too big."],
+ ["Verbs","suit","look good on you (colour, style)","Green really suits you."],
+ ["Verbs","match","be the same or almost the same colour or style","Her bag matches her shoes."],
+ ["Verbs","go with","look good together","Does this tie go with my shirt?"],
+ ["Verbs","get changed","take off your clothes and put on different ones","I need to get changed before the party."],
+ ["Verbs","get dressed / get undressed","put on / take off your clothes","I got dressed in five minutes this morning."]
+];
+const GROUPS=["All",...new Set(V.map(v=>v[0]))];
+let group="All",known=new Set(),deck=[],cur=null,flipped=false;
+GROUPS.forEach(g=>{const b=document.createElement("button");b.className="filter";b.textContent=g;b.setAttribute("aria-pressed",g===group);b.onclick=()=>{group=g;document.querySelectorAll(".filter").forEach(x=>x.setAttribute("aria-pressed",x.textContent===g));buildDeck()};$("filters").appendChild(b)});
+const saveCards=()=>TR.extra("cards",{known:[...known]},known.size,V.length);
+function pool(){return V.filter(v=>group==="All"||v[0]===group)}
+function buildDeck(){deck=shuffle(pool().filter(v=>!known.has(v[1])));next()}
+function next(){cur=deck.shift()||null;flipped=false;render()}
+function render(){const f=$("flash"),p=pool(),k=p.filter(v=>known.has(v[1])).length;
+  $("bar").style.width=(k/p.length*100)+"%";$("fCount").textContent=`${k} / ${p.length}`;
+  f.classList.toggle("back",flipped);
+  if(!cur){f.innerHTML='<span class="w">All done!</span><span class="d">You know every word in this group.</span>';if(known.size===V.length)mark("cards");return}
+  f.innerHTML=flipped?`<span class="t">${cur[0]}</span><span class="w">${cur[1]}</span><span class="d">${cur[2]}</span><span class="x">${cur[3]}</span>`
+    :`<span class="t">${cur[0]}</span><span class="w">${cur[1]}</span><span class="tip">What does it mean? Click to check.</span>`}
+$("flash").onclick=()=>{if(cur){flipped=!flipped;render()}};
+$("gotit").onclick=()=>{if(!cur)return;known.add(cur[1]);saveCards();next()};
+$("again").onclick=()=>{if(!cur)return;deck.splice(Math.min(3,deck.length),0,cur);next()};
+$("fReset").onclick=()=>{pool().forEach(v=>known.delete(v[1]));saveCards();buildDeck()};
+buildDeck();
+RESTORE.push(S=>{const k=S.cards&&S.cards.extra&&S.cards.extra.known;if(k&&k.length){k.forEach(x=>known.add(x));buildDeck()}});
+
+/* generic multiple choice */
+function mc(elId,scoreId,ex,items){
+  const el=$(elId);const got={};
+  const upd=()=>{const n=Object.values(got).filter(Boolean).length;$(scoreId).textContent=`${n} / ${items.length}`;if(n===items.length){mark(ex);TR.finish(ex,n,items.length)}};
+  items.forEach(([s,opts,ans,why],i)=>{const d=document.createElement("div");d.className="q";
+    d.innerHTML=`<span class="n">${i+1}</span><span class="s">${s}</span><div class="opts">${shuffle(opts).map(o=>`<button class="opt">${o}</button>`).join("")}</div><span class="why" hidden>${why||""}</span>`;
+    let first=true;
+    d.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{if(got[i])return;const ok=b.textContent===ans;
+      b.classList.add(ok?"ok":"no");
+      if(first){TR.answer(ex,i,s.replace(/<[^>]+>/g,""),b.textContent,ans,ok,Object.values(got).filter(Boolean).length+(ok?1:0),items.length);first=false}
+      if(ok){got[i]=true;d.querySelector(".why").hidden=!why;upd()}});
+    el.appendChild(d)});
+  RESTORE.push(S=>{const a=S[ex]&&S[ex].answers;if(!a)return;Object.entries(a).forEach(([i,r])=>{if(r.ok){got[i]=true;const d=el.children[i];if(!d)return;d.querySelectorAll(".opt").forEach(b=>{if(b.textContent===r.c)b.classList.add("ok")});const w=d.querySelector(".why");if(w.textContent)w.hidden=false}});upd()});
+}
+mc("which","whichScore","which",[
+ ["A sweater with a high collar that folds over and covers your neck.",["polo neck","V-neck","hooded"],"polo neck"],
+ ["A shirt with a pattern of squares.",["checked","striped","spotted"],"checked"],
+ ["A T-shirt in one colour with no design.",["plain","patterned","classic"],"plain"],
+ ["Soft leather with a rough surface. Not good in the rain.",["suede","velvet","linen"],"suede"],
+ ["Stretchy material for swimsuits and sports clothes.",["lycra","lace","silk"],"lycra"],
+ ["Cool natural material for summer suits. It creases easily.",["linen","wool","fur"],"linen"],
+ ["A short jacket with no sleeves, worn over a shirt.",["waistcoat","vest","cardigan"],"waistcoat","A vest (British English) is underwear. In American English, vest = waistcoat."],
+ ["Clothes that are untidy, old and a bit dirty.",["scruffy","casual","old-fashioned"],"scruffy"],
+ ["Comfortable, informal clothes, like jeans and trainers.",["casual","smart","classic"],"casual"],
+ ["A style that was popular a long time ago and isn't now.",["old-fashioned","classic","old"],"old-fashioned","Classic = never goes out of fashion. Old-fashioned = out of fashion now."],
+ ["A dress with no sleeves.",["sleeveless","short-sleeved","loose"],"sleeveless"],
+ ["Delicate material with a pattern of small holes.",["lace","denim","velvet"],"lace"]
+]);
+mc("verbs","verbsScore","verbs",[
+ ["I can't wear these trousers any more. They don't ___ me.",["fit","suit","match"],"fit","Fit = the right size."],
+ ["Red really ___ you. You should wear it more often.",["suits","fits","goes with"],"suits","Suit = looks good on you."],
+ ["Her earrings ___ her necklace perfectly: both are green.",["match","suit","fit"],"match","Match = the same colour or style."],
+ ["Does this belt ___ these trousers?",["go with","fit","dress up"],"go with"],
+ ["It's a formal dinner, so we need to ___.",["dress up","get dressed","hang up"],"dress up"],
+ ["I've just spilt coffee on my shirt. I need to ___.",["get changed","get dressed","dress up"],"get changed"],
+ ["Please ___ your coat. Don't leave it on the chair.",["hang up","get changed","put on"],"hang up"],
+ ["Get up and ___! We're leaving in ten minutes.",["get dressed","dress up","get changed"],"get dressed"],
+ ["It's bath time: ___ quickly, the water is getting cold.",["get undressed","get changed","hang up"],"get undressed"],
+ ["This jacket is the right size, but the colour doesn't really ___ me.",["suit","fit","match"],"suit"]
+]);
+
+/* 4 order builder */
+const ORD=[
+ [["scruffy","old"],"jeans"],
+ [["dirty","old"],"shoes"],
+ [["lovely","new","leather"],"jacket"],
+ [["old-fashioned","woollen"],"cardigan"],
+ [["smart","new","navy","linen"],"suit"],
+ [["tight","black","lycra"],"swimsuit"],
+ [["gorgeous","vintage","silk"],"scarf"],
+ [["loose","white","striped","cotton"],"shirt"],
+ [["cheap","old","checked"],"shirt"],
+ [["beautiful","long","red","velvet"],"dress"]
+];
+const ordGot={};
+const ordUpd=()=>{const n=Object.keys(ordGot).length;$("orderScore").textContent=`${n} / ${ORD.length}`;if(n===ORD.length){mark("order");TR.finish("order",n,ORD.length)}};
+ORD.forEach(([words,noun],i)=>{const d=document.createElement("div");d.className="build";
+  d.innerHTML=`<div class="slot"><span class="tip">a…</span></div><div class="opts"></div><span class="msg"></span>`;
+  const slot=d.querySelector(".slot"),pool=d.querySelector(".opts"),msg=d.querySelector(".msg");let picked=[],tried=false;
+  function draw(){slot.innerHTML=(picked.length?"":`<span class="tip">click the words…</span>`)+picked.map((w,k)=>`<button class="word" data-k="${k}">${w}</button>`).join("")+` <span class="noun">${noun}</span>`;
+    pool.innerHTML=shuffleOnce.filter(w=>!picked.includes(w)).map(w=>`<button class="word">${w}</button>`).join("");
+    slot.querySelectorAll(".word").forEach(b=>b.onclick=()=>{if(ordGot[i])return;picked.splice(+b.dataset.k,1);msg.textContent="";draw()});
+    pool.querySelectorAll(".word").forEach(b=>b.onclick=()=>{picked.push(b.textContent);draw();check()})}
+  const shuffleOnce=shuffle(words);
+  function check(){if(picked.length<words.length)return;const ok=picked.join(" ")===words.join(" ");
+    if(!tried){TR.answer("order",i,`${words.join(", ")} + ${noun}`,picked.join(" ")+" "+noun,words.join(" ")+" "+noun,ok,Object.keys(ordGot).length+(ok?1:0),ORD.length);tried=true}
+    if(ok){ordGot[i]=true;d.classList.add("ok");msg.textContent="✓ "+picked.join(" ")+" "+noun;ordUpd()}else msg.textContent="Not quite. Click a word to move it back and try again."}
+  d._done=()=>{picked=[...words];ordGot[i]=true;draw();d.classList.add("ok");msg.textContent="✓ "+words.join(" ")+" "+noun};
+  draw();$("order").appendChild(d)});
+RESTORE.push(S=>{const a=S.order&&S.order.answers;if(!a)return;Object.entries(a).forEach(([i,r])=>{if(r.ok)$("order").children[i]._done()});ordUpd()});
+
+/* open-answer helper: drafts autosave, button sends. keys[i] = [regex, shown answer] for auto-checked fields */
+function openSet(ex,fields,btn,msgEl,minFilled,keys){
+  keys=keys||[];let sent=false,t=null;
+  const keyed=fields.map((f,i)=>keys[i]?i:-1).filter(i=>i>=0);
+  const collect=()=>fields.map(([el,q],i)=>({i,q,a:el.value.trim()}));
+  const okOf=(i,a)=>keys[i]?keys[i][0].test(a.toLowerCase()):true;
+  const score=()=>keyed.filter(i=>okOf(i,fields[i][0].value.trim())).length;
+  const save=final=>{const sc=keyed.length?score():(final?1:0),tot=keyed.length||1;
+    collect().forEach(({i,q,a})=>{if(a)TR.answer(ex,i,q,a,keys[i]?keys[i][1]:"",okOf(i,a),sc,tot)});if(final)TR.finish(ex,sc,tot)};
+  const showKeys=()=>{keyed.forEach(i=>{const el=fields[i][0];let m=el.parentNode.querySelector(`.mark[data-k="${i}"]`);
+    if(!m){m=document.createElement("span");m.className="mark";m.dataset.k=i;m.style.cssText="font-size:15px;flex-basis:100%";if(el.parentNode.classList.contains("inline"))el.parentNode.append(m);else el.insertAdjacentElement("afterend",m)}
+    const ok=okOf(i,el.value.trim());m.style.color=ok?"var(--ok)":"var(--bad)";m.textContent=(ok?"✓ ":"✗ ")+"Answer: "+keys[i][1]});
+    fields.forEach((f,i)=>{if(keys[i]===undefined&&f[2]){let m=f[0].parentNode.querySelector(`.mark[data-k="${i}"]`);if(!m){m=document.createElement("span");m.className="mark";m.dataset.k=i;m.style.cssText="font-size:15px;color:var(--teal);flex-basis:100%";f[0].insertAdjacentElement("afterend",m)}m.textContent="Key: "+f[2]}})};
+  fields.forEach(([el])=>el.addEventListener("input",()=>{clearTimeout(t);t=setTimeout(()=>save(sent),1500)}));
+  btn.onclick=()=>{const filled=collect().filter(x=>x.a).length;if(filled<minFilled){msgEl.textContent="Please answer a few more first.";return}
+    clearTimeout(t);sent=true;save(true);mark(ex);showKeys();
+    msgEl.textContent=(keyed.length?`${score()} / ${keyed.length} correct. `:"")+(canSave?"Sent to Polina.":"Saved on this device. Open the page from your portal link to send it to Polina.")};
+  RESTORE.push(S=>{const a=S[ex]&&S[ex].answers;if(a)Object.entries(a).forEach(([i,r])=>{const f=fields[i];if(f&&r.a&&!f[0].value)f[0].value=r.a;if(f&&f[0].oninput)f[0].oninput()});if(S[ex]&&S[ex].final){sent=true;mark(ex);showKeys()}});
+}
+
+/* 5 listening */
+const TF=[
+ ["Liza thinks that 90% of women dress younger than their age.","T"],
+ ["Liza thinks that teenage girls would never dress older than their age.","F"],
+ ["Liza thinks that it's fine for older women to wear trendy clothes.","T"],
+ ["Adrian thinks that very few men admit to dressing younger than their age.","T"],
+ ["Adrian thinks that Mick Jagger looks awful in many of the clothes he wears.","F"],
+ ["Adrian thinks that men normally wear a suit and tie to work.",null]
+];
+const TFKEY={1:"They sometimes dress older to get into pubs and bars.",4:"He looks great.",5:"Most men don't dress like that nowadays."};
+const tfFields=[];
+TF.forEach(([s,done],i)=>{const d=document.createElement("div");d.className="tf";
+  if(done){d.innerHTML=`<span>${i+1}. ${s}</span><span class="done">done in class: ${done}</span>`+(done==="F"?`<input type="text" class="fix" id="fix${i}" placeholder="Correct it: Liza / Adrian actually thinks that…">`:"");}
+  else{d.innerHTML=`<span><b>${i+1}. ${s}</b></span><span class="seg"><button aria-pressed="false">T</button><button aria-pressed="false">F</button></span><input type="text" class="fix" id="fix${i}" placeholder="If F, correct it: Adrian actually thinks that…"><input type="hidden" id="tf${i}">`;
+    const hid=d.querySelector("#tf"+i);d.querySelectorAll(".seg button").forEach(b=>b.onclick=()=>{d.querySelectorAll(".seg button").forEach(x=>x.setAttribute("aria-pressed",x===b));hid.value=b.textContent;hid.dispatchEvent(new Event("input"))});
+    hid.oninput=()=>d.querySelectorAll(".seg button").forEach(x=>x.setAttribute("aria-pressed",x.textContent===hid.value));
+    tfFields.push([hid,`5c ${i+1}: ${s} (T/F)`,null,[/^f$/,"F"]]);}
+  $("tf").appendChild(d);
+  const fx=d.querySelector(".fix");if(fx)tfFields.push([fx,`5c ${i+1} correction`,TFKEY[i]]);});
+{const LF=[...tfFields.map(f=>[f[0],f[1],f[2]]),[$("r1"),"5d Liza: Wear whatever you think ___"],[$("r2"),"5d Liza: and makes you ___"],[$("r3"),"5d Adrian: Dress for the age ___"],[$("r4"),"5d Adrian: not for the age ___"],[$("agree"),"5e Who do you agree with more and why?"]];
+ const LK=[];tfFields.forEach((f,i)=>{if(f[3])LK[i]=f[3]});const n=tfFields.length;
+ LK[n]=[/suits? you/,"suits you"];LK[n+1]=[/feel (good|great|happy)/,"feel good"];LK[n+2]=[/you are/,"you are"];LK[n+3]=[/wish you were/,"you wish you were"];
+ openSet("listen",LF,$("sendListen"),$("listenMsg"),5,LK);}
+
+/* 6 debate (5f) */
+const TOP=[
+ ["People should stop buying new clothes and buy more second-hand and vintage clothes.","\"Second-hand clothes are fine for students, but adults should buy new ones.\""],
+ ["Men are just as interested in shopping for clothes as women.","\"Come on, most men just buy the same jeans every year and that's it.\""],
+ ["Nowadays, nobody is prepared to suffer in order to look good. The most important thing is comfort.","\"Look at people at weddings or job interviews. Everyone still suffers to look good.\""],
+ ["You can tell a lot about someone's personality from the clothes they wear.","\"Clothes tell you nothing. A lot of people just wear what's clean.\""],
+ ["Cheap fashion means exploiting people in less developed countries.","\"Expensive brands use the same factories, so price doesn't matter.\""]
+];
+const debFields=[];
+TOP.forEach(([c,o],i)=>{const d=document.createElement("div");d.className="topic";
+  d.innerHTML=`<span class="claim">${c}</span><label class="lab" for="dv${i}">My view</label><textarea id="dv${i}" placeholder="I think… because… For example,…"></textarea><span class="opp">Someone says: ${o}</span><label class="lab" for="dr${i}">My answer</label><textarea id="dr${i}" style="min-height:80px" placeholder="True, but…"></textarea>`;
+  $("topics").appendChild(d);debFields.push([d.querySelector("#dv"+i),`5f view: ${c}`],[d.querySelector("#dr"+i),`5f reply to ${o}`])});
+openSet("debate",debFields,$("sendDebate"),$("debateMsg"),6);
+
+/* 7 eBay listing (6a) */
+const ebFields=[];
+[1,2].forEach(n=>{const d=document.createElement("div");d.className="listing-grid";
+  d.innerHTML=`<div class="fields"><h3>Item ${n}</h3>
+   <label class="lab" for="e${n}t">Title (colour, pattern, material, item, size)</label><input type="text" id="e${n}t" placeholder="Black velvet blazer – Size S">
+   <label class="lab" for="e${n}c">Condition</label><input type="text" id="e${n}c" placeholder="Worn once / New with tags / Good, a bit faded">
+   <label class="lab" for="e${n}d">Description</label><textarea id="e${n}d" style="min-height:90px" placeholder="What is it like? What does it go with? Who would it suit? Why are you selling it?"></textarea>
+   <label class="lab" for="e${n}p">Starting price</label><input type="text" id="e${n}p" placeholder="£12"></div>
+   <div class="preview" aria-live="polite"><span class="eyebrow">Preview</span><span class="pt" id="e${n}tv">Your title</span><span class="pc" id="e${n}cv">Condition:</span><span class="pq" id="e${n}dv"></span><span class="pp" id="e${n}pv"></span></div>`;
+  $("listings").appendChild(d);
+  const sync=()=>{$(`e${n}tv`).textContent=$(`e${n}t`).value||"Your title";$(`e${n}cv`).textContent="Condition: "+$(`e${n}c`).value;$(`e${n}dv`).textContent=$(`e${n}d`).value?`"${$(`e${n}d`).value}"`:"";$(`e${n}pv`).textContent=$(`e${n}p`).value};
+  ["t","c","d","p"].forEach(k=>{const el=$(`e${n}${k}`);el.addEventListener("input",sync);el.oninput=sync;ebFields.push([el,`6a item ${n} ${({t:"title",c:"condition",d:"description",p:"price"})[k]}`])})});
+openSet("ebay",ebFields,$("sendEbay"),$("ebayMsg"),6);
+
+/* 8 video */
+const NOTES=[["Description of jeans",null],["1 Material","denim (example)"],["2 Style",""],["3 Celebrity wearer",""],["History of company",null],["4 When David and Clare started it and why",""],["5 Who they employ",""],["6 How many pairs of jeans they produce per week",""],["7 How they try to make their jeans environmentally friendly",""]];
+const vFields=[[$("usp"),"7a USP","Each pair of jeans is made by hand."]];
+const VK={2:[/classic/,"classic"],3:[/meghan|markle|duchess/,"Meghan Markle (the Duchess of Sussex)"],5:[/2002/,"In 2002, because the old factory closed down and they wanted to get people's jobs back"],6:[/former|old factory|worker|grand master/,"Many of the former factory's workers ('Grand Masters')"],7:[/180|hundred and eighty/,"about 180"],8:[/wash/,"They encourage people not to wash their jeans for 3 or 6 months (the no-wash club); free repairs for life"]};
+const VKL=[];
+NOTES.forEach(([k,ph],i)=>{if(ph===null){const s=document.createElement("div");s.className="sec";s.textContent=k;$("notes").appendChild(s);return}
+  const l=document.createElement("label");l.className="k";l.htmlFor="n"+i;l.textContent=k;const t=document.createElement("textarea");t.id="n"+i;
+  if(ph){t.value="denim";t.readOnly=true;t.style.minHeight="44px"}
+  $("notes").append(l,t);if(!ph){VKL[vFields.length]=VK[i];vFields.push([t,"7b "+k])}});
+vFields.push([$("nowash"),"7c Hiut jeans and the no-wash club"]);
+openSet("video",vFields,$("sendVideo"),$("videoMsg"),5,VKL);
+
+TR.init("clothes").then(S=>RESTORE.forEach(f=>{try{f(S)}catch(e){console.error(e)}}));
+</script>
+</body>
+</html>
