@@ -16,6 +16,6 @@ window.PORTAL_ACTIVITIES = {
   adv: { adjadv: "Adjective or adverb?", pairs: "Tricky pairs", confusing: "Confusing adverbs", cmatch: "Comment adverbs: meanings", comment: "Comment adverbs: use", types: "Types", place: "Position", fix: "Final check" },
   move: { walk: "The walk", tricky: "Tricky pairs", sports: "Play, go, do", stress: "Stress", match: "The big match", verbs: "Which verb?" },
   necklace: { words: "Words from the story", lend: "Borrow or lend?", vuln: "Vulnerable", use: "Story and surgery" },
-  clothes: { cards: "Flashcards", which: "Which word?", verbs: "Fit, suit, match", order: "Adjective order", listen: "Listening 5c–e", debate: "Take a side (5f)", ebay: "Writing 6a", video: "Video 7" },
+  clothes: { cards: "Flashcards", which: "Which word?", verbs: "Fit, suit, match", order: "Adjective order", listen: "Listening 5c–e", ebay: "Writing 6a", video: "Video 7" },
   ppps: { signals: "Signal words", forms: "Participles", choose: "Which tense?", words: "ever, just, yet…", dialogue: "Conversation", rw: "Right or wrong?" }
 };

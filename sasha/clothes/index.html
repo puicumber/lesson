@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex">
 <title>The Fitting Room</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@600;800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;700;800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@500&display=swap">
 <script src="../../assets/config.js?v=13"></script>
 <script src="../../assets/portal.js?v=3"></script>
 <script src="../../assets/track.js?v=2"></script>
@@ -16,7 +16,7 @@
   --bg:#f4f1f8; --card:#fffdfd; --ink:#1c1630; --muted:#5f5875; --line:#ddd5ea;
   --pink:#c81d6b; --pink-soft:#c81d6b17; --teal:#0d7f86; --teal-soft:#0d7f8617; --tag:#f2c14e;
   --ok:#1f8a5b; --ok-soft:#1f8a5b1c; --bad:#c2453d; --bad-soft:#c2453d1a;
-  --display:"Syne","Trebuchet MS",system-ui,sans-serif;
+  --display:"Outfit","Trebuchet MS",system-ui,sans-serif;
   --body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
   --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
 }
@@ -207,14 +207,6 @@ label.lab{font-weight:700}
     <div class="row"><button class="btn" id="sendListen">Check and send</button><span class="msg" id="listenMsg"></span></div>
   </section>
 
-  <section class="panel" id="p-debate" role="tabpanel" hidden>
-    <div class="head"><span class="eyebrow">Book · page 23 · 5f</span><h2>Take a side</h2>
-      <p class="lede">Choose three topics. For each one, say your opinion out loud first, then write it: your view, a reason and an example. Then answer the other person's comment, starting with one of the phrases.</p></div>
-    <div class="phrases"><span>Sorry, but I don't agree.</span><span>True, but…</span><span>I'm not sure about that.</span><span>I agree up to a point, but…</span><span>So, to sum up…</span></div>
-    <div class="topics" id="topics"></div>
-    <div class="row"><button class="btn" id="sendDebate">Send to Polina</button><span class="msg" id="debateMsg"></span></div>
-  </section>
-
   <section class="panel" id="p-ebay" role="tabpanel" hidden>
     <div class="head"><span class="eyebrow">Book · page 23 · 6a</span><h2>Sell two things online</h2>
       <p class="lede">Imagine you have decided to sell two items of clothing online. Write detailed descriptions, like the model, and set a starting price. The preview updates as you type.</p></div>
@@ -247,7 +239,7 @@ label.lab{font-weight:700}
 /* Media files. Leave null to show a note instead of a player. */
 const MEDIA={a223:"media/2.23.mp3",a224:"media/2.24.mp3",video:"media/jeans.mp4"};
 
-const TABS=[["cards","Flashcards","words"],["which","Which word?","words"],["verbs","Fit, suit, match","words"],["order","Order","words"],["listen","Listening","book"],["debate","Take a side","book"],["ebay","Writing","book"],["video","Video","book"]];
+const TABS=[["cards","Flashcards","words"],["which","Which word?","words"],["verbs","Fit, suit, match","words"],["order","Order","words"],["listen","Listening","book"],["ebay","Writing","book"],["video","Video","book"]];
 const $=id=>document.getElementById(id);
 const tabsEl=$("tabs");
 TABS.forEach(([id,name])=>{const b=document.createElement("button");b.className="tab";b.setAttribute("role","tab");b.id="t-"+id;b.textContent=name;b.onclick=()=>show(id);tabsEl.appendChild(b)});
@@ -446,20 +438,6 @@ TF.forEach(([s,done],i)=>{const d=document.createElement("div");d.className="tf"
  const LK=[];tfFields.forEach((f,i)=>{if(f[3])LK[i]=f[3]});const n=tfFields.length;
  LK[n]=[/suits? you/,"suits you"];LK[n+1]=[/feel (good|great|happy)/,"feel good"];LK[n+2]=[/you are/,"you are"];LK[n+3]=[/wish you were/,"you wish you were"];
  openSet("listen",LF,$("sendListen"),$("listenMsg"),5,LK);}
-
-/* 6 debate (5f) */
-const TOP=[
- ["People should stop buying new clothes and buy more second-hand and vintage clothes.","\"Second-hand clothes are fine for students, but adults should buy new ones.\""],
- ["Men are just as interested in shopping for clothes as women.","\"Come on, most men just buy the same jeans every year and that's it.\""],
- ["Nowadays, nobody is prepared to suffer in order to look good. The most important thing is comfort.","\"Look at people at weddings or job interviews. Everyone still suffers to look good.\""],
- ["You can tell a lot about someone's personality from the clothes they wear.","\"Clothes tell you nothing. A lot of people just wear what's clean.\""],
- ["Cheap fashion means exploiting people in less developed countries.","\"Expensive brands use the same factories, so price doesn't matter.\""]
-];
-const debFields=[];
-TOP.forEach(([c,o],i)=>{const d=document.createElement("div");d.className="topic";
-  d.innerHTML=`<span class="claim">${c}</span><label class="lab" for="dv${i}">My view</label><textarea id="dv${i}" placeholder="I think… because… For example,…"></textarea><span class="opp">Someone says: ${o}</span><label class="lab" for="dr${i}">My answer</label><textarea id="dr${i}" style="min-height:80px" placeholder="True, but…"></textarea>`;
-  $("topics").appendChild(d);debFields.push([d.querySelector("#dv"+i),`5f view: ${c}`],[d.querySelector("#dr"+i),`5f reply to ${o}`])});
-openSet("debate",debFields,$("sendDebate"),$("debateMsg"),6);
 
 /* 7 eBay listing (6a) */
 const ebFields=[];
