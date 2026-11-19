@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Still Growing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<script src="../../assets/config.js?v=15"></script>
+<script src="../../assets/portal.js?v=3"></script>
+<script src="../../assets/track.js?v=2"></script>
+<style>
+/* Look: a seed-to-plant garden journal. Leaf green + terracotta on warm paper. */
+:root{
+  --bg:#f6f1e4; --card:#fffdf6; --ink:#2a2a1f; --muted:#68674f; --line:#e1d9c0;
+  --leaf:#2f7d4a; --leaf-soft:#2f7d4a1a; --clay:#c4572e; --clay-soft:#c4572e1f; --sun:#e0a21b; --sun-soft:#e0a21b26;
+  --ok:#2f7d4a; --ok-soft:#2f7d4a1f; --bad:#c03b32; --bad-soft:#c03b321c;
+  --display:"Fraunces",Georgia,serif;
+  --body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#15170f; --card:#1d2016; --ink:#ecebdc; --muted:#aeac93; --line:#343826;
+  --leaf:#86cf8f; --leaf-soft:#86cf8f1f; --clay:#f0906a; --clay-soft:#f0906a24; --sun:#f2c45a; --sun-soft:#f2c45a22;
+  --ok:#86cf8f; --ok-soft:#86cf8f22; --bad:#f08077; --bad-soft:#f0807722; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#15170f; --card:#1d2016; --ink:#ecebdc; --muted:#aeac93; --line:#343826;
+  --leaf:#86cf8f; --leaf-soft:#86cf8f1f; --clay:#f0906a; --clay-soft:#f0906a24; --sun:#f2c45a; --sun-soft:#f2c45a22;
+  --ok:#86cf8f; --ok-soft:#86cf8f22; --bad:#f08077; --bad-soft:#f0807722; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 64px}
+.wrap{max-width:940px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+h1,h2,h3{font-family:var(--display);margin:0;line-height:1.05;text-wrap:balance}
+h1{font-size:clamp(42px,8vw,72px);font-weight:800;letter-spacing:-.02em;color:var(--leaf)}
+h2{font-size:clamp(28px,4vw,38px);font-weight:800}
+p{margin:0}
+.eyebrow{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.lede{color:var(--muted);max-width:64ch}
+.tip{font-size:14px;color:var(--muted);font-style:italic}
+
+.guide{position:relative;border-radius:24px;padding:26px clamp(20px,4vw,36px) 0;background:var(--card);border:1px solid var(--line);display:flex;flex-direction:column;gap:10px;overflow:hidden}
+.soil{margin:14px calc(-1*clamp(20px,4vw,36px)) 0;height:54px;background:linear-gradient(var(--clay-soft),var(--clay-soft)),repeating-linear-gradient(90deg,transparent 0 22px,var(--clay-soft) 22px 26px);border-top:3px solid var(--clay);display:flex;align-items:flex-end;justify-content:space-around;padding:0 20px}
+.sprout{font-size:30px;line-height:1;transform:translateY(-38px);transition:transform .4s;filter:grayscale(1);opacity:.35}
+.sprout.on{filter:none;opacity:1}
+.plantnote{position:absolute;right:clamp(16px,4vw,34px);top:22px;font-size:14px;color:var(--muted);text-align:right}
+
+nav.tabs{display:flex;flex-wrap:wrap;gap:8px}
+.tab{appearance:none;cursor:pointer;font:inherit;font-weight:700;font-size:15px;border-radius:12px 12px 12px 2px;padding:8px 16px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+.tab:hover{border-color:var(--leaf)}
+.tab[aria-selected="true"]{background:var(--leaf);border-color:var(--leaf);color:var(--card)}
+.tab.done::after{content:" 🌱"}
+.tab:focus-visible,.btn:focus-visible,.opt:focus-visible,.cat:focus-visible,select:focus-visible,.seed:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+
+section.panel{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:clamp(20px,4vw,34px);display:flex;flex-direction:column;gap:22px}
+.head{display:flex;flex-direction:column;gap:8px}
+.btn{appearance:none;cursor:pointer;font:inherit;font-weight:700;font-size:16px;border-radius:999px;padding:10px 20px;border:1px solid var(--leaf);background:var(--leaf);color:var(--card)}
+.btn.ghost{background:transparent;color:var(--leaf)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.score{font-weight:700;color:var(--leaf);font-variant-numeric:tabular-nums}
+
+/* rule */
+.rule{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
+.rule>div{background:var(--bg);border:1px solid var(--line);border-left:6px solid var(--leaf);border-radius:14px;padding:16px 18px;display:flex;flex-direction:column;gap:6px}
+.rule>div.c2{border-left-color:var(--clay)}
+.rule>div.c3{border-left-color:var(--sun)}
+.rule strong{font-family:var(--display);font-size:22px}
+.rule .ex{font-size:15px;color:var(--muted)}
+.rule .ex b{color:var(--ink)}
+.no-way{text-decoration:line-through;color:var(--bad)}
+.timeline{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px;background:var(--bg);border:1px dashed var(--line);border-radius:14px;padding:14px 16px}
+.timeline .pt{font-weight:700;font-size:14px;white-space:nowrap}
+.timeline .ln{height:6px;border-radius:3px;background:linear-gradient(90deg,var(--clay),var(--leaf));position:relative}
+.timeline .ln::after{content:"🌿";position:absolute;right:-10px;top:-14px;font-size:20px}
+.timeline .cap{grid-column:1/-1;font-size:15px;text-align:center}
+
+/* sorter */
+.sort-card{background:var(--bg);border:2px solid var(--line);border-radius:18px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center}
+.sort-card .word{font-family:var(--display);font-size:clamp(32px,6vw,48px);font-weight:800}
+.cats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;width:100%}
+.cat{appearance:none;cursor:pointer;font:inherit;font-weight:700;border-radius:14px;padding:14px 8px;border:2px solid var(--line);background:var(--card);color:var(--ink);display:flex;flex-direction:column;gap:4px;align-items:center}
+.cat .ic{font-size:30px}
+.cat small{font-weight:400;color:var(--muted)}
+.cat:hover{border-color:var(--leaf)}
+.cat.ok{border-color:var(--ok);background:var(--ok-soft)}
+.cat.no{border-color:var(--bad);background:var(--bad-soft);animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.feedback{min-height:1.5em;font-weight:700}
+.feedback.ok{color:var(--ok)}.feedback.no{color:var(--bad)}
+
+/* choose */
+.qs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:700px){.qs{grid-template-columns:1fr}}
+.q{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.q .n{font-size:12px;color:var(--muted);letter-spacing:.1em}
+.q .s{font-weight:700}
+.q .s .em{font-size:26px;margin-right:6px}
+.opts{display:flex;gap:6px;flex-wrap:wrap}
+.opt{appearance:none;cursor:pointer;font:inherit;font-size:15px;border-radius:8px;padding:6px 12px;background:var(--card);color:var(--ink);border:1px solid var(--line);text-align:left}
+.opt:hover{border-color:var(--leaf)}
+.opt.ok{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.opt.no{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.why{font-size:14px;color:var(--muted)}
+
+/* fill */
+.fill{display:flex;flex-direction:column;gap:8px;padding:0;margin:0}
+.fill li{list-style:none;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;padding:10px 14px;border-radius:12px;background:var(--bg);border:1px solid transparent}
+.fill li.ok{border-color:var(--ok)}.fill li.no{border-color:var(--bad)}
+.fill .v{font-size:14px;color:var(--clay);font-weight:700}
+.fill .mark{margin-left:auto;font-size:14px}.mark.ok{color:var(--ok)}.mark.no{color:var(--bad)}
+.story li{background:transparent;padding:6px 4px;border-radius:8px}
+.story{background:var(--bg);border-radius:16px;padding:16px!important;line-height:1.9}
+select{font:inherit;font-size:16px;color:var(--ink);background:var(--card);border:1px solid var(--leaf);border-radius:8px;padding:4px 8px;max-width:100%}
+
+/* talk */
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:700px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.seed{appearance:none;cursor:pointer;font:inherit;color:var(--ink);background:var(--bg);border:2px dashed var(--clay);border-radius:14px;min-height:118px;padding:14px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:15px}
+.seed:not(.open){font-size:36px}
+.seed.open{border-style:solid;border-color:var(--leaf)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="guide">
+    <span class="eyebrow">Homework · Present perfect simple &amp; continuous</span>
+    <h1>Still Growing</h1>
+    <p class="lede">Some things started in the past and are <b>still</b> happening now, like a plant that's still growing. How long? Since when? Learn the rule, then grow your garden: every finished step plants something new.</p>
+    <p class="tip" id="saveState"></p>
+    <div class="soil" id="garden" aria-label="Your garden"></div>
+  </header>
+
+  <nav class="tabs" role="tablist" id="tabs"></nav>
+
+  <section class="panel" id="p-rule" role="tabpanel">
+    <div class="head"><span class="eyebrow">Step 1</span><h2>The rule</h2>
+      <p class="lede">It started in the past and it's still true now. Which form do we use?</p></div>
+    <div class="timeline"><span class="pt">since 2022</span><span class="ln"></span><span class="pt">now</span>
+      <span class="cap">I've been working here <b>for</b> four years / <b>since</b> 2022. (I started in 2022, and I still work here.)</span></div>
+    <div class="rule">
+      <div><strong>have / has + been + -ing</strong><span>Present perfect <b>continuous</b> with <b>action verbs</b>: learn, work, wait, play, rain, study…</span>
+        <span class="ex"><b>How long have you been learning</b> English?<br><b>It's been raining</b> since lunchtime.</span></div>
+      <div class="c2"><strong>have / has + past participle</strong><span>Present perfect <b>simple</b> with <b>non-action verbs</b>: know, have (= own), like, love, want, believe, understand, belong…</span>
+        <span class="ex"><b>We've known</b> each other for ten years.<br><span class="no-way">We've been knowing each other…</span></span></div>
+      <div class="c3"><strong>a result you can see</strong><span>A recent action that explains what we see <b>now</b>: present perfect continuous.</span>
+        <span class="ex">Your eyes are red! — <b>I've been chopping</b> onions.<br>Why are you so hot? — <b>I've been running</b>.</span></div>
+    </div>
+    <div class="rule">
+      <div><strong>for</strong><span>+ a period of time</span><span class="ex">for two weeks · for ages · for half an hour</span></div>
+      <div class="c2"><strong>since</strong><span>+ a point in time</span><span class="ex">since Monday · since 2019 · since I was a child</span></div>
+      <div class="c3"><strong>live &amp; work</strong><span>Both forms are OK, same meaning.</span><span class="ex">I've lived here since 2010. = I've been living here since 2010.</span></div>
+    </div>
+    <p class="tip">⚠️ Don't use the present simple or present continuous with for / since: <span class="no-way">I am working here for two years.</span> → I've been working here for two years.</p>
+    <div class="row"><button class="btn" id="ruleOk">I've read it</button><span class="score" id="s-rule"></span></div>
+  </section>
+
+  <section class="panel" id="p-forsince" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Step 2</span><h2>for or since?</h2>
+      <p class="lede">A period of time or a point in time?</p></div>
+    <div id="forsince"></div>
+  </section>
+
+  <section class="panel" id="p-verbs" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Step 3</span><h2>Action or non-action?</h2>
+      <p class="lede">Can the verb go into the continuous form (been + -ing)? Action verbs can. Non-action verbs (feelings, thoughts, owning) usually can't.</p></div>
+    <div id="verbs"></div>
+  </section>
+
+  <section class="panel" id="p-build" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Step 4</span><h2>Choose the form</h2>
+      <p class="lede">Look at the verb in brackets. Action verb? Use the continuous. Non-action verb? Use the simple. Then press "Check".</p></div>
+    <ol class="fill" id="build"></ol>
+    <div class="row"><button class="btn" id="buildCheck">Check</button><span class="score" id="s-build"></span></div>
+  </section>
+
+  <section class="panel" id="p-choose" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Step 5</span><h2>One or both?</h2>
+      <p class="lede">Choose the correct form. If both are correct, choose "Both are OK". Remember live and work!</p></div>
+    <div class="qs" id="choose"></div>
+    <span class="score" id="s-choose"></span>
+  </section>
+
+  <section class="panel" id="p-why" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Step 6</span><h2>What have you been doing?</h2>
+      <p class="lede">You can see the result. Choose the best explanation.</p></div>
+    <div class="qs" id="why"></div>
+    <span class="score" id="s-why"></span>
+  </section>
+
+  <section class="panel" id="p-story" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Step 7</span><h2>Katya's year in Uganda</h2>
+      <p class="lede">Katya is a volunteer with a small charity. Complete her story, then press "Check". Tip: "how many" (two classrooms, so many people) uses the simple form.</p></div>
+    <ol class="fill story" id="story"></ol>
+    <div class="row"><button class="btn" id="storyCheck">Check</button><span class="score" id="s-story"></span></div>
+  </section>
+
+  <section class="panel" id="p-talk" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">For the lesson</span><h2>How long…?</h2>
+      <p class="lede">Open a seed and think about your answer. Use for or since, and add one more detail.</p></div>
+    <div class="cards" id="talk"></div>
+  </section>
+</div>
+
+<script>
+const TABS=[["rule","The rule"],["forsince","for / since"],["verbs","Action?"],["build","Choose the form"],["choose","One or both?"],["why","What have you been doing?"],["story","Katya's story"],["talk","Talk"]];
+const PLANTS=["🌱","🌿","🌷","🌻","🌳","🌼","🍅"];
+const tabsEl=document.getElementById("tabs"),garden=document.getElementById("garden");
+TABS.forEach(([id,name])=>{const b=document.createElement("button");b.className="tab";b.setAttribute("role","tab");b.id="t-"+id;b.textContent=name;b.onclick=()=>show(id);tabsEl.appendChild(b)});
+PLANTS.forEach(p=>{const s=document.createElement("span");s.className="sprout";s.textContent=p;s.setAttribute("aria-hidden","true");garden.appendChild(s)});
+function show(id){TABS.forEach(([t])=>{document.getElementById("p-"+t).hidden=t!==id;document.getElementById("t-"+t).setAttribute("aria-selected",t===id)});
+  try{if(location.hash!=="#"+id)history.replaceState(null,"","#"+id)}catch(e){}}
+const h0=location.hash.slice(1);show(TABS.some(t=>t[0]===h0)?h0:"rule");
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const strip=s=>String(s).replace(/<[^>]+>/g,"");
+const DONE=new Set();
+function grow(){const n=DONE.size;garden.querySelectorAll(".sprout").forEach((s,i)=>s.classList.toggle("on",i<n));garden.setAttribute("aria-label",`Your garden: ${n} of ${PLANTS.length} plants`)}
+const mark=id=>{const t=document.getElementById("t-"+id);if(t)t.classList.add("done");if(id!=="rule"&&id!=="talk"){DONE.add(id);grow()}};
+const TR=window.Track;const canSave=TR.online;const RESTORE=[];
+TR.onStatus(st=>{document.getElementById("saveState").textContent=!canSave?"Tip: open this page from your personal portal link to save your progress.":st==="saving"?"Saving…":st==="offline"?"No connection right now: your answers are kept on this device and will be sent later.":"Your progress saves automatically after every answer."});
+
+document.getElementById("ruleOk").onclick=()=>{mark("rule");document.getElementById("s-rule").textContent="Great! Now Step 2.";setTimeout(()=>{show("forsince");scrollTo({top:0,behavior:"smooth"})},600)};
+
+/* sorter: one card at a time */
+function sorter(act,C,W){const host=document.getElementById(act);
+  host.innerHTML=`<div class="sort-card"><span class="eyebrow" data-n></span><span class="word" data-w></span><div class="cats" data-c></div><p class="feedback" data-f></p><button class="btn" data-x hidden>Next</button></div><span class="score" id="s-${act}"></span>`;
+  const q=k=>host.querySelector(`[data-${k}]`),cats=q("c"),fb=q("f"),nx=q("x");
+  let list=shuffle(W),i=0,ok=0,first=true,pick=null;
+  Object.entries(C).forEach(([k,[l,ic,sub]])=>{const b=document.createElement("button");b.className="cat";b.innerHTML=`<span class="ic">${ic}</span>${l}${sub?`<small>${sub}</small>`:""}`;
+    b.onclick=()=>{if(!nx.hidden)return;const a=list[i];
+      if(k===a[1]){b.classList.add("ok");if(first)ok++;TR.answer(act,a[0],a[0],first?C[k][0]:C[pick][0],C[a[1]][0],first,ok,list.length);
+        fb.className="feedback ok";fb.textContent=a[2];nx.hidden=false;
+        document.getElementById("s-"+act).textContent=`First-try answers: ${ok} / ${i+1}`;if(i===list.length-1){nx.textContent="Finished!";TR.finish(act,ok,list.length);mark(act)}}
+      else{if(first){first=false;pick=k}b.classList.add("no");fb.className="feedback no";fb.textContent="Not quite. Try again!";setTimeout(()=>b.classList.remove("no"),500)}};cats.appendChild(b)});
+  function draw(){const a=list[i];first=true;q("n").textContent=`${i+1} / ${list.length}`;q("w").textContent=a[0];fb.textContent="";nx.hidden=true;cats.querySelectorAll(".cat").forEach(c=>c.classList.remove("ok","no"))}
+  nx.onclick=()=>{if(i<list.length-1){i++;draw();q("w").focus?.()}};draw();
+  const rb=document.createElement("button");rb.className="btn ghost";rb.textContent="Start again";rb.onclick=()=>{TR.reset(act);list=shuffle(W);i=0;ok=0;nx.textContent="Next";document.getElementById("s-"+act).textContent="";draw()};host.appendChild(rb);
+  RESTORE.push(S=>{const a=S[act]&&S[act].answers;if(!a)return;const d=Object.keys(a);if(!d.length)return;
+    list=[...list.filter(x=>d.includes(x[0])),...list.filter(x=>!d.includes(x[0]))];ok=Object.values(a).filter(r=>r.ok).length;i=Math.min(d.length,list.length-1);
+    document.getElementById("s-"+act).textContent=`First-try answers: ${ok} / ${d.length}`;draw();if(d.length>=list.length){nx.hidden=false;nx.textContent="Finished!";fb.className="feedback ok";fb.textContent="All done.";mark(act)}})}
+
+/* choose: multiple choice cards */
+function choose(act,data,keep){let ok=0,tried=0;const el=document.getElementById(act),apply=[];
+  const upd=()=>{document.getElementById("s-"+act).textContent=`First-try answers: ${ok} / ${tried}`;if(tried===data.length)mark(act)};
+  data.forEach(([s,opts,ans,why],i)=>{const d=document.createElement("div");d.className="q";
+    d.innerHTML=`<span class="n">${i+1}</span><p class="s">${s.replace("___","<u>&nbsp;?&nbsp;</u>")}</p><div class="opts"></div><p class="why" hidden></p>`;
+    const o=d.querySelector(".opts"),w=d.querySelector(".why");let answered=false;
+    (keep?opts:shuffle(opts)).forEach(t=>{const b=document.createElement("button");b.className="opt";b.textContent=t;
+      b.onclick=()=>{o.querySelectorAll(".opt").forEach(x=>x.classList.remove("no"));const first=!answered;
+        if(t===ans){b.classList.add("ok");w.hidden=false;w.textContent=why;(d.querySelector(".s u")||{}).innerHTML=`&nbsp;${ans}&nbsp;`;if(!answered){answered=true;tried++;ok++}}
+        else{b.classList.add("no");if(!answered){answered=true;tried++}}
+        upd();if(first){TR.answer(act,i,strip(s),t,ans,t===ans,ok,data.length);if(tried===data.length)TR.finish(act,ok,data.length)}};o.appendChild(b)});
+    apply[i]=rec=>{if(answered)return;answered=true;tried++;if(rec.ok)ok++;
+      o.querySelectorAll(".opt").forEach(x=>{if(x.textContent===ans)x.classList.add("ok");else if(!rec.ok&&x.textContent===rec.a)x.classList.add("no")});
+      w.hidden=false;w.textContent=why;(d.querySelector(".s u")||{}).innerHTML=`&nbsp;${ans}&nbsp;`};
+    el.appendChild(d)});
+  const rb=document.createElement("button");rb.className="btn ghost";rb.textContent="Start again";rb.style.alignSelf="flex-start";
+  rb.onclick=()=>{TR.reset(act);el.innerHTML="";document.getElementById("s-"+act).textContent="";document.getElementById("t-"+act).classList.remove("done");DONE.delete(act);grow();el.parentNode.removeChild(rb);choose(act,data,keep)};
+  el.after(rb);
+  RESTORE.push(S=>{const a=S[act]&&S[act].answers;if(!a)return;Object.entries(a).forEach(([i,r])=>apply[i]&&apply[i](r));if(tried)upd()})}
+
+/* fill: dropdown gaps + Check button */
+function fill(act,data){const el=document.getElementById(act);
+  const score=()=>data.filter((x,j)=>el.children[j].querySelector("select").value===x[3]).length;
+  data.forEach(([a,b,opts,ans,verb],i)=>{const li=document.createElement("li");
+    li.innerHTML=`<span>${a}</span><select aria-label="Gap ${i+1}"><option value="">…</option>${shuffle(opts).map(x=>`<option>${x}</option>`).join("")}</select>${verb?`<span class="v">(${verb})</span>`:""}<span>${b}</span><span class="mark"></span>`;el.appendChild(li);
+    li.querySelector("select").addEventListener("change",e=>{const v=e.target.value;if(v)TR.answer(act,i,strip(`${a} ___ ${b}`),v,ans,v===ans,score(),data.length)})});
+  document.getElementById(act+"Check").onclick=()=>{let n=0;data.forEach(([,,,ans],i)=>{const li=el.children[i],v=li.querySelector("select").value,m=li.querySelector(".mark"),g=v===ans;
+    li.className=v?(g?"ok":"no"):"";m.className="mark "+(g?"ok":"no");m.textContent=!v?"":g?"✓":"try again";if(g)n++});
+    document.getElementById("s-"+act).textContent=`${n} / ${data.length}`;TR.finish(act,n,data.length);if(n===data.length)mark(act)};
+  const rb=document.createElement("button");rb.className="btn ghost";rb.textContent="Reset";
+  rb.onclick=()=>{TR.reset(act);[...el.children].forEach(li=>{li.className="";li.querySelector("select").value="";li.querySelector(".mark").textContent=""});document.getElementById("s-"+act).textContent=""};
+  document.getElementById(act+"Check").after(rb);
+  RESTORE.push(S=>{const a=S[act]&&S[act].answers;if(a)Object.entries(a).forEach(([i,r])=>{const s=el.children[i]&&el.children[i].querySelector("select");if(s&&r.a)s.value=r.a});
+    if(S[act]&&S[act].final)document.getElementById(act+"Check").click()})}
+
+/* 2 for / since */
+sorter("forsince",{f:["for","⏳","a period"],s:["since","📍","a point in time"]},[
+ ["two weeks","f","Two weeks is a period: for two weeks."],["2020","s","2020 is a point in time: since 2020."],["Monday","s","Monday is a point: since Monday."],
+ ["ages","f","Ages = a long period: for ages."],["I was a child","s","A point in your life: since I was a child."],["ten minutes","f","A period: for ten minutes."],
+ ["last summer","s","A point in the past: since last summer."],["a long time","f","A period: for a long time."],["my birthday","s","A point: since my birthday."],
+ ["three hours","f","A period: for three hours."],["9 o'clock","s","A point on the clock: since 9 o'clock."],["half an hour","f","A period: for half an hour."],
+ ["we met","s","A point: since we met."],["about a year","f","A period: for about a year."],["lunchtime","s","A point in the day: since lunchtime."],["six months","f","A period: for six months."]
+]);
+
+/* 3 action / non-action */
+sorter("verbs",{a:["action","🏃","been + -ing is OK"],n:["non-action","🧠","simple form only"]},[
+ ["learn","a","learn is an action: I've been learning."],["know","n","know is non-action: I've known (NOT been knowing)."],["work","a","work is an action: I've been working."],
+ ["like","n","like is a feeling: I've liked (NOT been liking)."],["wait","a","wait is an action: I've been waiting."],["want","n","want is non-action: I've wanted."],
+ ["rain","a","rain is an action: it's been raining."],["believe","n","believe is a thought: I've believed."],["study","a","study is an action: I've been studying."],
+ ["love","n","love is a feeling: I've loved."],["cook","a","cook is an action: I've been cooking."],["understand","n","understand is a thought: I've understood."],
+ ["travel","a","travel is an action: I've been travelling."],["have (= own)","n","have = own is non-action: I've had this car for years."],["play","a","play is an action: I've been playing."],["belong","n","belong is non-action: It's belonged to my family for years."]
+]);
+
+/* 4 choose the form */
+fill("build",[
+ ["My sister","Spanish for three years.",["has been learning","is learning","learns"],"has been learning","learn"],
+ ["We","each other since we were at school.",["'ve known","'ve been knowing","know"],"'ve known","know"],
+ ["How long","for the bus?",["have you been waiting","are you waiting","do you wait"],"have you been waiting","wait"],
+ ["It","since Monday. Everything is wet!",["has been raining","is raining","rains"],"has been raining","rain"],
+ ["I","this phone for two years.",["'ve had","'ve been having","have"],"'ve had","have = own"],
+ ["She","cats since she was a little girl.",["has loved","has been loving","loves"],"has loved","love"],
+ ["Max","video games for five hours! Tell him to stop.",["has been playing","is playing","plays"],"has been playing","play"],
+ ["How long","your best friend?",["have you known","have you been knowing","do you know"],"have you known","know"],
+ ["I","very well recently. I'm so tired.",["haven't been sleeping","am not sleeping","don't sleep"],"haven't been sleeping","not sleep"],
+ ["This house","to our family since 1990.",["has belonged","has been belonging","belongs"],"has belonged","belong"],
+ ["They","for a new flat since the spring.",["have been looking","are looking","look"],"have been looking","look"]
+]);
+
+/* 5 one or both */
+const BOTH="Both are OK";
+choose("choose",[
+ ["We ___ here since 2018.",["'ve lived","'ve been living",BOTH],BOTH,"live: both forms are correct with the same meaning."],
+ ["I ___ a dog for years, but my mum says no.",["'ve wanted","'ve been wanting",BOTH],"'ve wanted","want is a non-action verb: present perfect simple."],
+ ["How long ___ at the bank?",["have you worked","have you been working",BOTH],BOTH,"work: both forms are correct."],
+ ["She ___ a headache since lunch.",["'s had","'s been having",BOTH],"'s had","have a headache = a state, not an action: present perfect simple."],
+ ["I ___ for three hours. I need a break!",["'ve been studying","'ve studied",BOTH],"'ve been studying","study is an action and we focus on how long: continuous."],
+ ["They ___ about the party since Friday.",["'ve known","'ve been knowing",BOTH],"'ve known","know is non-action: present perfect simple."],
+ ["My dad ___ as a taxi driver for 20 years.",["has worked","has been working",BOTH],BOTH,"work: both forms are correct."],
+ ["Your hands are dirty! What ___ ?",["have you been doing","have you done",BOTH],"have you been doing","We see the result of a recent activity: continuous."],
+ ["I ___ jazz since I was a teenager.",["'ve liked","'ve been liking",BOTH],"'ve liked","like is a feeling: present perfect simple."],
+ ["It ___ since six o'clock this morning.",["'s been snowing","'s snowed",BOTH],"'s been snowing","snow is an action that's still happening: continuous."],
+ ["He ___ in Kazan for a month.",["'s lived","'s been living",BOTH],BOTH,"live: both forms are correct."]
+],true);
+
+/* 6 what have you been doing */
+choose("why",[
+ ["<span class=em>😢</span>Your eyes are red.",["I've been cutting onions.","I've been painting the kitchen.","I've been sleeping all day."],"I've been cutting onions.","A recent action + a result we can see now: present perfect continuous."],
+ ["<span class=em>🥵</span>You're hot and out of breath.",["I've been running.","I've been reading.","I've been watching TV."],"I've been running.","Running makes you hot: present perfect continuous for the reason."],
+ ["<span class=em>🎨</span>There's blue paint on your T-shirt!",["I've been painting my room.","I've been cooking.","I've been shopping."],"I've been painting my room.","The paint is the result of the action."],
+ ["<span class=em>🌧️</span>The streets are all wet.",["It's been raining.","It's been very sunny.","It's been very windy."],"It's been raining.","Wet streets now = it has been raining."],
+ ["<span class=em>😴</span>You look really tired.",["I've been working all night.","I've been sleeping all day.","I've been relaxing on the sofa."],"I've been working all night.","Tired now because of a long action: present perfect continuous."],
+ ["<span class=em>🪫</span>Your phone battery is dead.",["I've been watching videos for hours.","I've been charging it.","I haven't been using it."],"I've been watching videos for hours.","A long action that explains the result."],
+ ["<span class=em>🍰</span>The kitchen smells amazing!",["I've been baking a cake.","I've been cleaning the bathroom.","I've been sleeping."],"I've been baking a cake.","You can smell the result of the action."],
+ ["<span class=em>🗣️</span>You've lost your voice!",["I've been singing at a concert.","I've been reading quietly.","I haven't been talking."],"I've been singing at a concert.","Singing a lot → no voice now."]
+]);
+
+/* 7 story */
+fill("story",[
+ ["Katya","for a small charity in Uganda since 2022.",["'s been working","works","is working"],"'s been working","work"],
+ ["She","Joyce, the head teacher of the village school, for six years.",["has known","has been knowing","knows"],"has known","know"],
+ ["The volunteers","a new school since March.",["have been building","are building","build"],"have been building","build"],
+ ["So far they","two classrooms.",["have built","have been building","built"],"have built","build"],
+ ["Katya","English to the children for three years.",["has been teaching","teaches","is teaching"],"has been teaching","teach"],
+ ["Today she is exhausted. She","in the hot sun all day.",["has been working","works","work"],"has been working","work"],
+ ["Her hands are dirty because she","trees in the school garden.",["has been planting","plants","is planted"],"has been planting","plant"],
+ ["On the phone, her mum asks: \"How long","there now?\"",["have you been","are you","do you be"],"have you been","be"],
+ ["\"I","here for almost four years,\" says Katya. \"And I love it!\"",["'ve lived","live","'m living"],"'ve lived","live"],
+ ["\"I","so many amazing people since I came here.\"",["'ve met","'ve been meeting","meet"],"'ve met","meet"]
+]);
+
+/* talk */
+(function(){const T=["How long have you lived in your flat or house?","How long have you known your best friend? How did you meet?","How long have you been learning English? Why did you start?","How long have you had your phone? Do you want a new one?","What series have you been watching recently?","Have you been doing any sport recently? How long?","What have you been doing this week?","Do you know anyone who does voluntary work? How long have they been doing it?","What's something you've wanted for a long time?"];
+  const el=document.getElementById("talk");T.forEach((t,i)=>{const b=document.createElement("button");b.className="seed";b.textContent="🌰";b.setAttribute("aria-label","Open question "+(i+1));b.onclick=()=>{b.classList.add("open");b.textContent=t};el.appendChild(b)})})();
+
+TR.init("ppc").then(S=>RESTORE.forEach(f=>{try{f(S)}catch(e){console.error(e)}}));
+</script>
+</body>
+</html>

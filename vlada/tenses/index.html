@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Time Machine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Space+Mono:wght@400;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<script src="../../assets/config.js?v=15"></script>
+<script src="../../assets/portal.js?v=3"></script>
+<script src="../../assets/track.js?v=2"></script>
+<style>
+/* Look: a retro time-machine control panel. Each tense has its own signal colour. */
+:root{
+  --bg:#eeeaf7; --card:#fbfaff; --ink:#1d1736; --muted:#5d5878; --line:#d6d0ea;
+  --acc:#5a2fd0; --acc-soft:#5a2fd01a; --hot:#d6337a; --hot-soft:#d6337a1c;
+  --c-pres:#0f8a8a; --c-cont:#2f6fd6; --c-past:#b8621b; --c-perf:#8a3fc4; --c-fut:#d6337a;
+  --ok:#17845a; --ok-soft:#17845a1f; --bad:#c43a3a; --bad-soft:#c43a3a1c;
+  --display:"Space Grotesk",system-ui,sans-serif; --mono:"Space Mono",ui-monospace,monospace;
+  --body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f0c1d; --card:#181430; --ink:#ebe8fb; --muted:#a8a2c8; --line:#2f2950;
+  --acc:#a98bff; --acc-soft:#a98bff22; --hot:#ff7fb3; --hot-soft:#ff7fb322;
+  --c-pres:#4fd1c5; --c-cont:#7fb0ff; --c-past:#f0a35e; --c-perf:#c99bff; --c-fut:#ff7fb3;
+  --ok:#6fd49b; --ok-soft:#6fd49b22; --bad:#ff8a8a; --bad-soft:#ff8a8a22; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f0c1d; --card:#181430; --ink:#ebe8fb; --muted:#a8a2c8; --line:#2f2950;
+  --acc:#a98bff; --acc-soft:#a98bff22; --hot:#ff7fb3; --hot-soft:#ff7fb322;
+  --c-pres:#4fd1c5; --c-cont:#7fb0ff; --c-past:#f0a35e; --c-perf:#c99bff; --c-fut:#ff7fb3;
+  --ok:#6fd49b; --ok-soft:#6fd49b22; --bad:#ff8a8a; --bad-soft:#ff8a8a22; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 64px}
+.wrap{max-width:960px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+h1,h2,h3{font-family:var(--display);margin:0;line-height:1.05;text-wrap:balance}
+h1{font-size:clamp(40px,8vw,70px);font-weight:700;letter-spacing:-.03em}
+h1 span{color:var(--acc)}
+h2{font-size:clamp(26px,4vw,36px);font-weight:700}
+p{margin:0}
+.eyebrow{font-family:var(--mono);font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.lede{color:var(--muted);max-width:66ch}
+.tip{font-size:14px;color:var(--muted);font-style:italic}
+
+.guide{border-radius:22px;padding:26px clamp(20px,4vw,36px);background:var(--card);border:2px solid var(--ink);box-shadow:6px 6px 0 var(--acc);display:flex;flex-direction:column;gap:12px}
+.dial{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:2px solid var(--line);border-radius:14px;overflow:hidden;font-family:var(--mono);font-size:13px;text-align:center}
+.dial div{padding:10px 6px;display:flex;flex-direction:column;gap:4px;align-items:center}
+.dial div+div{border-left:2px solid var(--line)}
+.dial b{font-size:15px}
+.dial .chips{display:flex;flex-wrap:wrap;gap:4px;justify-content:center}
+.chip{border-radius:999px;padding:1px 8px;font-size:12px;color:var(--card);white-space:nowrap}
+.k-pres{background:var(--c-pres)}.k-cont{background:var(--c-cont)}.k-past{background:var(--c-past)}.k-perf{background:var(--c-perf)}.k-fut{background:var(--c-fut)}
+
+nav.tabs{display:flex;flex-wrap:wrap;gap:8px}
+.tab{appearance:none;cursor:pointer;font:inherit;font-family:var(--mono);font-size:14px;border-radius:8px;padding:8px 14px;border:2px solid var(--line);background:var(--card);color:var(--ink)}
+.tab:hover{border-color:var(--acc)}
+.tab[aria-selected="true"]{background:var(--ink);border-color:var(--ink);color:var(--card)}
+.tab.done::after{content:" ●";color:var(--ok)}
+.tab:focus-visible,.btn:focus-visible,.opt:focus-visible,.cat:focus-visible,select:focus-visible{outline:3px solid var(--hot);outline-offset:2px}
+
+section.panel{background:var(--card);border:2px solid var(--line);border-radius:20px;padding:clamp(20px,4vw,34px);display:flex;flex-direction:column;gap:22px}
+.head{display:flex;flex-direction:column;gap:8px}
+.btn{appearance:none;cursor:pointer;font:inherit;font-weight:700;font-size:16px;border-radius:10px;padding:10px 20px;border:2px solid var(--ink);background:var(--ink);color:var(--card)}
+.btn.ghost{background:transparent;color:var(--ink)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.score{font-family:var(--mono);font-weight:700;color:var(--acc);font-variant-numeric:tabular-nums}
+
+/* map */
+.map{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.map>div{background:var(--bg);border-radius:14px;padding:16px 18px;border-top:6px solid var(--k);display:flex;flex-direction:column;gap:6px}
+.map strong{font-family:var(--display);font-size:22px;color:var(--k)}
+.map .form{font-family:var(--mono);font-size:14px}
+.map .ex{font-size:15px;color:var(--muted)}
+.map .ex b{color:var(--ink)}
+.map .sig{font-size:14px}
+.fut3{display:grid;gap:6px}
+.fut3 p{font-size:15px}
+.warn{background:var(--hot-soft);border-radius:14px;padding:14px 16px;font-size:15px}
+.no-way{text-decoration:line-through;color:var(--bad)}
+
+/* sorter */
+.sort-card{background:var(--bg);border:2px solid var(--line);border-radius:18px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center}
+.sort-card .word{font-family:var(--display);font-size:clamp(30px,6vw,46px);font-weight:700}
+.cats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;width:100%}
+@media (max-width:700px){.cats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.cat{appearance:none;cursor:pointer;font:inherit;font-weight:700;font-size:15px;border-radius:12px;padding:12px 6px;border:2px solid var(--line);border-bottom:5px solid var(--k);background:var(--card);color:var(--ink);display:flex;flex-direction:column;gap:2px;align-items:center}
+.cat .ic{font-size:26px}
+.cat:hover{border-color:var(--k)}
+.cat.ok{border-color:var(--ok);background:var(--ok-soft)}
+.cat.no{border-color:var(--bad);background:var(--bad-soft);animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.feedback{min-height:1.5em;font-weight:700}
+.feedback.ok{color:var(--ok)}.feedback.no{color:var(--bad)}
+
+/* choose */
+.qs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:700px){.qs{grid-template-columns:1fr}}
+.q{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.q .n{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.q .s{font-weight:700}
+.q .s b{color:var(--acc);text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:3px}
+.opts{display:flex;gap:6px;flex-wrap:wrap}
+.opt{appearance:none;cursor:pointer;font:inherit;font-size:15px;border-radius:8px;padding:6px 12px;background:var(--card);color:var(--ink);border:1px solid var(--line);text-align:left}
+.opt:hover{border-color:var(--acc)}
+.opt.ok{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.opt.no{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.why{font-size:14px;color:var(--muted)}
+
+/* fill */
+.fill{display:flex;flex-direction:column;gap:8px;padding:16px;margin:0;background:var(--bg);border-radius:16px;line-height:1.9}
+.fill li{list-style:none;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;padding:6px 8px;border-radius:10px;border:1px solid transparent}
+.fill li.ok{border-color:var(--ok)}.fill li.no{border-color:var(--bad)}
+.fill .v{font-family:var(--mono);font-size:13px;color:var(--hot)}
+.fill .mark{margin-left:auto;font-size:14px}.mark.ok{color:var(--ok)}.mark.no{color:var(--bad)}
+select{font:inherit;font-size:16px;color:var(--ink);background:var(--card);border:1px solid var(--acc);border-radius:8px;padding:4px 8px;max-width:100%}
+
+/* report */
+.report{display:flex;flex-direction:column;gap:10px}
+.rrow{display:grid;grid-template-columns:minmax(0,200px) minmax(0,1fr) 70px;gap:12px;align-items:center}
+@media (max-width:560px){.rrow{grid-template-columns:minmax(0,1fr) 60px}.rrow .meter{grid-column:1/-1;grid-row:2}}
+.meter{height:14px;border-radius:7px;background:var(--line);overflow:hidden}
+.meter span{display:block;height:100%;background:var(--acc);transition:width .4s}
+.meter span.lo{background:var(--hot)}.meter span.hi{background:var(--ok)}
+.rrow .pc{font-family:var(--mono);font-weight:700;text-align:right}
+.verdict{background:var(--bg);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="guide">
+    <span class="eyebrow">Homework · All the tenses we know</span>
+    <h1>The Time <span>Machine</span></h1>
+    <p class="lede">Past, present, future… it's easy to get lost in time! Start with the map, then travel through each part. At the end, the machine shows your report: what's easy for you and what to repeat.</p>
+    <div class="dial" aria-hidden="true">
+      <div><b>⏮ PAST</b><span class="chips"><span class="chip k-past">past simple</span></span></div>
+      <div><b>⏺ NOW</b><span class="chips"><span class="chip k-pres">present simple</span><span class="chip k-cont">present continuous</span><span class="chip k-perf">present perfect</span><span class="chip k-perf">pres. perf. continuous</span></span></div>
+      <div><b>⏭ FUTURE</b><span class="chips"><span class="chip k-fut">going to</span><span class="chip k-fut">will</span><span class="chip k-cont">present continuous</span></span></div>
+    </div>
+    <p class="tip" id="saveState"></p>
+  </header>
+
+  <nav class="tabs" role="tablist" id="tabs"></nav>
+
+  <section class="panel" id="p-map" role="tabpanel">
+    <div class="head"><span class="eyebrow">Step 0</span><h2>The map</h2>
+      <p class="lede">Read this first. Come back here any time you're not sure.</p></div>
+    <div class="map">
+      <div style="--k:var(--c-pres)"><strong>Present simple</strong><span class="form">I work · she works · do you work?</span>
+        <span>Habits, routines, facts.</span><span class="ex"><b>I go</b> to the gym twice a week. Water <b>boils</b> at 100°.</span>
+        <span class="sig">🔑 usually, often, every day, on Mondays, never</span></div>
+      <div style="--k:var(--c-cont)"><strong>Present continuous</strong><span class="form">I'm working · she's working</span>
+        <span>Now, at the moment, or a temporary situation.</span><span class="ex">Shh! <b>I'm talking</b> on the phone. <b>She's staying</b> with her aunt this month.</span>
+        <span class="sig">🔑 now, right now, at the moment, Look! Listen!</span></div>
+      <div style="--k:var(--c-past)"><strong>Past simple</strong><span class="form">I worked · I went · did you go?</span>
+        <span>Finished actions. We say or know <b>when</b>.</span><span class="ex"><b>I saw</b> Anna yesterday. We <b>went</b> to Turkey in 2023.</span>
+        <span class="sig">🔑 yesterday, last week, two days ago, in 2019, When…?</span></div>
+      <div style="--k:var(--c-perf)"><strong>Present perfect</strong><span class="form">I've seen · she's been · have you ever…?</span>
+        <span>Experiences (no time), a result now, or non-action verbs from the past until now.</span><span class="ex"><b>I've never been</b> to Japan. <b>I've lost</b> my keys! <b>We've known</b> each other for years.</span>
+        <span class="sig">🔑 ever, never, just, already, yet, for, since</span></div>
+      <div style="--k:var(--c-perf)"><strong>Present perfect continuous</strong><span class="form">I've been working · has she been waiting?</span>
+        <span>An action that started in the past and is still going on (how long?), or a recent action with a result we can see.</span><span class="ex"><b>I've been learning</b> English since September. Your eyes are red! <b>Have you been crying?</b></span>
+        <span class="sig">🔑 How long…? for, since, all day, recently</span></div>
+      <div style="--k:var(--c-fut)"><strong>The future</strong>
+        <div class="fut3">
+          <p><b>be going to</b> = a plan you decided before, or what we can see will happen: <i>I'm going to learn to drive. Look at those clouds, it's going to rain!</i></p>
+          <p><b>present continuous</b> = an arrangement (time, place, other people): <i>I'm meeting Anna at 7 tonight.</i></p>
+          <p><b>will</b> = a decision now, a promise, an offer, or an opinion about the future: <i>I'll get it! I'll help you. I think it'll be sunny.</i></p>
+        </div></div>
+    </div>
+    <p class="warn">⚠️ Non-action verbs (know, like, love, want, need, understand, believe, have = own) don't usually take -ing: <span class="no-way">I'm knowing</span> → I know · <span class="no-way">I've been knowing</span> → I've known.</p>
+    <div class="row"><button class="btn" id="mapOk">Let's go!</button><span class="score" id="s-map"></span></div>
+  </section>
+
+  <section class="panel" id="p-signals" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Part 1</span><h2>Signal words</h2>
+      <p class="lede">Which tense usually goes with these words? (For the present perfect, simple and continuous are together.)</p></div>
+    <div id="signals"></div>
+  </section>
+
+  <section class="panel" id="p-now" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Part 2</span><h2>Present simple or continuous?</h2>
+      <p class="lede">A habit or fact? Or now / temporary? Watch out for non-action verbs!</p></div>
+    <div class="qs" id="now"></div><span class="score" id="s-now"></span>
+  </section>
+
+  <section class="panel" id="p-past" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Part 3</span><h2>Past simple or present perfect?</h2>
+      <p class="lede">Do we say <b>when</b>? Is it finished?</p></div>
+    <div class="qs" id="past"></div><span class="score" id="s-past"></span>
+  </section>
+
+  <section class="panel" id="p-perfect" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Part 4</span><h2>Present perfect simple or continuous?</h2>
+      <p class="lede">Action verb + how long → continuous. Non-action verb, or how many / how much → simple.</p></div>
+    <div class="qs" id="perfect"></div><span class="score" id="s-perfect"></span>
+  </section>
+
+  <section class="panel" id="p-future" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Part 5</span><h2>The future</h2>
+      <p class="lede">A plan, an arrangement, or a decision right now?</p></div>
+    <div class="qs" id="future"></div><span class="score" id="s-future"></span>
+  </section>
+
+  <section class="panel" id="p-name" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Part 6</span><h2>Name that tense</h2>
+      <p class="lede">Look at the <b>underlined</b> verb. Which tense is it?</p></div>
+    <div class="qs" id="name"></div><span class="score" id="s-name"></span>
+  </section>
+
+  <section class="panel" id="p-mix" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Part 7</span><h2>A message from St Petersburg</h2>
+      <p class="lede">Lisa is writing to a friend. Choose the right form for every gap, then press "Check". All the tenses are here!</p></div>
+    <ol class="fill" id="mix"></ol>
+    <div class="row"><button class="btn" id="mixCheck">Check</button><span class="score" id="s-mix"></span></div>
+  </section>
+
+  <section class="panel" id="p-fix" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">Part 8</span><h2>Right or wrong?</h2>
+      <p class="lede">Is the sentence correct? If it's wrong, you'll see the correct version.</p></div>
+    <div class="qs" id="fix"></div><span class="score" id="s-fix"></span>
+  </section>
+
+  <section class="panel" id="p-report" role="tabpanel" hidden>
+    <div class="head"><span class="eyebrow">The end</span><h2>Your time machine report</h2>
+      <p class="lede">Your first-try answers in every part. Green is great; pink means "let's repeat this in class".</p></div>
+    <div class="report" id="report"></div>
+    <div class="verdict" id="verdict"></div>
+  </section>
+</div>
+
+<script>
+const TABS=[["map","Map"],["signals","1 Signals"],["now","2 Present"],["past","3 PS or PP"],["perfect","4 PP or PPC"],["future","5 Future"],["name","6 Name it"],["mix","7 Message"],["fix","8 Right or wrong"],["report","Report"]];
+const PARTS={signals:"Signal words",now:"Present simple / continuous",past:"Past simple / present perfect",perfect:"Present perfect simple / continuous",future:"The future",name:"Name that tense",mix:"All tenses together",fix:"Right or wrong"};
+const tabsEl=document.getElementById("tabs");
+TABS.forEach(([id,name])=>{const b=document.createElement("button");b.className="tab";b.setAttribute("role","tab");b.id="t-"+id;b.textContent=name;b.onclick=()=>show(id);tabsEl.appendChild(b)});
+function show(id){TABS.forEach(([t])=>{document.getElementById("p-"+t).hidden=t!==id;document.getElementById("t-"+t).setAttribute("aria-selected",t===id)});
+  if(id==="report")report();
+  try{if(location.hash!=="#"+id)history.replaceState(null,"","#"+id)}catch(e){}}
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const strip=s=>String(s).replace(/<[^>]+>/g,"");
+const SC={};  // part -> {ok, done, total}
+const mark=id=>{const t=document.getElementById("t-"+id);if(t)t.classList.add("done")};
+const unmark=id=>{const t=document.getElementById("t-"+id);if(t)t.classList.remove("done")};
+const TR=window.Track;const canSave=TR.online;const RESTORE=[];
+TR.onStatus(st=>{document.getElementById("saveState").textContent=!canSave?"Tip: open this page from your personal portal link to save your progress.":st==="saving"?"Saving…":st==="offline"?"No connection right now: your answers are kept on this device and will be sent later.":"Your progress saves automatically after every answer."});
+document.getElementById("mapOk").onclick=()=>{mark("map");show("signals");scrollTo({top:0,behavior:"smooth"})};
+
+/* sorter */
+function sorter(act,C,W){const host=document.getElementById(act);
+  host.innerHTML=`<div class="sort-card"><span class="eyebrow" data-n></span><span class="word" data-w></span><div class="cats" data-c></div><p class="feedback" data-f></p><button class="btn" data-x hidden>Next</button></div><span class="score" id="s-${act}"></span>`;
+  const q=k=>host.querySelector(`[data-${k}]`),cats=q("c"),fb=q("f"),nx=q("x");
+  let list=shuffle(W),i=0,ok=0,first=true,pick=null;SC[act]={ok:0,done:0,total:W.length};
+  Object.entries(C).forEach(([k,[l,ic,col]])=>{const b=document.createElement("button");b.className="cat";b.style.setProperty("--k",col);b.innerHTML=`<span class="ic">${ic}</span>${l}`;
+    b.onclick=()=>{if(!nx.hidden)return;const a=list[i];
+      if(k===a[1]){b.classList.add("ok");if(first)ok++;SC[act]={ok,done:i+1,total:list.length};TR.answer(act,a[0],a[0],first?C[k][0]:C[pick][0],C[a[1]][0],first,ok,list.length);
+        fb.className="feedback ok";fb.textContent=a[2];nx.hidden=false;
+        document.getElementById("s-"+act).textContent=`First-try answers: ${ok} / ${i+1}`;if(i===list.length-1){nx.textContent="Finished!";TR.finish(act,ok,list.length);mark(act)}}
+      else{if(first){first=false;pick=k}b.classList.add("no");fb.className="feedback no";fb.textContent="Not quite. Try again!";setTimeout(()=>b.classList.remove("no"),500)}};cats.appendChild(b)});
+  function draw(){const a=list[i];first=true;q("n").textContent=`${i+1} / ${list.length}`;q("w").textContent=a[0];fb.textContent="";nx.hidden=true;cats.querySelectorAll(".cat").forEach(c=>c.classList.remove("ok","no"))}
+  nx.onclick=()=>{if(i<list.length-1){i++;draw()}else show(TABS[TABS.findIndex(t=>t[0]===act)+1][0])};draw();
+  const rb=document.createElement("button");rb.className="btn ghost";rb.textContent="Start again";rb.style.alignSelf="flex-start";
+  rb.onclick=()=>{TR.reset(act);list=shuffle(W);i=0;ok=0;SC[act]={ok:0,done:0,total:W.length};nx.textContent="Next";document.getElementById("s-"+act).textContent="";unmark(act);draw()};host.appendChild(rb);
+  RESTORE.push(S=>{const a=S[act]&&S[act].answers;if(!a)return;const d=Object.keys(a);if(!d.length)return;
+    list=[...list.filter(x=>d.includes(x[0])),...list.filter(x=>!d.includes(x[0]))];ok=Object.values(a).filter(r=>r.ok).length;i=Math.min(d.length,list.length-1);SC[act]={ok,done:d.length,total:list.length};
+    document.getElementById("s-"+act).textContent=`First-try answers: ${ok} / ${d.length}`;draw();if(d.length>=list.length){nx.hidden=false;nx.textContent="Finished!";fb.className="feedback ok";fb.textContent="All done.";mark(act)}})}
+
+/* choose */
+function choose(act,data,keep){let ok=0,tried=0;const el=document.getElementById(act),apply=[];SC[act]={ok:0,done:0,total:data.length};
+  const upd=()=>{SC[act]={ok,done:tried,total:data.length};document.getElementById("s-"+act).textContent=`First-try answers: ${ok} / ${tried}`;if(tried===data.length)mark(act)};
+  data.forEach(([s,opts,ans,why],i)=>{const d=document.createElement("div");d.className="q";
+    d.innerHTML=`<span class="n">${String(i+1).padStart(2,"0")}</span><p class="s">${s.replace("___","<u>&nbsp;?&nbsp;</u>")}</p><div class="opts"></div><p class="why" hidden></p>`;
+    const o=d.querySelector(".opts"),w=d.querySelector(".why");let answered=false;
+    (keep?opts:shuffle(opts)).forEach(t=>{const b=document.createElement("button");b.className="opt";b.textContent=t;
+      b.onclick=()=>{o.querySelectorAll(".opt").forEach(x=>x.classList.remove("no"));const first=!answered;
+        if(t===ans){b.classList.add("ok");w.hidden=false;w.textContent=why;(d.querySelector(".s u")||{}).innerHTML=`&nbsp;${ans}&nbsp;`;if(!answered){answered=true;tried++;ok++}}
+        else{b.classList.add("no");if(!answered){answered=true;tried++}}
+        upd();if(first){TR.answer(act,i,strip(s),t,ans,t===ans,ok,data.length);if(tried===data.length)TR.finish(act,ok,data.length)}};o.appendChild(b)});
+    apply[i]=rec=>{if(answered)return;answered=true;tried++;if(rec.ok)ok++;
+      o.querySelectorAll(".opt").forEach(x=>{if(x.textContent===ans)x.classList.add("ok");else if(!rec.ok&&x.textContent===rec.a)x.classList.add("no")});
+      w.hidden=false;w.textContent=why;(d.querySelector(".s u")||{}).innerHTML=`&nbsp;${ans}&nbsp;`};
+    el.appendChild(d)});
+  const rb=document.createElement("button");rb.className="btn ghost";rb.textContent="Start again";rb.style.alignSelf="flex-start";
+  rb.onclick=()=>{TR.reset(act);el.innerHTML="";document.getElementById("s-"+act).textContent="";unmark(act);rb.remove();choose(act,data,keep)};
+  el.after(rb);
+  RESTORE.push(S=>{const a=S[act]&&S[act].answers;if(!a)return;Object.entries(a).forEach(([i,r])=>apply[i]&&apply[i](r));if(tried)upd()})}
+
+/* fill */
+function fill(act,data){const el=document.getElementById(act);SC[act]={ok:0,done:0,total:data.length};
+  const score=()=>data.filter((x,j)=>el.children[j].querySelector("select").value===x[3]).length;
+  data.forEach(([a,b,opts,ans,verb],i)=>{const li=document.createElement("li");
+    li.innerHTML=`<span>${a}</span><select aria-label="Gap ${i+1}"><option value="">…</option>${shuffle(opts).map(x=>`<option>${x}</option>`).join("")}</select>${verb?`<span class="v">(${verb})</span>`:""}<span>${b}</span><span class="mark"></span>`;el.appendChild(li);
+    li.querySelector("select").addEventListener("change",e=>{const v=e.target.value;if(v)TR.answer(act,i,strip(`${a} ___ ${b}`),v,ans,v===ans,score(),data.length)})});
+  document.getElementById(act+"Check").onclick=()=>{let n=0,f=0;data.forEach(([,,,ans],i)=>{const li=el.children[i],v=li.querySelector("select").value,m=li.querySelector(".mark"),g=v===ans;
+    if(v)f++;li.className=v?(g?"ok":"no"):"";m.className="mark "+(g?"ok":"no");m.textContent=!v?"":g?"✓":"try again";if(g)n++});
+    SC[act]={ok:n,done:f,total:data.length};
+    document.getElementById("s-"+act).textContent=`${n} / ${data.length}`;TR.finish(act,n,data.length);if(n===data.length)mark(act)};
+  const rb=document.createElement("button");rb.className="btn ghost";rb.textContent="Reset";
+  rb.onclick=()=>{TR.reset(act);[...el.children].forEach(li=>{li.className="";li.querySelector("select").value="";li.querySelector(".mark").textContent=""});document.getElementById("s-"+act).textContent="";SC[act]={ok:0,done:0,total:data.length};unmark(act)};
+  document.getElementById(act+"Check").after(rb);
+  RESTORE.push(S=>{const a=S[act]&&S[act].answers;if(a)Object.entries(a).forEach(([i,r])=>{const s=el.children[i]&&el.children[i].querySelector("select");if(s&&r.a)s.value=r.a});
+    if(S[act]&&S[act].final)document.getElementById(act+"Check").click()})}
+
+/* report */
+function report(){const host=document.getElementById("report");host.innerHTML="";const weak=[],strong=[];let todo=0;
+  Object.entries(PARTS).forEach(([k,label])=>{const s=SC[k]||{ok:0,done:0,total:1};const pc=s.done?Math.round(100*s.ok/(k==="mix"?s.total:s.done)):null;
+    const r=document.createElement("div");r.className="rrow";
+    r.innerHTML=`<span>${label}</span><span class="meter"><span style="width:${pc||0}%" class="${pc==null?"":pc<70?"lo":pc>=85?"hi":""}"></span></span><span class="pc">${pc==null?"–":pc+"%"}</span>`;host.appendChild(r);
+    if(pc==null||s.done<s.total)todo++;else if(pc<70)weak.push(label);else if(pc>=85)strong.push(label)});
+  const v=document.getElementById("verdict");
+  v.innerHTML=(todo?`<p>⏳ You still have <b>${todo}</b> part${todo>1?"s":""} to finish.</p>`:`<p>🎉 You've finished the whole journey!</p>`)+
+    (strong.length?`<p>💚 Easy for you: ${strong.join(", ")}.</p>`:"")+
+    (weak.length?`<p>🔁 Let's repeat in class: ${weak.join(", ")}.</p>`:"")+
+    `<p class="tip">Go back to the Map if something is confusing.</p>`}
+
+/* 1 signals */
+const K={pres:["present simple","🔁","var(--c-pres)"],cont:["present continuous","▶️","var(--c-cont)"],past:["past simple","⏮️","var(--c-past)"],perf:["present perfect","🔗","var(--c-perf)"],fut:["future","⏭️","var(--c-fut)"]};
+sorter("signals",K,[
+ ["every day","pres","A routine: present simple."],["usually","pres","How often: present simple."],["on Mondays","pres","A habit: present simple."],["twice a week","pres","How often: present simple."],
+ ["right now","cont","Happening now: present continuous."],["at the moment","cont","Happening now: present continuous."],["Look!","cont","Look! It's happening now: present continuous."],["Listen!","cont","Listen! Someone's singing: present continuous."],
+ ["yesterday","past","A finished time: past simple."],["two years ago","past","ago = finished time: past simple."],["last weekend","past","A finished time: past simple."],["in 2015","past","A finished time: past simple."],
+ ["ever","perf","Have you ever…? Present perfect."],["yet","perf","I haven't… yet: present perfect."],["since 2020","perf","From 2020 until now: present perfect (simple or continuous)."],["How long…?","perf","From the past until now: present perfect (simple or continuous)."],
+ ["tomorrow","fut","Tomorrow is the future: will, going to or present continuous."],["next year","fut","The future: will, going to or present continuous."],["in two days","fut","in + time = in the future."]
+]);
+
+/* 2 present simple / continuous */
+choose("now",[
+ ["I ___ to work by bus every day.",["go","'m going"],"go","Every day = a routine: present simple."],
+ ["Shh! The baby ___ .",["'s sleeping","sleeps"],"'s sleeping","Shh! It's happening now: present continuous."],
+ ["Water ___ at 100 degrees.",["boils","is boiling"],"boils","A fact: present simple."],
+ ["Look! It ___ again.",["'s snowing","snows"],"'s snowing","Look! = now: present continuous."],
+ ["I ___ what you mean.",["understand","'m understanding"],"understand","understand is a non-action verb: no -ing."],
+ ["My brother usually lives in Sochi, but this month he ___ in Moscow.",["'s staying","stays"],"'s staying","A temporary situation: present continuous."],
+ ["How often ___ your grandparents?",["do you visit","are you visiting"],"do you visit","How often = a habit: present simple."],
+ ["What ___ right now? — A book about Japan.",["are you reading","do you read"],"are you reading","right now: present continuous."],
+ ["She ___ coffee. She prefers tea.",["doesn't like","isn't liking"],"doesn't like","like is a non-action verb: present simple."],
+ ["I can't talk now, I ___ dinner.",["'m cooking","cook"],"'m cooking","now: present continuous."],
+ ["I ___ a new phone. Mine is broken.",["need","'m needing"],"need","need is a non-action verb: present simple."],
+ ["My dad ___ in a hospital. He's a nurse.",["works","is working"],"works","His job, a permanent situation: present simple."]
+]);
+
+/* 3 past simple / present perfect */
+choose("past",[
+ ["I ___ this film. Let's watch something else.",["'ve already seen","already saw"],"'ve already seen","already + present perfect, the result is important now."],
+ ["We ___ to Turkey last summer.",["went","'ve been"],"went","last summer = finished time: past simple."],
+ ["___ to Japan?",["Have you ever been","Did you ever go"],"Have you ever been","A life experience: Have you ever…?"],
+ ["She ___ her job two weeks ago.",["left","has left"],"left","ago = past simple."],
+ ["I ___ my homework yet.",["haven't finished","didn't finish"],"haven't finished","yet + present perfect."],
+ ["When ___ that jacket?",["did you buy","have you bought"],"did you buy","Questions with When…? use the past simple."],
+ ["Oh no, I ___ my wallet! I can't pay.",["'ve lost","lost"],"'ve lost","The result is important now (I can't pay): present perfect."],
+ ["I ___ in Kazan for five years, and then I moved to Moscow.",["lived","'ve lived"],"lived","It's finished (I don't live there now): past simple."]
+]);
+
+/* 4 present perfect simple / continuous */
+choose("perfect",[
+ ["I ___ this book for a week, but I'm only on page 50.",["'ve been reading","'ve read"],"'ve been reading","An action still in progress, how long: continuous."],
+ ["I ___ three books this month.",["'ve read","'ve been reading"],"'ve read","How many (three books): simple."],
+ ["We ___ each other for ages.",["'ve known","'ve been knowing"],"'ve known","know is non-action: simple."],
+ ["Sorry I'm late! How long ___ ?",["have you been waiting","are you waiting"],"have you been waiting","How long + an action verb: present perfect continuous (NOT present continuous)."],
+ ["She's tired because she ___ all day.",["'s been cleaning","cleans"],"'s been cleaning","A long action with a result now (tired): continuous."],
+ ["I ___ my keys! Have you seen them?",["'ve lost","'ve been losing"],"'ve lost","A single action with a result now: present perfect simple."],
+ ["He ___ that car since 2019.",["'s had","'s been having"],"'s had","have = own is non-action: simple."],
+ ["It ___ for hours. When will it stop?",["'s been raining","rains"],"'s been raining","An action from the past until now: continuous."],
+ ["I ___ two cups of coffee today.",["'ve had","'ve been having"],"'ve had","How many (two cups): simple."]
+]);
+
+/* 5 future */
+choose("future",[
+ ["Look at those black clouds! It ___ rain.",["'s going to","will"],"'s going to","We can see it will happen: going to."],
+ ["A: I'm cold. B: Wait, I ___ close the window.",["'ll","'m going to"],"'ll","A decision right now: will."],
+ ["I ___ my grandma on Saturday. I've already bought the train ticket.",["'m visiting","will visit"],"'m visiting","An arrangement (ticket, day): present continuous."],
+ ["I think robots ___ most of our jobs in the future.",["will do","are doing"],"will do","An opinion about the future (I think…): will."],
+ ["We ___ a flat next year. We're saving money for it now.",["'re going to buy","will buy"],"'re going to buy","A plan we decided before: going to."],
+ ["Don't worry, I ___ tell anyone. I promise!",["won't","'m not going to"],"won't","A promise: will / won't."],
+ ["What ___ tonight? — I'm meeting Anna at 7.",["are you doing","will you do"],"are you doing","Asking about arrangements: present continuous."],
+ ["That bag looks heavy. I ___ help you.",["'ll","'m helping"],"'ll","An offer: will."],
+ ["My sister ___ married in June. The wedding is at a lovely hotel.",["'s getting","will get"],"'s getting","An arrangement (date, place): present continuous."],
+ ["I've decided: I ___ learn to drive this year.",["'m going to","will"],"'m going to","I've decided = a plan: going to."],
+ ["The phone's ringing! — OK, I ___ answer it.",["'ll","'m going to"],"'ll","A decision at the moment of speaking: will."]
+]);
+
+/* 6 name the tense */
+choose("name",[
+ ["She <b>has been studying</b> all evening.",["present perfect continuous","present perfect","present continuous"],"present perfect continuous","has been + -ing."],
+ ["We <b>are flying</b> to Dubai on Friday.",["present continuous (future)","present simple","be going to"],"present continuous (future)","am/is/are + -ing about a future arrangement."],
+ ["I<b>'ve never tried</b> sushi.",["present perfect","past simple","present perfect continuous"],"present perfect","have + past participle."],
+ ["He <b>gets up</b> at 6 every day.",["present simple","present continuous","past simple"],"present simple","verb + -s for he/she/it."],
+ ["They <b>didn't call</b> me yesterday.",["past simple","present perfect","present simple"],"past simple","didn't + verb."],
+ ["It<b>'s going to snow</b>.",["be going to","will","present continuous"],"be going to","am/is/are going to + verb."],
+ ["I<b>'ll call</b> you later.",["will","be going to","present simple"],"will","'ll = will + verb."],
+ ["What <b>are</b> you <b>doing</b>?",["present continuous","present simple","present perfect continuous"],"present continuous","are + -ing."],
+ ["How long <b>have</b> you <b>known</b> her?",["present perfect","present perfect continuous","past simple"],"present perfect","have + past participle (known)."]
+]);
+
+/* 7 mixed message */
+fill("mix",[
+ ["Hi Masha! You know I","in Kazan, but this month",["live","'m living","lived"],"live","live"],
+ ["I","with my aunt in St Petersburg.",["'m staying","stay","stayed"],"'m staying","stay"],
+ ["I","here since 1 November.",["'ve been","am","was"],"'ve been","be"],
+ ["Every morning I","along the river. It's beautiful!",["walk","'m walking","walked"],"walk","walk"],
+ ["Yesterday I","the Hermitage for the first time.",["visited","'ve visited","visit"],"visited","visit"],
+ ["It's the biggest museum I","!",["'ve ever seen","ever saw","ever see"],"'ve ever seen","ever / see"],
+ ["Right now I","in a little café near the museum.",["'m sitting","sit","sat"],"'m sitting","sit"],
+ ["It","all morning, so I'm staying inside.",["'s been raining","rains","is raining"],"'s been raining","rain"],
+ ["My aunt","the owner of this café for twenty years.",["has known","has been knowing","knows"],"has known","know"],
+ ["Tomorrow at 10 I","my old school friend. We booked a table here.",["'m meeting","meet","met"],"'m meeting","meet"],
+ ["I think we","a great time!",["'ll have","have","had"],"'ll have","have"],
+ ["Next year I","Italian. I've already found a teacher!",["'m going to learn","learn","learned"],"'m going to learn","learn"],
+ ["Oh, my coffee's cold. I","another one.",["'ll order","order","ordered"],"'ll order","order"],
+ ["","you ever been to St Petersburg? Come and visit!",["Have","Did","Are"],"Have","have / be"]
+]);
+
+/* 8 right or wrong */
+choose("fix",[
+ ["I'm knowing the answer.",["Right","Wrong"],"Wrong","know is non-action: I know the answer."],
+ ["She works in a bank.",["Right","Wrong"],"Right","Her job: present simple."],
+ ["I've seen him two days ago.",["Right","Wrong"],"Wrong","ago = past simple: I saw him two days ago."],
+ ["I'm working here for two years.",["Right","Wrong"],"Wrong","From the past until now: I've been working here for two years."],
+ ["Look! The bus comes.",["Right","Wrong"],"Wrong","Look! = now: The bus is coming."],
+ ["I've been waiting for an hour.",["Right","Wrong"],"Right","How long + action verb: present perfect continuous."],
+ ["We've known each other since five years.",["Right","Wrong"],"Wrong","five years is a period: for five years."],
+ ["Did you finish your homework yet?",["Right","Wrong"],"Wrong","yet + present perfect: Have you finished your homework yet?"],
+ ["It's cold. I'll close the window.",["Right","Wrong"],"Right","A decision now: will."],
+ ["He doesn't like coffee.",["Right","Wrong"],"Right","Present simple negative: doesn't + verb."],
+ ["What do you do now? — I'm watching TV.",["Right","Wrong"],"Wrong","Now: What are you doing?"],
+ ["I'm going to visit my cousin next weekend.",["Right","Wrong"],"Right","A plan: going to."]
+],true);
+
+const h0=location.hash.slice(1);show(TABS.some(t=>t[0]===h0)?h0:"map");
+TR.init("tenses").then(S=>{RESTORE.forEach(f=>{try{f(S)}catch(e){console.error(e)}});if(!document.getElementById("p-report").hidden)report()});
+</script>
+</body>
+</html>

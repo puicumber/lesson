@@ -19,5 +19,7 @@ window.PORTAL_ACTIVITIES = {
   clothes: { cards: "Flashcards", which: "Which word?", verbs: "Fit, suit, match", order: "Adjective order", listen: "Listening 5c–e", ebay: "Writing 6a", video: "Video 7" },
   procedures: { procs: "Which procedure?", plain: "Say it simply", calm: "Reassuring or not?", soften: "Softer words", going: "Tell the patient", what: "What… sentences" },
   phrasal: { meaning: "Meanings", particle: "The little word", types: "Which type?", order: "Right or wrong?", pron: "it, them, her", story: "Concert day", talk: "Talk to each other" },
+  ppc: { forsince: "for / since", verbs: "Action or non-action?", build: "Choose the form", choose: "One or both?", why: "What have you been doing?", story: "Katya's story" },
+  tenses: { signals: "Signal words", now: "Present simple / continuous", past: "Past simple / present perfect", perfect: "PP simple / continuous", future: "The future", name: "Name that tense", mix: "All tenses: message", fix: "Right or wrong" },
   ppps: { signals: "Signal words", forms: "Participles", choose: "Which tense?", words: "ever, just, yet…", dialogue: "Conversation", rw: "Right or wrong?" }
 };
