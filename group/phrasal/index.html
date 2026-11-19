@@ -327,7 +327,8 @@ exercise("particle",PART.length,(saved,done)=>{
 
 /* 3. Types */
 const TY=[["wake up",1],["look for",3],["turn off",2],["get up",1],["try on",2],["run out of",3],["go out",1],["pick up",2],["get on with",3],["sit down",1],["write down",2],["look round",3],["check in",1],["give back",2],["get off (a bus)",3],["put away",2]];
-choiceEx("types",TY.map(([v,t])=>({q:v,r:"Type "+t,why:t===1?"Type 1: no object.":t===2?"Type 2: you can split it (turn it off).":"Type 3: never split (look for it)."})),{fixed:["Type 1","Type 2","Type 3"],cls:["t1","t2","t3"]});
+const TYWHY={"wake up":"Type 1 here: I wake up at 7. (With an object it splits: wake me up.)","check in":"Type 1 here: We checked in at 3. (With luggage it can split: check your bags in.)"};
+choiceEx("types",TY.map(([v,t])=>({q:v,r:"Type "+t,why:TYWHY[v]||(t===1?"Type 1: no object.":t===2?"Type 2: you can split it (turn it off).":"Type 3: never split (look for it).")})),{fixed:["Type 1","Type 2","Type 3"],cls:["t1","t2","t3"]});
 // show sort cards in a grid: move each .q into the grid container (already there)
 
 /* 4. Right or wrong */
