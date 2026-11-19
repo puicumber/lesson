@@ -17,5 +17,6 @@ window.PORTAL_ACTIVITIES = {
   move: { walk: "The walk", tricky: "Tricky pairs", sports: "Play, go, do", stress: "Stress", match: "The big match", verbs: "Which verb?" },
   necklace: { words: "Words from the story", lend: "Borrow or lend?", vuln: "Vulnerable", use: "Story and surgery" },
   clothes: { cards: "Flashcards", which: "Which word?", verbs: "Fit, suit, match", order: "Adjective order", listen: "Listening 5c–e", ebay: "Writing 6a", video: "Video 7" },
+  procedures: { procs: "Which procedure?", plain: "Say it simply", calm: "Reassuring or not?", soften: "Softer words", going: "Tell the patient", what: "What… sentences" },
   ppps: { signals: "Signal words", forms: "Participles", choose: "Which tense?", words: "ever, just, yet…", dialogue: "Conversation", rw: "Right or wrong?" }
 };
