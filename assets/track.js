@@ -45,7 +45,7 @@
   function body(name, keepalive) {
     const e = ex[name];
     const answers = Object.values(e.answers);
-    const wrong = answers.filter(a => a.ok === false).map(a => a.c ? `${a.q} → ${a.c}` : a.q);
+    const wrong = answers.filter(a => a.ok === false || a.fok === false).map(a => a.c ? `${a.q} → ${a.c}` : a.q);
     const details = Object.assign({}, e.extra || {}, { answers: e.answers, wrong, partial: !e.final, ts: Date.now() });
     return { p_code: code, p_activity: SET + "/" + name, p_score: e.score || 0, p_total: e.total || 0, p_details: details };
   }
@@ -100,7 +100,13 @@
     // Record one answer. q = question text, a = what the student gave, c = correct answer.
     answer(name, idx, q, a, c, ok, score, total) {
       const e = get(name);
-      e.answers[idx] = { q, a, c, ok };
+      // Keep the student's first answer when they change it later (f = first answer, fok = was it right).
+      const prev = e.answers[idx], rec = { q, a, c, ok };
+      if (prev) {
+        if (prev.f !== undefined) { rec.f = prev.f; rec.fok = prev.fok; }
+        else if (prev.a !== a) { rec.f = prev.a; rec.fok = prev.ok; }
+      }
+      e.answers[idx] = rec;
       e.score = score; e.total = total;
       persist(name, false);
     },
