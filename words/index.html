@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Word Garden</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<script src="../assets/config.js?v=18"></script>
+<script src="../assets/portal.js?v=4"></script>
+<script src="../assets/words.js?v=1"></script>
+<script src="../assets/srs.js?v=1"></script>
+<style>
+:root{
+  --bg:#f5efe2;--paper:#fffaf0;--ink:#2b2a22;--muted:#6f6a58;--line:#e2d8c2;
+  --leaf:#2f7a43;--leaf-soft:#2f7a431c;--clay:#c45f36;--clay-soft:#c45f3620;--sun:#e2a72e;--sun-soft:#e2a72e2a;
+  --shadow:0 2px 0 #0000000d,0 14px 34px -14px #5a48204d;
+  --display:"Fraunces",Georgia,serif;--body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#17160f;--paper:#221f16;--ink:#eee8d6;--muted:#ada58c;--line:#3a3524;
+  --leaf:#6cc483;--leaf-soft:#6cc48322;--clay:#ec8a63;--clay-soft:#ec8a6326;--sun:#efc35a;--sun-soft:#efc35a26;
+  --shadow:0 2px 0 #0004,0 14px 34px -14px #0009;color-scheme:dark}}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{min-height:100dvh;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.5;
+  background-image:radial-gradient(circle at 12% 8%,var(--sun-soft),transparent 32%),radial-gradient(circle at 92% 96%,var(--leaf-soft),transparent 38%);
+  padding:max(20px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) 56px max(16px,env(safe-area-inset-left))}
+[hidden]{display:none!important}
+.wrap{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+h1,h2,h3{font-family:var(--display);margin:0;line-height:1.05;letter-spacing:-.01em}
+h1{font-size:clamp(34px,7vw,52px);font-weight:800}
+h2{font-size:clamp(22px,4vw,28px);font-weight:800}
+p{margin:0}
+.muted{color:var(--muted)}
+.top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.back{color:var(--muted);text-decoration:none;font-weight:700;font-size:15px}
+.back:hover{color:var(--leaf)}
+.chip{display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:14px;border-radius:999px;padding:4px 12px;background:var(--sun-soft);color:var(--ink);border:1px solid var(--line)}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:22px;padding:clamp(18px,4vw,28px);box-shadow:var(--shadow);display:flex;flex-direction:column;gap:14px}
+.big{font-family:var(--display);font-weight:800;font-size:clamp(44px,10vw,64px);line-height:1;color:var(--leaf)}
+.btn{appearance:none;cursor:pointer;font:inherit;font-weight:700;font-size:17px;border-radius:999px;padding:12px 24px;border:2px solid var(--leaf);background:var(--leaf);color:var(--paper);transition:transform .12s}
+.btn:hover{transform:translateY(-1px)}
+.btn.ghost{background:transparent;color:var(--leaf)}
+.btn.clay{background:var(--clay);border-color:var(--clay)}
+.btn:disabled{opacity:.5;cursor:default;transform:none}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+:focus-visible{outline:3px solid var(--sun);outline-offset:3px}
+.banner{border:2px dashed var(--sun);background:var(--sun-soft);border-radius:14px;padding:10px 14px;font-weight:700;font-size:15px}
+
+/* garden beds */
+.beds{display:flex;flex-direction:column;gap:12px}
+.bed{border:1px solid var(--line);border-radius:16px;padding:14px 16px;display:flex;flex-direction:column;gap:8px;background:var(--bg)}
+.bed h3{font-size:19px}
+.soil{display:flex;height:14px;border-radius:99px;overflow:hidden;background:var(--line)}
+.soil span{display:block;height:100%}
+.soil .s{background:var(--leaf)}.soil .l{background:var(--sun)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:14px;color:var(--muted)}
+.bed .row .btn{font-size:14px;padding:6px 14px;border-width:1px}
+
+/* session */
+.progress{display:flex;align-items:center;gap:12px}
+.track{flex:1;height:10px;border-radius:99px;background:var(--line);overflow:hidden}
+.track span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--leaf),var(--sun));transition:width .3s}
+.count{font-weight:700;font-variant-numeric:tabular-nums;color:var(--muted);font-size:15px;white-space:nowrap}
+.stage{perspective:1400px}
+.card{position:relative;width:100%;min-height:min(62dvh,400px);border:none;padding:0;background:none;font:inherit;color:inherit;cursor:pointer;transform-style:preserve-3d;transition:transform .55s cubic-bezier(.3,.7,.3,1);display:block}
+.card.flip{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:26px;background:var(--paper);border:2px solid var(--line);box-shadow:var(--shadow);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:clamp(20px,5vw,40px);text-align:center;overflow:auto}
+.face.backside{transform:rotateY(180deg);border-color:var(--leaf)}
+.card:not(.flip) .backside,.card.flip .front{pointer-events:none}
+.face .tag{position:absolute;top:14px;left:18px;right:18px;display:flex;justify-content:space-between;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.word{font-family:var(--display);font-weight:800;font-size:clamp(36px,9vw,64px);line-height:1.05;overflow-wrap:anywhere}
+.hint{color:var(--muted);font-size:15px}
+.ru{font-family:var(--display);font-weight:800;font-size:clamp(28px,6.5vw,44px);color:var(--leaf);line-height:1.1}
+.small-word{font-weight:700;font-size:18px;color:var(--muted)}
+.def{font-size:18px;max-width:34ch}
+.ex{font-style:italic;font-size:18px;max-width:38ch;border-top:1px dashed var(--line);padding-top:12px}
+.ex mark{background:var(--sun-soft);color:inherit;font-style:normal;font-weight:700;border-radius:4px;padding:0 3px}
+.say{appearance:none;cursor:pointer;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;font:inherit;font-size:15px;font-weight:700;padding:6px 14px}
+.answer{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.answer .btn{width:100%;padding:16px 10px;font-size:18px}
+.keys{text-align:center;font-size:13px;color:var(--muted)}
+kbd{font-family:inherit;border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:0 5px;background:var(--paper)}
+.again-note{text-align:center;font-size:14px;color:var(--clay);min-height:1.4em}
+
+/* done */
+.sum{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}
+.sum div{border-radius:16px;padding:14px;background:var(--bg);border:1px solid var(--line);text-align:center}
+.sum b{display:block;font-family:var(--display);font-size:36px;line-height:1.1}
+.sum .ok b{color:var(--leaf)}.sum .no b{color:var(--clay)}.sum .fire b{color:var(--sun)}
+.sprout{font-size:64px;text-align:center;line-height:1}
+.saved{font-size:14px;color:var(--muted);text-align:center}
+.pop{animation:pop .5s ease-out}
+@keyframes pop{0%{transform:scale(.6);opacity:0}70%{transform:scale(1.08)}100%{transform:scale(1);opacity:1}}
+@media (max-width:480px){.answer .btn{font-size:16px}.card{min-height:min(58dvh,380px)}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}.card.flip{transform:none}.card.flip .front{visibility:hidden}.face.backside{transform:none}.card:not(.flip) .backside{visibility:hidden}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><a class="back" id="backLink" href="../my/">← My page</a><span class="chip" id="streak" hidden></span></div>
+  <p class="banner" id="previewBanner" hidden>Preview: this is how students see the cards. Nothing is saved.</p>
+
+  <!-- home -->
+  <section id="home" hidden style="display:flex;flex-direction:column;gap:20px">
+    <header><h1 id="hello">Word garden</h1><p class="muted" style="margin-top:6px">Remembered words come back later and later. Forgotten words come back tomorrow.</p></header>
+    <div class="panel">
+      <div class="big" id="todayN">0</div>
+      <p id="todayText"></p>
+      <div class="row"><button class="btn" id="startBtn" type="button">Start ▸</button></div>
+    </div>
+    <div class="panel">
+      <h2>My beds</h2>
+      <div class="legend"><span>🌳 strong</span><span>🌱 growing</span><span>🌰 not planted yet</span></div>
+      <div class="beds" id="beds"></div>
+    </div>
+  </section>
+
+  <!-- session -->
+  <section id="session" hidden style="display:flex;flex-direction:column;gap:16px">
+    <div class="progress"><div class="track"><span id="bar"></span></div><span class="count" id="count"></span></div>
+    <p class="banner" id="practiceBanner" hidden>Extra practice: this round doesn't change your schedule.</p>
+    <div class="stage">
+      <div class="card" id="card" role="button" tabindex="0">
+        <div class="face front" id="front"></div>
+        <div class="face backside" id="backside"></div>
+      </div>
+    </div>
+    <p class="again-note" id="againNote"></p>
+    <div class="row" id="showRow" style="justify-content:center"><button class="btn" id="showBtn" type="button">Show the answer</button></div>
+    <div class="answer" id="answerRow" hidden>
+      <button class="btn clay" id="noBtn" type="button">✗ Not yet</button>
+      <button class="btn" id="yesBtn" type="button">✓ I knew it</button>
+    </div>
+    <p class="keys">Keyboard: <kbd>Space</kbd> flip · <kbd>1</kbd> not yet · <kbd>2</kbd> I knew it</p>
+  </section>
+
+  <!-- done -->
+  <section id="done" hidden style="display:flex;flex-direction:column;gap:16px">
+    <div class="panel">
+      <div class="sprout pop" aria-hidden="true">🌻</div>
+      <h2 style="text-align:center" id="doneTitle">Well done!</h2>
+      <div class="sum" id="sum"></div>
+      <p class="muted" style="text-align:center" id="nextText"></p>
+      <p class="saved" id="savedText" aria-live="polite"></p>
+      <div class="row" style="justify-content:center"><button class="btn ghost" id="homeBtn" type="button">Back to my garden</button></div>
+    </div>
+  </section>
+
+  <p class="banner" id="msg" hidden></p>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const S=window.SRS,esc=S.esc;
+const params=new URLSearchParams(location.search);
+const PREVIEW=params.get("preview");
+let CODE=null,STUDENT=null,SETS=[],STATE=S.empty(),dirty=0;
+let deck=[],pos=0,flipped=false,practice=false,firstPass={},results={ok:0,no:0};
+
+function show(id){["home","session","done"].forEach(x=>$(x).hidden=x!==id);window.scrollTo(0,0)}
+function msg(t){$("msg").hidden=false;$("msg").textContent=t}
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+const stageIcon=st=>!st?"🌰":st.b>=2?"🌳":"🌱";
+function highlight(ex,w){const base=String(w).replace(/^(a|an|the|be)\s+/i,"").replace(/\s*\(.*?\)\s*/g," ").replace(/\s*\/.*$/,"").trim();
+  const e=esc(ex);if(!base)return e;const first=base.split(/\s+/)[0].replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
+  const stem=first.length>4?first.slice(0,first.length-(first.endsWith("e")?1:0)):first;
+  return e.replace(new RegExp("\\b("+stem+"[a-z'-]*)","i"),"<mark>$1</mark>")}
+
+/* ---------- speech ---------- */
+let voice=null;
+function pickVoice(){try{const v=speechSynthesis.getVoices();voice=v.find(x=>/en-GB/i.test(x.lang))||v.find(x=>/^en/i.test(x.lang))||null}catch(e){}}
+if("speechSynthesis" in window){pickVoice();speechSynthesis.onvoiceschanged=pickVoice}
+function say(t,ev){if(ev)ev.stopPropagation();try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(String(t).replace(/\(.*?\)/g,""));u.lang="en-GB";if(voice)u.voice=voice;u.rate=.9;speechSynthesis.speak(u)}catch(e){}}
+const canSay="speechSynthesis" in window;
+
+/* ---------- home ---------- */
+function home(){
+  const q=S.queue(SETS,STATE);const n=q.review.length+q.fresh.length;
+  if(!PREVIEW){const st=S.streak(STATE);$("streak").hidden=!st;$("streak").textContent=`🔥 ${st} day${st>1?"s":""} in a row`}
+  $("todayN").textContent=n;
+  if(n){$("todayText").innerHTML=`word${n>1?"s":""} to water today: <b>${q.review.length}</b> to review and <b>${q.fresh.length}</b> new.`+(q.waitingNew?` <span class="muted">${q.waitingNew} more new words wait for the next days.</span>`:"");$("startBtn").hidden=false}
+  else{const nd=S.nextDue(SETS,STATE);$("todayText").innerHTML=`Nothing to water today ✓ ${nd?`Your next words come back <b>${S.whenText(nd)}</b>.`:""} You can still practise any bed below.`;$("startBtn").hidden=true}
+  const beds=$("beds");beds.innerHTML="";
+  SETS.forEach(s=>{const x=S.stats(s,STATE);
+    const d=document.createElement("div");d.className="bed";
+    d.innerHTML=`<div class="top"><h3>${esc(s.title)}</h3><span class="muted" style="font-size:14px">${x.total} words</span></div>
+      <div class="soil" role="img" aria-label="${x.strong} strong, ${x.learning} growing, ${x.fresh} not planted"><span class="s" style="width:${x.strong/x.total*100}%"></span><span class="l" style="width:${x.learning/x.total*100}%"></span></div>
+      <div class="row" style="justify-content:space-between"><span class="legend"><span>🌳 ${x.strong}</span><span>🌱 ${x.learning}</span><span>🌰 ${x.fresh}</span></span></div>`;
+    const b=document.createElement("button");b.type="button";b.className="btn ghost";b.textContent=PREVIEW?"Go through all words":"Practise this bed";
+    b.onclick=()=>start(shuffle(s.words.map(w=>({id:S.cardId(s,w),set:s,w,st:STATE.cards[S.cardId(s,w)]}))).slice(0,PREVIEW?999:12),true);
+    d.querySelector(".row").appendChild(b);beds.appendChild(d)});
+  show("home");
+}
+$("startBtn").onclick=()=>{const q=S.queue(SETS,STATE);start([...q.review,...shuffle(q.fresh)],false)};
+
+/* ---------- session ---------- */
+function start(cards,isPractice){
+  if(!cards.length)return;
+  deck=cards.map(c=>({...c,again:false}));pos=0;practice=isPractice;firstPass={};results={ok:0,no:0};
+  $("practiceBanner").hidden=!(practice&&!PREVIEW);show("session");draw();
+}
+function draw(){
+  const c=deck[pos];flipped=false;$("card").classList.remove("flip");
+  const done=Object.keys(firstPass).length,total=new Set(deck.map(d=>d.id)).size;
+  $("bar").style.width=(done/total*100)+"%";$("count").textContent=`${done} / ${total}`;
+  const st=STATE.cards[c.id];
+  $("front").innerHTML=`<div class="tag"><span>${stageIcon(st)} ${esc(c.set.title)}</span><span>${c.again?"one more time":st?"review":"new word"}</span></div>
+    <div class="word">${esc(c.w.w)}</div>${canSay?`<button class="say" type="button" data-say>🔊 Listen</button>`:""}<p class="hint">Remember the meaning or say a sentence with it. Then flip.</p>`;
+  $("backside").innerHTML=`<div class="tag"><span>${stageIcon(st)} ${esc(c.set.title)}</span><span></span></div>
+    <div class="small-word">${esc(c.w.w)}</div>${c.w.ru?`<div class="ru">${esc(c.w.ru)}</div>`:""}${c.w.def?`<p class="def">${esc(c.w.def)}</p>`:""}${c.w.ex?`<p class="ex">${highlight(c.w.ex,c.w.w)}</p>`:""}${canSay&&c.w.ex?`<button class="say" type="button" data-say-ex>🔊 Example</button>`:""}`;
+  $("front").querySelectorAll("[data-say]").forEach(b=>b.onclick=e=>say(c.w.w,e));
+  $("backside").querySelectorAll("[data-say-ex]").forEach(b=>b.onclick=e=>say(c.w.ex,e));
+  $("card").setAttribute("aria-label",`Card: ${c.w.w}. Press to see the answer.`);
+  $("showRow").hidden=false;$("answerRow").hidden=true;$("againNote").textContent="";faces();
+}
+function faces(){$("front").inert=flipped;$("backside").inert=!flipped}
+function flip(){if(!deck[pos])return;flipped=!flipped;$("card").classList.toggle("flip",flipped);faces();
+  const c=deck[pos];$("card").setAttribute("aria-label",flipped?`${c.w.w}: ${c.w.ru||""}. ${c.w.def||""}`:`Card: ${c.w.w}. Press to see the answer.`);
+  if(flipped){$("showRow").hidden=true;$("answerRow").hidden=false;$("yesBtn").focus({preventScroll:true})}}
+$("card").onclick=flip;$("showBtn").onclick=flip;
+function answer(ok){
+  const c=deck[pos];if(!c||!flipped)return;
+  if(!(c.id in firstPass)){
+    firstPass[c.id]=ok;ok?results.ok++:results.no++;
+    if(!practice&&!PREVIEW){const day=S.today();STATE.cards[c.id]=S.grade(STATE.cards[c.id],ok,day);if(!STATE.days.includes(day))STATE.days.push(day);STATE.ts=Date.now();dirty++;S.keepLocal(CODE,STATE);if(dirty>=8)flush()}
+  }
+  if(!ok){deck.splice(Math.min(pos+4,deck.length),0,{...c,again:true});}
+  pos++;
+  if(pos>=deck.length)return finish();
+  draw();$("card").focus({preventScroll:true});if(!ok)$("againNote").textContent=`“${c.w.w}” will come back in a moment.`;
+}
+$("noBtn").onclick=()=>answer(false);$("yesBtn").onclick=()=>answer(true);
+document.addEventListener("keydown",e=>{
+  if($("session").hidden||e.altKey||e.ctrlKey||e.metaKey)return;
+  const tag=(e.target.tagName||"").toLowerCase();
+  if((e.key===" "||e.key==="Enter")&&tag!=="button"&&tag!=="a"){e.preventDefault();flip()}
+  else if(flipped&&(e.key==="1"||e.key==="ArrowLeft")){e.preventDefault();answer(false)}
+  else if(flipped&&(e.key==="2"||e.key==="ArrowRight")){e.preventDefault();answer(true)}
+});
+
+/* ---------- finish / save ---------- */
+async function flush(keepalive){if(!dirty||PREVIEW||!CODE)return true;const n=dirty;dirty=0;const ok=await S.save(CODE,STATE,keepalive);if(!ok)dirty+=n;return ok}
+addEventListener("pagehide",()=>flush(true));
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden")flush(true)});
+async function finish(){
+  const total=results.ok+results.no;
+  $("doneTitle").textContent=results.no===0?"Perfect! Every word remembered":results.ok>=results.no?"Well done!":"Good work, these words need more water";
+  const st=S.streak(STATE);
+  $("sum").innerHTML=`<div class="ok"><b>${results.ok}</b>I knew it</div><div class="no"><b>${results.no}</b>${practice||PREVIEW?"not yet":"back tomorrow"}</div>`+(!practice&&!PREVIEW?`<div class="fire"><b>${st}</b>day${st===1?"":"s"} in a row</div>`:"");
+  const nd=S.nextDue(SETS,STATE);
+  $("nextText").textContent=practice||PREVIEW?"That was extra practice. Your schedule stays the same.":nd?`Next words come back ${S.whenText(nd)}.`:"";
+  show("done");
+  if(!practice&&!PREVIEW){$("savedText").textContent="Saving…";const ok=await flush();$("savedText").textContent=ok?"Saved ✓":"Saved on this device. It will sync next time you're online."}
+  else $("savedText").textContent="";
+}
+$("homeBtn").onclick=home;
+
+/* ---------- load ---------- */
+(async()=>{
+  if(PREVIEW){
+    SETS=S.all().filter(s=>PREVIEW==="all"||s.id===PREVIEW);
+    $("previewBanner").hidden=false;$("backLink").hidden=true;
+    if(!SETS.length)return msg("No word set with this name.");
+    $("hello").textContent=SETS.length===1?SETS[0].title:"Word garden";return home();
+  }
+  CODE=Portal.code();
+  if(CODE)$("backLink").href="../my/?c="+encodeURIComponent(CODE);
+  if(!Portal.ready)return msg("The portal isn't connected yet. Please check back soon.");
+  if(!CODE)return msg("Please open this page from your personal link.");
+  try{
+    const d=await Portal.getPortal(CODE);
+    if(!d||!d.student)return msg("This link doesn't work. Please ask Polina for your personal link.");
+    STUDENT=d.student;SETS=S.setsFor(STUDENT,CODE);
+    STATE=S.merge((d.state||{})[S.KEY],S.local(CODE));
+    // if this device had answers the server hasn't got yet, send them
+    const server=S.clean((d.state||{})[S.KEY]);if(Object.keys(STATE.cards).some(k=>!server.cards[k]||(server.cards[k].t||0)<(STATE.cards[k].t||0))){dirty=1;flush()}
+    $("hello").innerHTML=`${esc(STUDENT.name)}'s word garden`;document.title=`${STUDENT.name}'s words`;
+    if(!SETS.length)return msg("You don't have any word sets yet. They will appear here after your lessons.");
+    home();
+  }catch(e){console.error(e);msg("Something went wrong while loading. Please refresh the page.")}
+})();
+</script>
+</body>
+</html>
