@@ -7,7 +7,6 @@ window.AUTO_MATERIALS = {
     { id: "auto-g36", title: "Grivas p. 36–37 · Exam Practice 1", url: "https://puicumber.github.io/lesson/polina/grivas-36/", kind: "homework", activity: "g36", note: "Review of your mistakes: collocations, open cloze, word formation, transformations." },
     { id: "auto-rte", title: "Return to Earth", url: "https://puicumber.github.io/lesson/polina/return-to-earth/", kind: "lesson", activity: "rte", note: "Listening, vocabulary, Use of English, speaking and writing around a TEDx talk." },
     { id: "auto-read1", title: "Strangers everywhere · reading lesson", url: "https://puicumber.github.io/lesson/polina/reading-1/", kind: "lesson", activity: "read1" },
-    { id: "auto-g33", title: "Grivas p. 33–35 · Collocations & en- verbs", url: "https://puicumber.github.io/lesson/polina/grivas-33/", kind: "vocabulary", activity: "g33" }
   ]
 };
 // Polina is saved in Teacher Desk as "Me".
