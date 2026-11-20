@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Seven Days on the Island</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<script src="../../assets/config.js?v=18"></script>
+<script src="../../assets/portal.js?v=3"></script>
+<script src="../../assets/track.js?v=2"></script>
+<style>
+/* Survival game: 7 days on an island. Each exercise is one day; finishing a day with 80%+ earns a supply. Single warm theme. */
+:root{
+  --bg:#f3ead6; --card:#fffaf0; --ink:#1f2a24; --muted:#5d6a61; --line:#d9ccb0;
+  --sea:#1d6f78; --sea-soft:#1d6f7814; --leaf:#2f7a4a; --ok:#2f8a4f; --ok-soft:#2f8a4f1f;
+  --bad:#c2412d; --bad-soft:#c2412d1a; --sun:#e98a1d; --sun-soft:#e98a1d22;
+  --head:"Bricolage Grotesque",system-ui,sans-serif; --body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55;
+  padding:20px max(16px,env(safe-area-inset-left,0px)) 64px max(16px,env(safe-area-inset-right,0px));
+  background-image:radial-gradient(1000px 420px at 50% -160px,#1d6f7826,transparent 70%)}
+.wrap{max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+h1,h2,h3{font-family:var(--head);margin:0;line-height:1.08;text-wrap:balance}
+h1{font-size:clamp(34px,7vw,60px);font-weight:800;letter-spacing:-.01em}
+h2{font-size:clamp(24px,4vw,32px);font-weight:800}
+h3{font-size:18px;font-weight:600}
+p{margin:0}
+.eyebrow{font-weight:700;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--sea)}
+.muted{color:var(--muted)}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--sun);outline-offset:2px;border-radius:8px}
+
+.hero{display:flex;flex-direction:column;gap:10px}
+.save{font-size:14px;color:var(--muted);background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 12px}
+
+/* supplies bar */
+.bag{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.slots{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px}
+.slot{aspect-ratio:1;border:2px dashed var(--line);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:clamp(20px,5vw,30px);filter:grayscale(1);opacity:.35}
+.slot.on{border-style:solid;border-color:var(--sun);background:var(--sun-soft);filter:none;opacity:1;animation:pop .5s}
+@keyframes pop{0%{transform:scale(.6)}70%{transform:scale(1.12)}100%{transform:scale(1)}}
+.rescue{background:var(--leaf);color:#fff;border-radius:12px;padding:12px 14px;font-weight:700}
+
+/* day tabs */
+nav.days{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:8px}
+nav.days button{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px;text-align:left;display:flex;flex-direction:column;gap:2px;min-height:76px}
+nav.days button[aria-selected="true"]{border-color:var(--sea);box-shadow:inset 0 0 0 2px var(--sea);background:#fff}
+nav.days .d{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+nav.days .t{font-weight:700;line-height:1.2}
+nav.days .s{font-size:13px;color:var(--muted)}
+nav.days .done .s{color:var(--ok);font-weight:700}
+
+/* exercise panel */
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:clamp(16px,3vw,26px);display:flex;flex-direction:column;gap:14px}
+.rule{background:var(--sea-soft);border-left:4px solid var(--sea);border-radius:8px;padding:10px 12px;font-size:15px}
+.rule b{color:var(--sea)}
+.top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;font-size:14px;color:var(--muted)}
+.streak{font-weight:700;color:var(--sun)}
+.meter{height:8px;background:var(--line);border-radius:99px;overflow:hidden}
+.meter i{display:block;height:100%;background:var(--sea);width:0;transition:width .3s}
+.q{font-size:clamp(19px,3vw,23px);font-weight:700;line-height:1.35}
+.ctx{color:var(--muted);font-style:italic}
+.opts{display:grid;gap:8px}
+.opts.row{grid-template-columns:repeat(auto-fit,minmax(110px,1fr))}
+.opt{background:#fff;border:2px solid var(--line);border-radius:12px;padding:12px 14px;text-align:left;font-size:17px;min-height:48px}
+.opt:hover:not(:disabled){border-color:var(--sea)}
+.opt:disabled{cursor:default}
+.opt.ok{border-color:var(--ok);background:var(--ok-soft)}
+.opt.bad{border-color:var(--bad);background:var(--bad-soft)}
+.why{border-radius:10px;padding:10px 12px;font-size:15px}
+.why.ok{background:var(--ok-soft)} .why.bad{background:var(--bad-soft)}
+.actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.btn{background:var(--sea);color:#fff;border:0;border-radius:12px;padding:11px 18px;font-weight:700;min-height:46px}
+.btn.ghost{background:transparent;color:var(--muted);border:1px solid var(--line)}
+.end{text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center;padding:10px 0}
+.big{font-family:var(--head);font-size:56px;font-weight:800;line-height:1}
+.dots{display:flex;flex-wrap:wrap;gap:5px}
+.dots span{width:12px;height:12px;border-radius:50%;background:var(--line)}
+.dots .y{background:var(--ok)} .dots .n{background:var(--bad)}
+
+/* typing */
+ol.type{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:12px}
+ol.type li{display:flex;flex-direction:column;gap:6px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+ol.type .s{font-weight:700}
+ol.type input{font:inherit;font-size:17px;padding:9px 12px;border:2px solid var(--line);border-radius:10px;width:min(320px,100%);background:#fff}
+ol.type input.ok{border-color:var(--ok);background:var(--ok-soft)}
+ol.type input.bad{border-color:var(--bad);background:var(--bad-soft)}
+ol.type .fb{font-size:14px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">English File · Units 4B, 5A, 5B, 6A · Homework</span>
+    <h1>Seven Days on the Island 🏝️</h1>
+    <p class="muted">Your boat is gone. You have seven days and one radio with no batteries. Every day is a grammar challenge: score 80% or more and you find a supply. Find all seven and the rescue boat comes.</p>
+    <p class="save" id="saveState" role="status"></p>
+  </header>
+
+  <section class="bag" aria-label="Your supplies">
+    <h3>Your supplies</h3>
+    <div class="slots" id="slots"></div>
+    <p class="rescue" id="rescue" hidden>🚤 Rescue boat on the horizon! You survived all seven days. Great job, Denis!</p>
+  </section>
+
+  <nav class="days" id="days" role="tablist" aria-label="Days"></nav>
+  <section class="panel" id="panel" role="tabpanel" aria-live="polite"></section>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const TR=window.Track;const RESTORE=[];
+TR.onStatus(st=>{$("saveState").textContent=!TR.online?"Tip: open this page from your personal portal link so your progress is saved.":st==="saving"?"Saving…":st==="offline"?"No connection right now. Your answers are kept on this device and will be sent later.":"Your progress saves automatically after every answer."});
+
+const RULES={
+  zero:"<b>Zero</b>: always true, facts. <i>If + present, present.</i>",
+  first:"<b>First</b>: a real possibility in the future. <i>If + present, will + verb.</i>",
+  second:"<b>Second</b>: imaginary or unlikely, now or in the future. <i>If + past, would + verb.</i>",
+  third:"<b>Third</b>: imaginary past, it didn't happen. <i>If + had + past participle, would have + past participle.</i>",
+  wpres:"<b>wish + past simple</b> (or <i>could</i>): you want the present to be different.",
+  wwould:"<b>wish + would</b>: another person or thing annoys you and you want it to change. Not for yourself: <i>I wish I would</i> is wrong.",
+  wpast:"<b>wish + past perfect</b>: a regret about the past.",
+  used:"<b>used to + verb</b>: a past habit that is finished. Questions and negatives: <i>did you use to / didn't use to</i>.",
+  beused:"<b>be used to + -ing</b>: it is normal for me now, not strange.",
+  getused:"<b>get used to + -ing</b>: it is becoming normal, little by little."
+};
+const W=(k,extra)=>RULES[k]+(extra?" "+extra:"");
+
+const CH=["Zero","First","Second","Third"];
+const DAYS=[
+ {key:"which",title:"Which conditional?",supply:"🔥",sname:"fire",type:"choice",row:true,
+  intro:"Read the sentence. Which conditional is it?",
+  items:[
+   ["If you heat ice, it melts.",CH,0,W("zero")],
+   ["If it rains tomorrow, we'll stay in the tent.",CH,1,W("first")],
+   ["If I found a bear in my kitchen, I'd run out of the house.",CH,2,W("second")],
+   ["If we had taken a map, we wouldn't have got lost.",CH,3,W("third")],
+   ["If you don't drink enough water, you get a headache.",CH,0,W("zero")],
+   ["If I were you, I'd take a warmer jacket.",CH,2,W("second","<i>If I were you</i> = advice.")],
+   ["We'll miss the boat if we don't leave now.",CH,1,W("first","The <i>if</i> part can come second.")],
+   ["She would have survived the storm if she had stayed in the cave.",CH,3,W("third")],
+   ["If I had a million dollars, I'd buy an island.",CH,2,W("second")],
+   ["Plants die if they don't get enough light.",CH,0,W("zero")]
+  ]},
+ {key:"forms",title:"Pick the form",supply:"💧",sname:"water",type:"choice",
+  intro:"Choose the right words for the gap.",
+  items:[
+   ["If I ___ lost in a forest, I'd follow a river.",["get","got","had got"],1,W("second")],
+   ["If you ___ a snake, don't touch it.",["see","saw","will see"],0,"Real situation: <i>if + present</i>, then an instruction."],
+   ["If they had listened to the guide, they ___ into trouble.",["wouldn't get","won't get","wouldn't have got"],2,W("third")],
+   ["If you mix blue and yellow, you ___ green.",["get","got","would get"],0,W("zero")],
+   ["What ___ you do if you met a shark?",["will","would","did"],1,W("second")],
+   ["If I ___ you, I wouldn't swim there.",["am","were","would be"],1,W("second","<i>If I were you</i> is the usual form for advice.")],
+   ["If we ___ earlier, we would have caught the last bus.",["left","had left","would leave"],1,W("third")],
+   ["If it ___ sunny tomorrow, we'll go fishing.",["is","will be","was"],0,W("first","No <i>will</i> after <i>if</i>.")],
+   ["He ___ the race if he had trained harder.",["would win","would have won","had won"],1,W("third")],
+   ["I ___ you a message if I find any food.",["'ll send","'d send","send"],0,W("first")]
+  ]},
+ {key:"wish",title:"Three kinds of wish",supply:"⛺",sname:"shelter",type:"choice",
+  intro:"Read the situation. Choose the best wish.",
+  items:[
+   ["\"I'm always tired. I don't have enough time to sleep.\"",["I wish I had more time.","I wish I would have more time.","I wish I'd had more time."],0,W("wpres")],
+   ["\"My neighbour plays loud music every night.\"",["I wish he turns it down.","I wish he would turn it down.","I wish he had turned it down."],1,W("wwould")],
+   ["\"I ate too much pizza last night.\"",["I wish I didn't eat so much.","I wish I wouldn't eat so much.","I wish I hadn't eaten so much."],2,W("wpast")],
+   ["\"I can't swim.\"",["I wish I can swim.","I wish I could swim.","I wish I would swim."],1,W("wpres","<i>can</i> becomes <i>could</i>.")],
+   ["\"It's raining again and I want to go out.\"",["I wish it would stop raining.","I wish it stops raining.","I wish it had stopped raining."],0,W("wwould","You want the rain to change.")],
+   ["\"I didn't go to my friend's party.\"",["I wish I went.","I wish I had gone.","I wish I would go."],1,W("wpast")],
+   ["\"My brother never answers his phone.\"",["I wish he would answer his phone.","I wish he answers his phone.","I wish he had answered his phone."],0,W("wwould")],
+   ["\"My flat is really small.\"",["I wish I live in a bigger flat.","I wish I would live in a bigger flat.","I wish I lived in a bigger flat."],2,W("wpres")],
+   ["\"I sold my old guitar, and now I miss it.\"",["I wish I hadn't sold it.","I wish I didn't sell it.","I wish I wouldn't sell it."],0,W("wpast")],
+   ["\"I'm not very good at cooking.\"",["I wish I am better at cooking.","I wish I were better at cooking.","I wish I would be better at cooking."],1,W("wpres","<i>was</i> is OK too in everyday English.")]
+  ]},
+ {key:"wishtype",title:"Write the wish",supply:"🐟",sname:"food",type:"typing",
+  intro:"Write the missing words. Use the verb in brackets. Check when you finish.",
+  items:[
+   ["I don't have a car.","I wish I ___ a car.","have",["had"]],
+   ["You never listen to me!","I wish you ___ to me.","listen",["would listen","'d listen"]],
+   ["I didn't study for the test.","I wish I ___ for the test.","study",["had studied","'d studied"]],
+   ["I can't speak Spanish.","I wish I ___ Spanish.","speak",["could speak"]],
+   ["I said something stupid.","I wish I ___ it.","not say",["hadn't said","had not said"]],
+   ["The bus is always late!","I wish the bus ___ on time.","come",["would come","came"]],
+   ["I'm so busy this week.","I wish I ___ so busy.","not be",["wasn't","weren't","was not","were not"]],
+   ["I forgot your birthday.","I wish I ___ it.","remember",["had remembered","'d remembered"]]
+  ]},
+ {key:"usedto",title:"Sleep habits",supply:"🧭",sname:"compass",type:"choice",
+  intro:"used to, be used to or get used to? Choose the right words.",
+  items:[
+   ["When I was a child, I ___ sleep with a teddy bear.",["used to","was used to","got used to"],0,W("used")],
+   ["I work nights, so I'm ___ sleeping during the day.",["use to","used to","get used to"],1,W("beused")],
+   ["It took me months to ___ waking up at 5 a.m.",["get used to","used to","be use to"],0,W("getused")],
+   ["___ you use to have nightmares when you were little?",["Did","Do","Were"],0,W("used")],
+   ["I didn't ___ drink coffee, but now I can't live without it.",["use to","used to","get used to"],0,W("used","After <i>didn't</i>: <i>use to</i>, no d.")],
+   ["My new flat is next to a railway. I'm slowly ___ the noise.",["used to","getting used to","use to"],1,W("getused")],
+   ["She ___ go to bed late. Now she's asleep by ten.",["used to","is used to","gets used to"],0,W("used")],
+   ["I'll never ___ sleeping in a tent. It's so uncomfortable!",["used to","use to","get used to"],2,W("getused")],
+   ["He has a new baby. He isn't ___ sleeping so little yet.",["used to","use to","using to"],0,W("beused")],
+   ["Are you used to ___ early?",["get up","getting up","got up"],1,"After <i>be used to</i> and <i>get used to</i> comes <b>-ing</b>."]
+  ]},
+ {key:"preps",title:"at, in or on?",supply:"🪢",sname:"rope",type:"choice",row:true,speed:true,
+  intro:"Quick fire! Choose the preposition. Try to keep your streak going.",
+  items:[
+   ["___ the morning",["at","in","on"],1,"<b>in</b> parts of the day: in the morning, in the evening."],
+   ["___ Monday",["at","in","on"],2,"<b>on</b> days and dates."],
+   ["___ midnight",["at","in","on"],0,"<b>at</b> exact times: at midnight, at 6 o'clock."],
+   ["___ 2019",["at","in","on"],1,"<b>in</b> years, months, seasons."],
+   ["___ the weekend",["at","in","on"],0,"<b>at</b> the weekend (British English)."],
+   ["___ my birthday",["at","in","on"],2,"<b>on</b> a special day."],
+   ["___ the bus stop",["at","in","on"],0,"<b>at</b> a point or place: at the bus stop, at home."],
+   ["___ the sofa",["at","in","on"],2,"<b>on</b> a surface."],
+   ["___ bed",["at","in","on"],1,"<b>in</b> bed (sleeping or lying there)."],
+   ["___ a small village",["at","in","on"],1,"<b>in</b> towns, villages, countries."],
+   ["___ night",["at","in","on"],0,"<b>at</b> night (but <i>in</i> the morning)."],
+   ["___ the second floor",["at","in","on"],2,"<b>on</b> floors: on the second floor."],
+   ["___ summer",["at","in","on"],1,"<b>in</b> seasons."],
+   ["___ Christmas Day",["at","in","on"],2,"<b>on</b> one day. Compare: <i>at Christmas</i> (the holiday period)."],
+   ["I'm still ___ work.",["at","in","on"],0,"<b>at</b> work, at school, at university."],
+   ["Who's that ___ the photo?",["at","in","on"],1,"<b>in</b> a photo or picture."]
+  ]},
+ {key:"fix",title:"Right or wrong?",supply:"🔋",sname:"batteries",type:"choice",row:true,
+  intro:"Final day! Is the sentence right or wrong? Everything from this week.",
+  items:[
+   ["If I would have more money, I'd travel more.",["Right","Wrong"],1,"No <i>would</i> after <i>if</i>: <b>If I had</b> more money…"],
+   ["I wish I had gone to bed earlier last night.",["Right","Wrong"],0,W("wpast")],
+   ["If you press this button, the light comes on.",["Right","Wrong"],0,W("zero")],
+   ["I'm used to get up early.",["Right","Wrong"],1,"<b>I'm used to getting up</b> early: -ing after <i>be used to</i>."],
+   ["If we had left on time, we wouldn't miss the plane.",["Right","Wrong"],1,"Third conditional: we <b>wouldn't have missed</b> the plane."],
+   ["I wish my phone would stop ringing.",["Right","Wrong"],0,W("wwould")],
+   ["I'll text you when I will arrive.",["Right","Wrong"],1,"No <i>will</i> after <i>when</i>: <b>when I arrive</b>."],
+   ["Did you used to play computer games?",["Right","Wrong"],1,"<b>Did you use to</b>: no d after <i>did</i>."],
+   ["I wish I can remember all these rules!",["Right","Wrong"],1,"<b>I wish I could</b> remember…"],
+   ["We met in April, on a rainy Saturday.",["Right","Wrong"],0,"<b>in</b> April, <b>on</b> Saturday."],
+   ["If it snows tomorrow, we'll build a snowman.",["Right","Wrong"],0,W("first")],
+   ["See you at Friday!",["Right","Wrong"],1,"<b>on</b> Friday."]
+  ]}
+];
+const total=d=>d.items.length;
+
+/* state per day */
+const ST={};DAYS.forEach(d=>ST[d.key]={ans:{},pos:0,best:0});
+const pct=d=>{const s=ST[d.key];return total(d)?s.best/total(d):0};
+const done=d=>pct(d)>=.8;
+
+/* supplies */
+function drawBag(){const sl=$("slots");sl.innerHTML="";DAYS.forEach(d=>{const x=document.createElement("div");x.className="slot"+(done(d)?" on":"");x.textContent=d.supply;x.title=d.sname;x.setAttribute("aria-label",d.sname+(done(d)?": found":": not found yet"));sl.appendChild(x)});
+  $("rescue").hidden=!DAYS.every(done)}
+/* tabs */
+let cur=0;
+function drawTabs(){const n=$("days");n.innerHTML="";DAYS.forEach((d,i)=>{const b=document.createElement("button");b.setAttribute("role","tab");b.setAttribute("aria-selected",i===cur);b.className=done(d)?"done":"";
+  const s=ST[d.key];const answered=Object.keys(s.ans).length;
+  b.innerHTML=`<span class="d">Day ${i+1}</span><span class="t">${d.title}</span><span class="s">${done(d)?d.supply+" found":answered>=total(d)?`score ${s.best} / ${total(d)}`:answered?`${answered} / ${total(d)} answered`:"not started"}</span>`;
+  b.onclick=()=>{cur=i;render()};n.appendChild(b)})}
+function render(){drawTabs();drawBag();const d=DAYS[cur];(d.type==="typing"?renderTyping:renderChoice)(d)}
+
+/* choice engine */
+function scoreOf(d){return Object.values(ST[d.key].ans).filter(a=>a.ok).length}
+function streakOf(d){let n=0;const a=ST[d.key].ans;for(let i=0;i<total(d);i++){if(!a[i])break;n=a[i].ok?n+1:0}return n}
+function renderChoice(d){
+  const s=ST[d.key];const P=$("panel");const N=total(d);
+  const answered=Object.keys(s.ans).length;
+  if(answered>=N){return renderEnd(d)}
+  if(s.pos>=N||s.ans[s.pos])s.pos=[...Array(N).keys()].find(i=>!s.ans[i]);
+  const i=s.pos;const [q,opts,a,why]=d.items[i];
+  P.innerHTML=`<div><span class="eyebrow">Day ${cur+1} · find the ${d.sname} ${d.supply}</span><h2>${d.title}</h2></div>
+   <p class="muted">${d.intro}</p>
+   <div class="top"><span>Question ${i+1} of ${N} · score ${scoreOf(d)}</span><span class="streak">${streakOf(d)>1?"🔥 streak "+streakOf(d):""}</span></div>
+   <div class="meter"><i style="width:${answered/N*100}%"></i></div>
+   <p class="q">${q}</p>
+   <div class="opts${d.row?" row":""}" id="opts"></div>
+   <div id="why"></div>
+   <div class="actions"><button class="btn" id="next" hidden>Next →</button><button class="btn ghost" id="reset">Start this day again</button></div>`;
+  const O=$("opts");
+  opts.forEach((t,k)=>{const b=document.createElement("button");b.className="opt";b.textContent=t;b.onclick=()=>{
+    const ok=k===a;[...O.children].forEach((c,j)=>{c.disabled=true;if(j===a)c.classList.add("ok");else if(j===k)c.classList.add("bad")});
+    s.ans[i]={a:t,ok};
+    const sc=scoreOf(d);if(sc>s.best)s.best=sc;
+    TR.answer(d.key,i,q,t,opts[a],ok,sc,N);
+    $("why").innerHTML=`<p class="why ${ok?"ok":"bad"}">${ok?"✅ Correct! ":"❌ Not quite. The answer is <b>"+opts[a].replace(/[.!?]$/,"")+"</b>. "}${why}</p>`;
+    const last=Object.keys(s.ans).length>=N;
+    if(last){TR.finish(d.key,sc,N)}
+    const nx=$("next");nx.hidden=false;nx.textContent=last?"See my result":"Next →";nx.focus();
+    drawTabs();drawBag()};O.appendChild(b)});
+  $("next").onclick=()=>{s.pos=i+1;renderChoice(d)};
+  $("reset").onclick=()=>resetDay(d);
+}
+function renderEnd(d){
+  const s=ST[d.key];const N=total(d);const sc=scoreOf(d);const ok=sc/N>=.8;const P=$("panel");
+  P.innerHTML=`<div><span class="eyebrow">Day ${cur+1}</span><h2>${d.title}</h2></div>
+   <div class="end"><div class="big">${sc} / ${N}</div>
+   <p>${ok?`You found the <b>${d.sname}</b> ${d.supply}! `+(cur<DAYS.length-1?"On to the next day.":""):`You need ${Math.ceil(N*.8)} to find the ${d.sname}. Try the day again, you can do it!`}</p>
+   <div class="dots">${[...Array(N).keys()].map(i=>`<span class="${s.ans[i]&&s.ans[i].ok?"y":"n"}" title="Question ${i+1}"></span>`).join("")}</div>
+   <div class="actions">${cur<DAYS.length-1?'<button class="btn" id="go">Next day →</button>':""}<button class="btn ghost" id="reset">Play this day again</button></div></div>
+   ${mistakes(d)}`;
+  if($("go"))$("go").onclick=()=>{cur++;render();scrollTo({top:$("days").offsetTop-10,behavior:matchMedia("(prefers-reduced-motion:reduce)").matches?"auto":"smooth"})};
+  $("reset").onclick=()=>resetDay(d);
+}
+function mistakes(d){const s=ST[d.key];const w=d.items.map((it,i)=>[it,s.ans[i]]).filter(([,a])=>a&&!a.ok);
+  if(!w.length)return"";
+  return `<div><h3>Look again</h3><ul>${w.map(([it,a])=>`<li>${it[0]}<br><span class="muted">You: ${a.a} · Answer: <b>${it[1][it[2]]}</b></span></li>`).join("")}</ul></div>`}
+function resetDay(d){const s=ST[d.key];s.ans={};s.pos=0;TR.reset(d.key);if(d.type==="typing")s.vals={};render()}
+
+/* typing engine */
+const norm=x=>(x||"").toLowerCase().replace(/[’‘`]/g,"'").replace(/[.!?]/g,"").replace(/\s+/g," ").trim().replace(/^i wish /,"").replace(/^(i|you|the bus|he|she)'d /,"'d ").replace(/^(i|you|the bus)\s+/,"");
+function tOk(d,i,v){return d.items[i][3].some(c=>norm(v)===norm(c))}
+function renderTyping(d){
+  const s=ST[d.key];s.vals=s.vals||{};const N=total(d);const P=$("panel");
+  P.innerHTML=`<div><span class="eyebrow">Day ${cur+1} · find the ${d.sname} ${d.supply}</span><h2>${d.title}</h2></div>
+   <p class="muted">${d.intro}</p>
+   <p class="rule">${RULES.wpres}<br>${RULES.wwould}<br>${RULES.wpast}</p>
+   <ol class="type" id="tl"></ol>
+   <div class="actions"><button class="btn" id="chk">Check my answers</button><button class="btn ghost" id="reset">Clear and start again</button></div>
+   <p id="tres" class="q" role="status"></p>`;
+  const L=$("tl");
+  d.items.forEach(([ctx,frame,verb],i)=>{const li=document.createElement("li");const id="t"+i;
+    li.innerHTML=`<span class="ctx">${ctx}</span><label class="s" for="${id}">${i+1}. ${frame.replace("___","_____")} <span class="muted">(${verb})</span></label><input id="${id}" autocomplete="off" autocapitalize="off" spellcheck="false"><span class="fb"></span>`;
+    const inp=li.querySelector("input");inp.value=s.vals[i]||"";
+    inp.addEventListener("change",()=>{const v=inp.value.trim();s.vals[i]=v;if(!v)return;const ok=tOk(d,i,v);s.ans[i]={a:v,ok};
+      const sc=Object.values(s.ans).filter(a=>a.ok).length;
+      TR.answer(d.key,i,frame.replace("___","___ ("+verb+")"),v,d.items[i][3][0],ok,sc,N);drawTabs()});
+    L.appendChild(li)});
+  const check=(save)=>{let n=0;d.items.forEach((it,i)=>{const li=L.children[i];const inp=li.querySelector("input");const fb=li.querySelector(".fb");const v=inp.value.trim();
+      inp.classList.remove("ok","bad");fb.textContent="";if(!v){fb.textContent="Write an answer.";return}
+      const ok=tOk(d,i,v);if(ok)n++;inp.classList.add(ok?"ok":"bad");if(!ok)fb.innerHTML="Answer: <b>"+it[3][0]+"</b>";s.ans[i]={a:v,ok}});
+    if(n>s.best)s.best=n;$("tres").textContent=`${n} / ${N} correct`+(n/N>=.8?` · you found the ${d.sname} ${d.supply}!`:` · you need ${Math.ceil(N*.8)} to find the ${d.sname}.`);
+    if(save)TR.finish(d.key,n,N);drawTabs();drawBag()};
+  $("chk").onclick=()=>check(true);
+  $("reset").onclick=()=>resetDay(d);
+  if(s.checked){check(false)}
+}
+
+/* restore saved answers */
+RESTORE.push(S=>{DAYS.forEach(d=>{const x=S[d.key];if(!x||!x.answers)return;const s=ST[d.key];
+  Object.entries(x.answers).forEach(([i,r])=>{if(r&&r.a!=null){s.ans[i]={a:r.a,ok:!!r.ok};if(d.type==="typing"){s.vals=s.vals||{};s.vals[i]=r.a}}});
+  const sc=Object.values(s.ans).filter(a=>a.ok).length;s.best=Math.max(s.best,sc);if(d.type==="typing"&&x.final)s.checked=true});
+  render()});
+
+render();
+TR.init("survive").then(S=>RESTORE.forEach(f=>{try{f(S)}catch(e){console.error(e)}}));
+</script>
+</body>
+</html>

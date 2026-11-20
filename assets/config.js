@@ -23,5 +23,6 @@ window.PORTAL_ACTIVITIES = {
   phrasal: { meaning: "Meanings", particle: "The little word", types: "Which type?", order: "Right or wrong?", pron: "it, them, her", story: "Concert day", talk: "Talk to each other" },
   ppc: { forsince: "for / since", verbs: "Action or non-action?", build: "Choose the form", choose: "One or both?", why: "What have you been doing?", story: "Katya's story" },
   tenses: { signals: "Signal words", now: "Present simple / continuous", past: "Past simple / present perfect", perfect: "PP simple / continuous", future: "The future", name: "Name that tense", mix: "All tenses: message", fix: "Right or wrong" },
+  survive: { which: "Which conditional?", forms: "Pick the form", wish: "Three kinds of wish", wishtype: "Write the wish", usedto: "used to / be used to / get used to", preps: "at, in, on", fix: "Right or wrong?" },
   ppps: { signals: "Signal words", forms: "Participles", choose: "Which tense?", words: "ever, just, yet…", dialogue: "Conversation", rw: "Right or wrong?" }
 };
