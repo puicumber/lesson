@@ -248,9 +248,9 @@ $("spForm").onsubmit=async e=>{e.preventDefault();
   if(!error){e.target.reset();await load()}};
 function answers(x,m,s,rs){const r=rs.find(z=>z.details&&z.details.answers&&Object.keys(z.details.answers).length);const a=r.details.answers;
   $("ansTitle").textContent=`${x.name} · ${m.title} · ${ACT[m.activity][s]}`;
-  $("ansMeta").textContent=`${isPartial(r)?"In progress":"Finished"} · last saved ${when(r.created_at)} · ${r.score} / ${r.total}. Shows the first answer to each question.`;
+  $("ansMeta").textContent=`${isPartial(r)?"In progress":"Finished"} · last saved ${when(r.created_at)} · ${r.score} / ${r.total}. If the student changed an answer, the first one is shown too.`;
   const esc=t=>String(t==null?"":t).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
-  $("ansRows").innerHTML=Object.entries(a).map(([k,v],n)=>`<tr><td>${n+1}</td><td style="white-space:normal;min-width:220px">${esc(v.q)}</td><td style="color:${v.ok?"var(--ok)":"var(--bad)"};font-weight:700">${esc(v.a)}</td><td>${v.ok?"":esc(v.c)}</td><td>${v.ok?"✓":"✗"}</td></tr>`).join("");
+  $("ansRows").innerHTML=Object.entries(a).map(([k,v],n)=>`<tr><td>${n+1}</td><td style="white-space:normal;min-width:220px">${esc(v.q)}</td><td style="color:${v.ok?"var(--ok)":"var(--bad)"};font-weight:700">${esc(v.a)}${v.f!==undefined?`<div style="font-size:12px;font-weight:400;color:${v.fok?"var(--ok)":"var(--bad)"}">first: ${esc(v.f)}${v.fok?"":" ✗"} → changed</div>`:""}</td><td>${v.ok?"":esc(v.c)}</td><td>${v.ok?(v.fok===false?"✓ <span class=\"muted\">fixed</span>":"✓"):"✗"}</td></tr>`).join("");
   $("ansBox").hidden=false;$("ansBox").scrollIntoView({behavior:"smooth"})}
 $("matForm").onsubmit=async e=>{e.preventDefault();
   if(linkProblem()&&!warnArmed){warnArmed=true;$("matForm").querySelector("button[type=submit]").textContent="Add anyway";$("linkWarn").scrollIntoView({behavior:"smooth",block:"center"});return}
