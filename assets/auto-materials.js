@@ -10,3 +10,5 @@ window.AUTO_MATERIALS = {
     { id: "auto-g33", title: "Grivas p. 33–35 · Collocations & en- verbs", url: "https://puicumber.github.io/lesson/polina/grivas-33/", kind: "vocabulary", activity: "g33" }
   ]
 };
+// Polina is saved in Teacher Desk as "Me".
+window.AUTO_MATERIALS.me = window.AUTO_MATERIALS.polina;
