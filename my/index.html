@@ -10,17 +10,100 @@
 <script src="../assets/config.js?v=18"></script>
 <script src="../assets/portal.js?v=3"></script>
 <script src="../assets/auto-materials.js?v=1"></script>
+<style id="themeCss"></style>
+<style>
+/* ---------- decorated hero ---------- */
+body{background-color:var(--bg);transition:background-color .3s}
+body[data-pattern="dots"]{background-image:radial-gradient(color-mix(in srgb,var(--green) 22%,transparent) 1.6px,transparent 1.8px);background-size:22px 22px}
+body[data-pattern="grid"]{background-image:linear-gradient(color-mix(in srgb,var(--green) 12%,transparent) 1px,transparent 1px),linear-gradient(90deg,color-mix(in srgb,var(--green) 12%,transparent) 1px,transparent 1px);background-size:28px 28px}
+body[data-pattern="stripes"]{background-image:repeating-linear-gradient(135deg,color-mix(in srgb,var(--green) 9%,transparent) 0 14px,transparent 14px 34px)}
+body[data-pattern="confetti"]{background-image:radial-gradient(circle at 20% 30%,color-mix(in srgb,var(--green) 30%,transparent) 2.5px,transparent 3px),radial-gradient(circle at 70% 60%,color-mix(in srgb,var(--gold) 40%,transparent) 2.5px,transparent 3px),radial-gradient(circle at 45% 85%,color-mix(in srgb,var(--green) 20%,transparent) 2px,transparent 2.5px);background-size:90px 90px}
+.me{position:relative;background:linear-gradient(135deg,color-mix(in srgb,var(--green) 16%,var(--card)),var(--card) 70%);border:1px solid var(--line);border-radius:24px;padding:clamp(20px,4vw,34px);overflow:hidden}
+.me-row{position:relative;z-index:1;display:flex;gap:clamp(14px,3vw,24px);align-items:center;flex-wrap:wrap}
+.avatar{appearance:none;cursor:pointer;flex:none;width:clamp(84px,16vw,112px);aspect-ratio:1;border-radius:50%;border:4px solid var(--green);background:var(--card);font-size:clamp(46px,9vw,64px);line-height:1;display:grid;place-items:center;box-shadow:0 6px 0 color-mix(in srgb,var(--green) 30%,transparent);transition:transform .2s}
+.avatar:hover{transform:rotate(-6deg) scale(1.04)}
+.avatar:focus-visible,.opt:focus-visible,.dtab:focus-visible,.dlg .btn:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+.me-text{flex:1 1 240px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.mood{display:inline-flex;align-self:flex-start;align-items:center;gap:6px;font-weight:700;font-size:15px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:4px 12px}
+.mood:empty{display:none}
+.me-actions{position:relative;z-index:1;display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+#stickers{position:absolute;inset:0;z-index:0;pointer-events:none}
+.stk{position:absolute;z-index:0;font-size:clamp(26px,5vw,38px);line-height:1;pointer-events:none;filter:drop-shadow(0 2px 0 color-mix(in srgb,var(--ink) 18%,transparent))}
+.stk:nth-child(1){top:10px;right:14px;transform:rotate(12deg)}
+.stk:nth-child(2){bottom:12px;right:22%;transform:rotate(-10deg)}
+.stk:nth-child(3){top:14px;right:24%;transform:rotate(-6deg)}
+.stk:nth-child(4){bottom:10px;right:12px;transform:rotate(8deg)}
+.stk:nth-child(5){top:42%;right:10%;transform:rotate(-14deg)}
+.stk:nth-child(6){bottom:8px;left:42%;transform:rotate(16deg)}
+@media (max-width:560px){.stk{opacity:.55}.stk:nth-child(n+5){display:none}}
+/* ---------- badges ---------- */
+.badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.badge{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;padding:14px 10px;border-radius:16px;border:1px solid var(--line);background:var(--bg)}
+.badge .medal{width:62px;height:62px;border-radius:50%;display:grid;place-items:center;font-size:32px;background:color-mix(in srgb,var(--gold) 22%,var(--card));border:3px solid var(--gold)}
+.badge b{font-family:var(--display);font-size:16px;line-height:1.1}
+.badge small{font-size:13px;color:var(--muted);line-height:1.3}
+.badge.locked .medal{background:var(--line);border-color:var(--line);filter:grayscale(1);opacity:.45}
+.badge.locked b{color:var(--muted)}
+.badge.fresh{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-soft)}
+.count{font-family:var(--display);font-weight:800;color:var(--green)}
+/* ---------- decorate dialog ---------- */
+.dlg{border:none;padding:0;border-radius:22px;background:var(--card);color:var(--ink);width:min(640px,calc(100vw - 24px));max-height:calc(100dvh - 24px);box-shadow:0 20px 60px #0005}
+.dlg::backdrop{background:#0006}
+.dlg-in{display:flex;flex-direction:column;gap:14px;padding:clamp(16px,3.5vw,24px);max-height:calc(100dvh - 24px)}
+.dlg-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.preview{font-size:44px;line-height:1}
+.dtabs{display:flex;gap:6px;flex-wrap:wrap}
+.dtab{appearance:none;cursor:pointer;font:inherit;font-weight:700;font-size:14px;border-radius:999px;padding:6px 14px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+.dtab[aria-selected="true"]{background:var(--green);border-color:var(--green);color:var(--card)}
+.dbody{overflow-y:auto;min-height:180px;padding:2px}
+.hint{font-size:14px;color:var(--muted);margin-bottom:10px}
+.opts{display:grid;gap:8px}
+.opts.emoji{grid-template-columns:repeat(auto-fill,minmax(58px,1fr))}
+.opts.wide{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}
+.opt{appearance:none;cursor:pointer;font:inherit;position:relative;border:2px solid var(--line);background:var(--bg);color:var(--ink);border-radius:14px;padding:8px;min-height:58px;display:flex;align-items:center;justify-content:center;gap:8px;transition:transform .12s,border-color .12s}
+.opts.emoji .opt{font-size:30px;aspect-ratio:1}
+.opt:hover:not(:disabled){transform:translateY(-2px);border-color:var(--green)}
+.opt[aria-pressed="true"]{border-color:var(--green);background:var(--green-soft);box-shadow:inset 0 0 0 1px var(--green)}
+.opt[aria-pressed="true"]::after{content:"✓";position:absolute;top:-8px;right:-8px;width:22px;height:22px;border-radius:50%;background:var(--green);color:var(--card);font-size:13px;font-weight:700;display:grid;place-items:center}
+.opt:disabled{cursor:not-allowed;opacity:.5}
+.opt .lock{position:absolute;bottom:2px;right:4px;font-size:11px;font-weight:700;color:var(--muted)}
+.swatch{width:26px;height:26px;border-radius:50%;flex:none;border:2px solid #fff8;box-shadow:0 0 0 1px #0002}
+.patt{width:100%;height:40px;border-radius:8px;border:1px solid var(--line)}
+.opt.text{justify-content:flex-start;text-align:left;font-size:15px;font-weight:700}
+.dfoot{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:20;background:var(--ink);color:var(--card);padding:12px 18px;border-radius:14px;font-weight:700;max-width:calc(100vw - 32px);box-shadow:0 10px 30px #0004}
+.burst{position:fixed;z-index:19;pointer-events:none;font-size:26px;animation:fly 1.4s ease-out forwards}
+@keyframes fly{from{transform:translate(0,0) rotate(0);opacity:1}to{transform:translate(var(--x),var(--y)) rotate(var(--r));opacity:0}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}.burst{display:none}}
+</style>
 </head>
 <body>
 <div class="wrap">
-  <header class="hero">
-    <h1 id="hello">Hello!</h1>
-    <p class="muted" id="sub">Loading your materials…</p>
+  <header class="hero me" id="hero">
+    <div id="stickers" aria-hidden="true"></div>
+    <div class="me-row">
+      <button class="avatar" id="avatar" type="button" aria-label="Decorate my page" hidden>🙂</button>
+      <div class="me-text">
+        <h1 id="hello">Hello!</h1>
+        <p class="mood" id="mood"></p>
+        <p class="muted" id="sub">Loading your materials…</p>
+      </div>
+    </div>
+    <div class="me-actions" id="meActions" hidden>
+      <button class="btn small" type="button" id="decoBtn">🎨 Decorate my page</button>
+      <a class="btn ghost small" href="#badgePanel" id="badgeLink">🏅 My badges</a>
+    </div>
   </header>
 
   <section class="panel" id="todoPanel" hidden>
     <h2>To do</h2>
     <div class="grid" id="todo"></div>
+  </section>
+
+  <section class="panel" id="badgePanel" hidden>
+    <div class="row" style="justify-content:space-between"><h2>My badges</h2><span class="count" id="badgeCount"></span></div>
+    <p class="muted">Do your homework to collect badges. Some badges unlock new avatars and stickers.</p>
+    <div class="badges" id="badges"></div>
   </section>
 
   <section class="panel" id="libPanel" hidden>
@@ -31,6 +114,25 @@
 
   <p class="notice" id="msg" hidden></p>
 </div>
+
+<dialog class="dlg" id="dlg" aria-labelledby="dlgTitle">
+  <div class="dlg-in">
+    <div class="dlg-head">
+      <h2 id="dlgTitle">Decorate my page</h2>
+      <span class="preview" id="dlgPreview" aria-hidden="true"></span>
+    </div>
+    <div class="dtabs" role="tablist" id="dtabs"></div>
+    <div class="dbody" id="dbody" role="tabpanel"></div>
+    <div class="dfoot">
+      <span class="muted" id="saveState" aria-live="polite"></span>
+      <div class="row">
+        <button class="btn ghost small" type="button" id="dlgCancel">Cancel</button>
+        <button class="btn small" type="button" id="dlgSave">Save</button>
+      </div>
+    </div>
+  </div>
+</dialog>
+
 <script>
 const ACT=window.PORTAL_ACTIVITIES||{};
 const KIND={vocabulary:"Vocabulary",lesson:"Lesson",grammar:"Grammar",homework:"Homework",practice:"Practice"};
@@ -55,13 +157,202 @@ function card(m,results){
     html+=`<div class="bar"><span style="width:${pct}%"></span></div><div class="subs">${s.subs.map(k=>`<span class="sub ${s.doneSubs.includes(k)?"ok":""}">${ACT[m.activity][k]}</span>`).join("")}</div>`}
   a.innerHTML=html;return a;
 }
+
+/* =================== Decorations =================== */
+// Colour themes: light and dark versions. a = accent, g = second colour.
+const THEMES={
+  forest:{label:"Forest",L:{a:"#1f7a4d",g:"#c8921a",bg:"#eef2ec",card:"#fbfcf8",line:"#cfd9cf"},D:{a:"#5cc18d",g:"#e3b54a",bg:"#141b17",card:"#1c2520",line:"#33423a"}},
+  ocean:{label:"Ocean",L:{a:"#1d64a8",g:"#d0861a",bg:"#eaf0f6",card:"#fafcfe",line:"#cdd8e4"},D:{a:"#6fb0ec",g:"#e8b04a",bg:"#121a22",card:"#1a2430",line:"#2e3d4d"}},
+  lagoon:{label:"Lagoon",L:{a:"#0b7f77",g:"#d4612a",bg:"#e6f3f1",card:"#f8fdfc",line:"#c6e0dc"},D:{a:"#4fcbbf",g:"#f0915c",bg:"#0f1b1a",card:"#172523",line:"#2b403d"}},
+  grape:{label:"Grape",L:{a:"#5b3fb8",g:"#d08a1a",bg:"#efecf8",card:"#fbfaff",line:"#d6d0ec"},D:{a:"#a993f0",g:"#e8b04a",bg:"#16141f",card:"#1f1c2b",line:"#383250"}},
+  berry:{label:"Berry",L:{a:"#a8336f",g:"#c8921a",bg:"#f6ecf1",card:"#fefafc",line:"#e6cdd9"},D:{a:"#e683b5",g:"#e3b54a",bg:"#1e1419",card:"#281b22",line:"#45303b"}},
+  cherry:{label:"Cherry",L:{a:"#b8322f",g:"#2e7d5b",bg:"#f7ecea",card:"#fffaf9",line:"#e8cfcb"},D:{a:"#f08079",g:"#5cc18d",bg:"#1e1413",card:"#291c1b",line:"#47302e"}},
+  sunset:{label:"Sunset",L:{a:"#c4521c",g:"#8a3d8f",bg:"#f8eee6",card:"#fffaf6",line:"#ead3c3"},D:{a:"#f0915c",g:"#d38bd8",bg:"#1f1611",card:"#2a1e17",line:"#4a3528"}},
+  arcade:{label:"Arcade night",dark:true,L:{a:"#f2c14e",g:"#4fd1c5",bg:"#12131c",card:"#1b1d2a",line:"#2f3247"},D:{a:"#f2c14e",g:"#4fd1c5",bg:"#12131c",card:"#1b1d2a",line:"#2f3247"}}
+};
+const PATTERNS={plain:"Plain",dots:"Dots",grid:"Grid",stripes:"Stripes",confetti:"Confetti"};
+// need = how many badges unlock it
+const AVATARS=["🦊","🐼","🐸","🐙","🦉","🐢","🐳","🐝","🐧","🐱","🐶","🦁","🐨","🐰","🦖","🦄","🐯","🦔","🤖","👾","👻","🌵","🍕","🚀",
+  {e:"🐉",need:3},{e:"🧙",need:5},{e:"🦸",need:7},{e:"👑",need:9}];
+const STICKERS=["⭐","🌈","🔥","💎","🎧","🎮","☕","🍩","🌸","🍀","⚽","🎸","📚","✈️","🌙","🍉","🎲","🧩","🐾","❤️",
+  {e:"🏅",need:2},{e:"🚀",need:4},{e:"🏆",need:6},{e:"🦄",need:8}];
+const MAX_STICKERS=6;
+const MOODS=["Ready to learn 💪","Need coffee first ☕","Feeling chill 😎","Busy, busy, busy 🐝","Game on 🎮","Hungry for new words 📚","Sleepy but trying 😴","On fire today 🔥","Living my best life ✨","Ask me about my weekend 🙂","Small steps, every day 🐢","Brain is full 🤯"];
+
+const STYLE_KEY="me:style";
+const DEFAULT_LOOK={theme:"forest",pattern:"plain",avatar:"",stickers:[],mood:""};
+let LOOK={...DEFAULT_LOOK},SAVED={...DEFAULT_LOOK},BADGE_N=0;
+const lsKey=k=>"me-"+k+":"+(Portal.code()||"anon");
+const lsGet=k=>{try{return JSON.parse(localStorage.getItem(lsKey(k))||"null")}catch(e){return null}};
+const lsSet=(k,v)=>{try{localStorage.setItem(lsKey(k),JSON.stringify(v))}catch(e){}};
+const item=x=>typeof x==="string"?{e:x,need:0}:x;
+
+function themeCss(){
+  const v=p=>`--green:${p.a};--green-soft:${p.a}1f;--gold:${p.g};--gold-soft:${p.g}26;--bg:${p.bg};--card:${p.card};--line:${p.line};`;
+  let css="";
+  for(const [k,t] of Object.entries(THEMES)){
+    const darkInk="--ink:#e9ebf2;--muted:#a3a9bd;color-scheme:dark;";
+    css+=`:root[data-theme="${k}"]{${v(t.L)}${t.dark?darkInk:""}}`;
+    css+=`@media (prefers-color-scheme:dark){:root[data-theme="${k}"]{${v(t.D)}}}`;
+  }
+  document.getElementById("themeCss").textContent=css;
+}
+function clean(l){
+  const ok=new Set(AVATARS.map(x=>item(x).e)),okS=new Set(STICKERS.map(x=>item(x).e));
+  return {
+    theme:THEMES[l&&l.theme]?l.theme:"forest",
+    pattern:PATTERNS[l&&l.pattern]?l.pattern:"plain",
+    avatar:l&&ok.has(l.avatar)?l.avatar:"",
+    stickers:(l&&Array.isArray(l.stickers)?l.stickers:[]).filter(s=>okS.has(s)).slice(0,MAX_STICKERS),
+    mood:l&&MOODS.includes(l.mood)?l.mood:""
+  };
+}
+function applyLook(l){
+  document.documentElement.dataset.theme=l.theme;
+  document.body.dataset.pattern=l.pattern;
+  const av=document.getElementById("avatar");av.textContent=l.avatar||"🙂";
+  document.getElementById("mood").textContent=l.mood||"";
+  document.getElementById("stickers").innerHTML=l.stickers.map(s=>`<span class="stk">${s}</span>`).join("");
+  document.getElementById("dlgPreview").textContent=l.avatar||"🙂";
+}
+
+/* ---- dialog ---- */
+const TABS=[["theme","Colour"],["avatar","Avatar"],["stickers","Stickers"],["mood","Mood"],["pattern","Background"]];
+let curTab="theme";
+function opt(cls,pressed,html,label,locked){
+  const b=document.createElement("button");b.type="button";b.className="opt"+(cls?" "+cls:"");
+  b.setAttribute("aria-pressed",pressed);b.innerHTML=html;if(label)b.setAttribute("aria-label",label);
+  if(locked){b.disabled=true;b.insertAdjacentHTML("beforeend",`<span class="lock">🔒${locked}</span>`);b.title=`Collect ${locked} badges to unlock`}
+  return b;
+}
+function drawTab(){
+  const body=document.getElementById("dbody");body.innerHTML="";
+  document.querySelectorAll(".dtab").forEach(t=>t.setAttribute("aria-selected",t.dataset.k===curTab));
+  const grid=document.createElement("div");grid.className="opts";
+  const hint=t=>body.insertAdjacentHTML("beforeend",`<p class="hint">${t}</p>`);
+  if(curTab==="theme"){
+    hint("Pick a colour for your page.");grid.classList.add("wide");
+    for(const [k,t] of Object.entries(THEMES)){
+      const b=opt("text",LOOK.theme===k,`<span class="swatch" style="background:linear-gradient(135deg,${t.L.a} 50%,${t.L.g} 50%)"></span>${t.label}`);
+      b.onclick=()=>{LOOK.theme=k;applyLook(LOOK);drawTab()};grid.appendChild(b)}
+  }else if(curTab==="avatar"){
+    hint("Choose who you are today.");grid.classList.add("emoji");
+    AVATARS.map(item).forEach(a=>{const lock=a.need>BADGE_N?a.need:0;
+      const b=opt("",LOOK.avatar===a.e,a.e,"Avatar "+a.e,lock);
+      b.onclick=()=>{LOOK.avatar=a.e;applyLook(LOOK);drawTab()};grid.appendChild(b)});
+  }else if(curTab==="stickers"){
+    hint(`Stick up to ${MAX_STICKERS} stickers on your page. You have ${LOOK.stickers.length}.`);grid.classList.add("emoji");
+    STICKERS.map(item).forEach(s=>{const lock=s.need>BADGE_N?s.need:0;const on=LOOK.stickers.includes(s.e);
+      const b=opt("",on,s.e,"Sticker "+s.e,lock);
+      if(!on&&!lock&&LOOK.stickers.length>=MAX_STICKERS)b.disabled=true;
+      b.onclick=()=>{LOOK.stickers=on?LOOK.stickers.filter(x=>x!==s.e):[...LOOK.stickers,s.e];applyLook(LOOK);drawTab()};grid.appendChild(b)});
+  }else if(curTab==="mood"){
+    hint("How are you feeling? It shows under your name.");grid.classList.add("wide");
+    const none=opt("text",!LOOK.mood,"No mood");none.onclick=()=>{LOOK.mood="";applyLook(LOOK);drawTab()};grid.appendChild(none);
+    MOODS.forEach(m=>{const b=opt("text",LOOK.mood===m,m);b.onclick=()=>{LOOK.mood=m;applyLook(LOOK);drawTab()};grid.appendChild(b)});
+  }else{
+    hint("Choose a background pattern.");grid.classList.add("wide");
+    for(const [k,label] of Object.entries(PATTERNS)){
+      const b=opt("",LOOK.pattern===k,`<span style="display:flex;flex-direction:column;gap:6px;width:100%;align-items:center"><span class="patt" data-p="${k}"></span>${label}</span>`);
+      b.onclick=()=>{LOOK.pattern=k;applyLook(LOOK);drawTab()};grid.appendChild(b)}
+  }
+  body.appendChild(grid);
+  // pattern previews reuse the page pattern styles
+  body.querySelectorAll(".patt").forEach(el=>{const p=el.dataset.p;
+    el.style.backgroundColor="var(--bg)";
+    el.style.backgroundImage={plain:"none",dots:"radial-gradient(color-mix(in srgb,var(--green) 35%,transparent) 1.6px,transparent 1.8px)",grid:"linear-gradient(color-mix(in srgb,var(--green) 22%,transparent) 1px,transparent 1px),linear-gradient(90deg,color-mix(in srgb,var(--green) 22%,transparent) 1px,transparent 1px)",stripes:"repeating-linear-gradient(135deg,color-mix(in srgb,var(--green) 16%,transparent) 0 8px,transparent 8px 18px)",confetti:"radial-gradient(circle at 20% 30%,color-mix(in srgb,var(--green) 45%,transparent) 2.5px,transparent 3px),radial-gradient(circle at 70% 60%,color-mix(in srgb,var(--gold) 55%,transparent) 2.5px,transparent 3px)"}[p];
+    el.style.backgroundSize={dots:"12px 12px",grid:"12px 12px",confetti:"34px 34px"}[p]||"auto"});
+}
+function openDlg(){
+  const d=document.getElementById("dlg");LOOK={...SAVED,stickers:[...SAVED.stickers]};
+  document.getElementById("saveState").textContent="";
+  const tabs=document.getElementById("dtabs");tabs.innerHTML="";
+  TABS.forEach(([k,label])=>{const t=document.createElement("button");t.type="button";t.className="dtab";t.setAttribute("role","tab");t.dataset.k=k;t.textContent=label;t.onclick=()=>{curTab=k;drawTab()};tabs.appendChild(t)});
+  drawTab();
+  if(d.showModal)d.showModal();else d.setAttribute("open","");
+}
+function closeDlg(){const d=document.getElementById("dlg");if(d.close)d.close();else d.removeAttribute("open")}
+async function saveLook(){
+  const st=document.getElementById("saveState");
+  SAVED=clean(LOOK);const rec={...SAVED,ts:Date.now()};lsSet("style",rec);
+  st.textContent="Saving…";
+  const ok=await Portal.log(STYLE_KEY,1,1,rec);
+  st.textContent=ok?"Saved ✓":"Saved on this device";
+  setTimeout(closeDlg,ok?450:900);
+  if(!earnedIds.has("decorate"))refreshBadges();
+}
+
+/* =================== Badges =================== */
+let RES=[],MATS=[],earnedIds=new Set();
+function badgeList(){
+  const ex=RES.filter(r=>!r.activity.startsWith("done:")&&!r.activity.startsWith("me:")&&r.activity.includes("/"));
+  const pass=ex.filter(r=>r.total&&r.best/r.total>=0.8),perfect=ex.filter(r=>r.total&&r.best>=r.total);
+  const done=MATS.filter(m=>(m.activity||RES.some(r=>r.activity==="done:"+m.id))&&status(m,RES).complete);
+  const hours=ex.map(r=>r.last?new Date(r.last).getHours():null).filter(h=>h!=null);
+  const onTime=done.filter(m=>{if(!m.due)return false;const s=status(m,RES);const t=Math.max(0,...s.mine.map(r=>r.last?+new Date(r.last):0));return t&&t<=+new Date(m.due+"T23:59:59")});
+  const styled=!!lsGet("style")||!!(window.__state&&window.__state[STYLE_KEY]);
+  return [
+    {id:"start",e:"🌱",t:"First step",d:"Start any exercise",ok:ex.length>0},
+    {id:"pass",e:"✅",t:"Got it!",d:"Finish an exercise with 80% or more",ok:pass.length>0},
+    {id:"perfect",e:"💯",t:"Flawless",d:"Get every answer right in an exercise",ok:perfect.length>0},
+    {id:"decorate",e:"🎨",t:"Make it yours",d:"Decorate your page",ok:styled},
+    {id:"hw1",e:"🏁",t:"Homework hero",d:"Finish a whole homework",ok:done.length>0},
+    {id:"retry",e:"🔁",t:"Never give up",d:"Try the same exercise 3 times",ok:ex.some(r=>(r.attempts||0)>=3)},
+    {id:"five",e:"🖐️",t:"High five",d:"Finish 5 exercises",ok:pass.length>=5},
+    {id:"ontime",e:"⏰",t:"Right on time",d:"Finish a homework before its due date",ok:onTime.length>0},
+    {id:"owl",e:"🦉",t:"Night owl",d:"Practise after 10 pm",ok:hours.some(h=>h>=22||h<4)},
+    {id:"bird",e:"🐦",t:"Early bird",d:"Practise before 9 am",ok:hours.some(h=>h>=4&&h<9)},
+    {id:"ten",e:"🔟",t:"Ten down",d:"Finish 10 exercises",ok:pass.length>=10},
+    {id:"perfect5",e:"🌟",t:"Star student",d:"Get 100% in 5 exercises",ok:perfect.length>=5},
+    {id:"hw3",e:"🏆",t:"Champion",d:"Finish 3 homeworks",ok:done.length>=3},
+    {id:"twenty",e:"🚀",t:"Unstoppable",d:"Finish 20 exercises",ok:pass.length>=20}
+  ];
+}
+function refreshBadges(){
+  const list=badgeList();const earned=list.filter(b=>b.ok);BADGE_N=earned.length;
+  const seen=new Set(lsGet("seen")||[]);
+  const fresh=earned.filter(b=>!seen.has(b.id)&&!earnedIds.has(b.id));
+  earnedIds=new Set(earned.map(b=>b.id));
+  document.getElementById("badgeCount").textContent=`${earned.length} / ${list.length}`;
+  const box=document.getElementById("badges");box.innerHTML="";
+  list.forEach(b=>{const isNew=fresh.includes(b);
+    box.insertAdjacentHTML("beforeend",`<div class="badge${b.ok?"":" locked"}${isNew?" fresh":""}"><span class="medal" aria-hidden="true">${b.ok?b.e:"?"}</span><b>${b.t}${isNew?" · new!":""}</b><small>${b.d}</small><span class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">${b.ok?"Earned":"Not yet"}</span></div>`)});
+  document.getElementById("badgePanel").hidden=false;
+  lsSet("seen",[...earnedIds]);
+  if(fresh.length)celebrate(fresh);
+}
+function celebrate(fresh){
+  const t=document.createElement("div");t.className="toast";t.setAttribute("role","status");
+  t.textContent=fresh.length===1?`New badge: ${fresh[0].e} ${fresh[0].t}!`:`${fresh.length} new badges: ${fresh.map(b=>b.e).join(" ")}`;
+  document.body.appendChild(t);setTimeout(()=>t.remove(),4200);
+  if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+  const bits=["🎉","✨","⭐",...fresh.map(b=>b.e)];
+  for(let i=0;i<18;i++){const s=document.createElement("span");s.className="burst";s.textContent=bits[i%bits.length];
+    s.style.left="50%";s.style.top="70%";s.style.setProperty("--x",(Math.random()*600-300)+"px");s.style.setProperty("--y",(-200-Math.random()*350)+"px");s.style.setProperty("--r",(Math.random()*540-270)+"deg");
+    document.body.appendChild(s);setTimeout(()=>s.remove(),1500)}
+}
+
+/* =================== Page =================== */
+themeCss();
 (async()=>{
   const msg=document.getElementById("msg");const code=Portal.code();
   if(!Portal.ready){msg.hidden=false;msg.textContent="The portal isn't connected yet. Please check back soon.";document.getElementById("sub").textContent="";return}
   if(!code){msg.hidden=false;msg.textContent="Please open this page from the personal link Polina sent you.";document.getElementById("sub").textContent="";return}
+  // show the saved look right away from this device, before the server answers
+  const local=lsGet("style");if(local){SAVED=clean(local);applyLook(SAVED)}
   try{
     const d=await Portal.getPortal(code);
     if(!d||!d.student){msg.hidden=false;msg.textContent="This link doesn't work. Please ask Polina for your personal link.";document.getElementById("sub").textContent="";return}
+    window.__state=d.state||{};
+    const server=window.__state[STYLE_KEY];
+    const pick=server&&(!local||(server.ts||0)>=(local.ts||0))?server:local;
+    if(pick){SAVED=clean(pick);applyLook(SAVED);if(pick===server)lsSet("style",server)}
+    document.getElementById("avatar").hidden=false;document.getElementById("meActions").hidden=false;
+    document.getElementById("avatar").onclick=openDlg;document.getElementById("decoBtn").onclick=openDlg;
+    document.getElementById("dlgCancel").onclick=()=>{applyLook(SAVED);closeDlg()};
+    document.getElementById("dlg").addEventListener("cancel",()=>applyLook(SAVED));
+    document.getElementById("dlgSave").onclick=saveLook;
+
     document.title=`${d.student.name}'s English`;
     document.getElementById("hello").innerHTML=`Hello, <span>${d.student.name}</span>!`;
     const res=d.results||[];
@@ -69,6 +360,7 @@ function card(m,results){
     const saved=d.materials||[],have=new Set(saved.map(m=>key(m.url)));
     const auto=((window.AUTO_MATERIALS||{})[String(d.student.name||"").trim().toLowerCase()]||[]).filter(m=>!have.has(key(m.url)));
     const mats=[...auto,...saved];
+    RES=res;MATS=mats;refreshBadges();
     const todo=mats.filter(m=>!status(m,res).complete&&(m.activity||(m.kind==="homework"&&(!m.due||new Date(m.due)>=new Date(new Date().toDateString())))));
     const tracked=mats.filter(m=>m.activity);
     document.getElementById("sub").textContent=todo.length?`You have ${todo.length} thing${todo.length>1?"s":""} to do. Your progress saves automatically.`:tracked.length?"Everything is done. Great job!":"Here are your materials.";
