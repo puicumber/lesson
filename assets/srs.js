@@ -115,7 +115,7 @@
       <p class="muted">${n ? `<b style="color:var(--ink)">${n} word${n > 1 ? "s" : ""}</b> to review today${q.fresh.length ? ` (${q.fresh.length} new)` : ""}. It takes a few minutes.` : `All done for today ✓${nd ? ` Next words come back ${whenText(nd)}.` : ""}`}</p>
       <div class="bar" title="Words you know well"><span style="width:${total ? Math.round(strong / total * 100) : 0}%"></span></div>
       <p class="muted" style="font-size:14px">${strong} of ${total} words growing strong · ${sets.map(s => esc(s.title)).join(" · ")}</p>
-      <div class="row"><a class="btn${n ? "" : " ghost"}" href="${href}">${n ? "Start ▸" : "Open my garden"}</a></div>`;
+      <div class="row"><a class="btn${n ? "" : " ghost"}" style="text-decoration:none" href="${href}">${n ? "Start ▸" : "Open my garden"}</a></div>`;
   }
 
   // ---- Teacher Desk ----
