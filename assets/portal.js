@@ -29,5 +29,18 @@
     if (!c || !/puicumber\.github\.io/.test(url)) return url;
     return url + (url.includes("?") ? "&" : "?") + "c=" + encodeURIComponent(c);
   }
-  window.Portal = { client, ready, code, getPortal, log, withCode };
+  // Speaking tasks: https://puicumber.github.io/lesson/speak/?id=ab12&t=Title&q=Question&q=Question&max=120
+  // Each question is saved as the result "speak/<id>-<n>" (n from 1), with the recording in the "voice" storage bucket.
+  function speakTask(url) {
+    try {
+      const u = new URL(url, location.href);
+      if (!/\/speak\/?$/.test(u.pathname.replace(/index\.html$/, ""))) return null;
+      const id = (u.searchParams.get("id") || "").replace(/[^a-z0-9]/gi, "").slice(0, 12);
+      const qs = u.searchParams.getAll("q").map(q => q.trim()).filter(Boolean);
+      if (!id || !qs.length) return null;
+      const max = Math.min(300, Math.max(30, parseInt(u.searchParams.get("max"), 10) || 120));
+      return { id, title: u.searchParams.get("t") || "Speaking", qs, max, keys: qs.map((_, i) => id + "-" + (i + 1)) };
+    } catch (e) { return null; }
+  }
+  window.Portal = { client, ready, code, getPortal, log, withCode, speakTask };
 })();
