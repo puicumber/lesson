@@ -159,6 +159,12 @@ function detail(x){
       const tr=document.createElement("tr");
       tr.innerHTML=`<td>${i?"":m.title}</td><td>${ACT[m.activity][s]}</td><td>${best?`${best.score} / ${best.total}`:"–"}</td><td>${fin.length||"–"}${rs[0]&&isPartial(rs[0])?' <span class="muted">· in progress</span>':""}</td><td>${rs[0]?when(rs[0].created_at):"–"}</td><td></td>`;
       if(rs.some(r=>r.details&&r.details.answers&&Object.keys(r.details.answers).length)){const b=document.createElement("button");b.className="btn ghost small";b.textContent="Answers";b.onclick=()=>answers(x,m,s,rs);tr.lastElementChild.appendChild(b)}
+      if(rs.length){const c=document.createElement("button");c.className="btn ghost small del";c.style.marginLeft="6px";c.textContent="Clear";c.title="Delete this student's results for this exercise (for test runs or a fresh start)";let armed=null;
+        c.onclick=async()=>{if(!armed){c.textContent="Sure? Click again";c.classList.add("armed");armed=setTimeout(()=>{armed=null;c.textContent="Clear";c.classList.remove("armed")},3000);return}
+          clearTimeout(armed);c.disabled=true;c.textContent="Clearing…";
+          const {error}=await db.from("results").delete().eq("student_code",x.code).eq("activity",m.activity+"/"+s);
+          if(error){c.disabled=false;c.textContent="Error, try again";return}
+          await load();detail(S.find(z=>z.code===x.code)||x)};tr.lastElementChild.appendChild(c)}
       tb.appendChild(tr)})});
   const cnt={};const lastBy={};mine.forEach(r=>{if(!lastBy[r.activity])lastBy[r.activity]=r});
   mine.filter(r=>!isPartial(r)||lastBy[r.activity]===r).forEach(r=>(r.details&&r.details.wrong||[]).forEach(w=>cnt[w]=(cnt[w]||0)+1));
