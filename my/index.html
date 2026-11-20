@@ -8,7 +8,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
 <link rel="stylesheet" href="../assets/portal.css?v=2">
 <script src="../assets/config.js?v=18"></script>
-<script src="../assets/portal.js?v=3"></script>
+<script src="../assets/portal.js?v=4"></script>
 <script src="../assets/auto-materials.js?v=1"></script>
 <script src="../assets/groups.js?v=1"></script>
 <script src="../assets/group-board.js?v=1"></script>
@@ -139,16 +139,17 @@ body[data-pattern="confetti"]{background-image:radial-gradient(circle at 20% 30%
 
 <script>
 const ACT=window.PORTAL_ACTIVITIES||{};
-const KIND={vocabulary:"Vocabulary",lesson:"Lesson",grammar:"Grammar",homework:"Homework",practice:"Practice"};
+const KIND={speaking:"Speaking",vocabulary:"Vocabulary",lesson:"Lesson",grammar:"Grammar",homework:"Homework",practice:"Practice"};
 function fmtDate(d){return new Date(d).toLocaleDateString("en-GB",{day:"numeric",month:"short"})}
 function status(m,results){
-  const subs=ACT[m.activity]?Object.keys(ACT[m.activity]):[];
+  const sp=m.activity==="speak"?Portal.speakTask(m.url):null;
+  const subs=sp?sp.keys:ACT[m.activity]?Object.keys(ACT[m.activity]):[];
   const mine=results.filter(r=>m.activity&&(r.activity===m.activity||r.activity.startsWith(m.activity+"/")));
   const doneSubs=subs.filter(s=>mine.some(r=>r.activity===m.activity+"/"+s&&r.total&&r.best/r.total>=0.8));
   const started=mine.length>0;
   const marked=results.some(r=>r.activity==="done:"+m.id);
   const complete=marked||(subs.length?doneSubs.length===subs.length:false);
-  return {subs,doneSubs,started,complete,mine};
+  return {subs,doneSubs,started,complete,mine,sp};
 }
 function card(m,results){
   const s=status(m,results);const late=m.due&&!s.complete&&new Date(m.due)<new Date(new Date().toDateString());
@@ -158,7 +159,7 @@ function card(m,results){
   if(m.note)html+=`<p class="muted">${m.note}</p>`;
   if(m.due)html+=`<p class="muted">Due ${fmtDate(m.due)}</p>`;
   if(s.subs.length){const pct=Math.round(s.doneSubs.length/s.subs.length*100);
-    html+=`<div class="bar"><span style="width:${pct}%"></span></div><div class="subs">${s.subs.map(k=>`<span class="sub ${s.doneSubs.includes(k)?"ok":""}">${ACT[m.activity][k]}</span>`).join("")}</div>`}
+    html+=`<div class="bar"><span style="width:${pct}%"></span></div><div class="subs">${s.subs.map(k=>`<span class="sub ${s.doneSubs.includes(k)?"ok":""}">${s.sp?"🎙 "+(s.subs.indexOf(k)+1):ACT[m.activity][k]}</span>`).join("")}</div>`}
   a.innerHTML=html;return a;
 }
 

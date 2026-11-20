@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Speaking</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&family=Space+Mono:wght@700&display=swap">
+<script src="../assets/config.js?v=18"></script>
+<script src="../assets/portal.js?v=4"></script>
+<style>
+/* Radio studio: warm cream walls, red ON AIR lamp, teal mixing desk. */
+:root{
+  --bg:#fbf3e6; --card:#fffdf8; --ink:#231c2b; --muted:#6b6070; --line:#ecdcc4;
+  --red:#e2412f; --red-soft:#e2412f1c; --teal:#0f7c78; --teal-soft:#0f7c781c; --amber:#d98a10;
+  --ok:#1d8452; --ok-soft:#1d84521f; --bad:#c43c2f;
+  --display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif; --body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif; --mono:"Space Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#17131c; --card:#211b28; --ink:#f6eee4; --muted:#bcaebf; --line:#3a3044;
+  --red:#ff6b57; --red-soft:#ff6b5724; --teal:#4fd0c6; --teal-soft:#4fd0c622; --amber:#f2b64a;
+  --ok:#78d3a0; --ok-soft:#78d3a024; --bad:#ff8b7e; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#17131c; --card:#211b28; --ink:#f6eee4; --muted:#bcaebf; --line:#3a3044;
+  --red:#ff6b57; --red-soft:#ff6b5724; --teal:#4fd0c6; --teal-soft:#4fd0c622; --amber:#f2b64a;
+  --ok:#78d3a0; --ok-soft:#78d3a024; --bad:#ff8b7e; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:18px;line-height:1.55;
+  padding:24px max(16px,env(safe-area-inset-right,0px)) 64px max(16px,env(safe-area-inset-left,0px))}
+[hidden]{display:none!important}
+.wrap{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+h1,h2{font-family:var(--display);margin:0;line-height:1.05;text-wrap:balance}
+h1{font-size:clamp(34px,8vw,54px);font-weight:800;letter-spacing:-.02em}
+p{margin:0}
+.muted{color:var(--muted)}
+.hero{display:flex;flex-direction:column;gap:10px}
+.lamp{align-self:flex-start;display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:13px;letter-spacing:.18em;border:2px solid var(--line);color:var(--muted);border-radius:8px;padding:4px 10px;transition:all .2s}
+.lamp i{width:10px;height:10px;border-radius:50%;background:var(--line)}
+.lamp.on{border-color:var(--red);color:var(--card);background:var(--red);box-shadow:0 0 0 4px var(--red-soft),0 0 22px var(--red)}
+.lamp.on i{background:var(--card)}
+.tips{display:flex;flex-wrap:wrap;gap:8px}
+.tip{font-size:15px;background:var(--teal-soft);color:var(--ink);border-radius:999px;padding:4px 12px}
+.notice{border:2px dashed var(--amber);border-radius:14px;padding:12px 16px;background:color-mix(in srgb,var(--amber) 12%,transparent)}
+.q{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:clamp(18px,4vw,26px);display:flex;flex-direction:column;gap:16px;position:relative}
+.q.rec{border-color:var(--red);box-shadow:0 0 0 3px var(--red-soft)}
+.q.sent{border-color:var(--ok)}
+.qhead{display:flex;gap:12px;align-items:flex-start}
+.num{flex:none;font-family:var(--mono);font-size:15px;width:38px;height:38px;border-radius:10px;display:grid;place-items:center;background:var(--teal);color:var(--card)}
+.qtext{font-family:var(--display);font-size:clamp(21px,4.6vw,26px);font-weight:600;line-height:1.2;white-space:pre-line}
+.deck{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.dial{position:relative;width:112px;height:112px;flex:none}
+.dial svg{position:absolute;inset:0;transform:rotate(-90deg)}
+.dial circle{fill:none;stroke-width:7}
+.dial .track{stroke:var(--line)}
+.dial .prog{stroke:var(--red);stroke-linecap:round;transition:stroke-dashoffset .25s linear}
+.mic{position:absolute;inset:12px;border-radius:50%;border:none;cursor:pointer;background:var(--red);color:#fff;font:inherit;font-weight:700;font-size:15px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;box-shadow:0 5px 0 color-mix(in srgb,var(--red) 55%,#000);transition:transform .1s}
+.mic:active{transform:translateY(3px);box-shadow:0 2px 0 color-mix(in srgb,var(--red) 55%,#000)}
+.mic svg{position:static;transform:none;width:30px;height:30px}
+.mic.stop{background:var(--ink);color:var(--card);box-shadow:0 5px 0 #0006}
+.mic .sq{width:22px;height:22px;border-radius:4px;background:currentColor}
+.mic:disabled{opacity:.45;cursor:not-allowed}
+.mic:focus-visible,.btn:focus-visible{outline:3px solid var(--amber);outline-offset:3px}
+.readout{display:flex;flex-direction:column;gap:6px;min-width:0;flex:1 1 180px}
+.time{font-family:var(--mono);font-size:30px;line-height:1}
+.time small{font-size:15px;color:var(--muted)}
+.meter{display:flex;gap:4px;align-items:flex-end;height:26px}
+.meter span{width:8px;height:100%;border-radius:3px;background:var(--teal);transform-origin:bottom;transform:scaleY(.12);transition:transform .08s}
+.state{font-size:16px;color:var(--muted)}
+.state.ok{color:var(--ok);font-weight:700}
+.state.bad{color:var(--bad);font-weight:700}
+.take{display:flex;flex-direction:column;gap:12px;border-top:1px dashed var(--line);padding-top:14px}
+audio{width:100%;height:44px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.btn{appearance:none;cursor:pointer;font:inherit;font-weight:700;font-size:17px;border-radius:999px;padding:11px 22px;border:2px solid var(--teal);background:var(--teal);color:var(--card);min-height:46px}
+.btn.ghost{background:transparent;color:var(--teal)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.done{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-weight:700;color:var(--ok)}
+.done .tick{width:30px;height:30px;border-radius:50%;background:var(--ok);color:var(--card);display:grid;place-items:center}
+.foot{text-align:center;font-size:15px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <span class="lamp" id="lamp" aria-hidden="true"><i></i>ON AIR</span>
+    <h1 id="title">Speaking</h1>
+    <p class="muted" id="intro">Press the red button, answer out loud, then send your answer to Polina.</p>
+    <div class="tips" id="tips"></div>
+  </header>
+  <p class="notice" id="msg" hidden></p>
+  <div id="qs" style="display:flex;flex-direction:column;gap:18px"></div>
+  <p class="foot muted" id="foot" hidden>All answers sent. Polina will listen to them. Great job! 🎉</p>
+</div>
+<script>
+(function(){
+const C=window.PORTAL_CONFIG||{},P=window.Portal;
+const $=id=>document.getElementById(id);
+const task=P&&P.speakTask?P.speakTask(location.href):null;
+const code=P&&P.code?P.code():null;
+const online=!!(C.url&&C.key&&code);
+const esc=t=>String(t==null?"":t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const mmss=s=>{s=Math.max(0,Math.round(s));return Math.floor(s/60)+":"+String(s%60).padStart(2,"0")};
+const say=(t)=>{$("msg").hidden=false;$("msg").innerHTML=t};
+
+if(!task){say("This speaking link is not complete. Please ask Polina to send it again.");$("intro").hidden=true;return}
+document.title=task.title+" · Speaking";$("title").textContent=task.title;
+const MAX=task.max;
+$("tips").innerHTML=[`🎙 Up to ${mmss(MAX)} for each answer`,"🤔 It's fine to pause and think","🔁 Not happy? Record again before you send"].map(t=>`<span class="tip">${t}</span>`).join("");
+
+const canRecord=!!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia&&window.MediaRecorder);
+if(!canRecord)say("This browser can't record sound. Please open the link in <b>Chrome</b> or <b>Safari</b> (if you opened it inside Telegram or WhatsApp, tap ⋯ and choose “Open in browser”).");
+else if(!code)say("Open this page from your personal portal link, otherwise Polina won't get your answers.");
+
+// type the browser can record: Chrome/Firefox → webm/ogg (Opus), Safari → mp4 (AAC)
+const MIME=(()=>{if(!window.MediaRecorder||!MediaRecorder.isTypeSupported)return"";
+  return["audio/webm;codecs=opus","audio/mp4","audio/ogg;codecs=opus","audio/webm"].find(t=>MediaRecorder.isTypeSupported(t))||""})();
+const extOf=m=>/mp4|aac|m4a/.test(m)?"m4a":/ogg/.test(m)?"ogg":/mpeg/.test(m)?"mp3":/wav/.test(m)?"wav":"webm";
+
+const lsKey="speak:"+(code||"anon")+":"+task.id;
+const local=(()=>{try{return JSON.parse(localStorage.getItem(lsKey)||"{}")}catch(e){return{}}})();
+const keepLocal=()=>{try{localStorage.setItem(lsKey,JSON.stringify(local))}catch(e){}};
+
+let busy=null; // the card that is recording right now
+const cards=[];
+const R=2*Math.PI*49;
+
+task.qs.forEach((q,i)=>{
+  const key=task.keys[i];
+  const el=document.createElement("section");el.className="q";el.setAttribute("aria-label","Question "+(i+1));
+  el.innerHTML=`<div class="qhead"><span class="num">${i+1}</span><p class="qtext">${esc(q)}</p></div>
+    <div class="deck">
+      <div class="dial"><svg viewBox="0 0 112 112" aria-hidden="true"><circle class="track" cx="56" cy="56" r="49"/><circle class="prog" cx="56" cy="56" r="49" stroke-dasharray="${R}" stroke-dashoffset="${R}"/></svg>
+        <button class="mic" type="button" aria-label="Start recording"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-2.08A7 7 0 0 0 19 12h-2z"/></svg><span>Record</span></button></div>
+      <div class="readout"><div class="time" aria-hidden="true">0:00 <small>/ ${mmss(MAX)}</small></div><div class="meter" aria-hidden="true">${"<span></span>".repeat(9)}</div><p class="state" role="status" aria-live="polite"></p></div>
+    </div>
+    <div class="take" hidden><audio controls preload="metadata"></audio><div class="row"><button class="btn send" type="button">Send to Polina</button><button class="btn ghost again" type="button">Record again</button></div></div>
+    <div class="done" hidden><span class="tick" aria-hidden="true">✓</span><span class="dtext"></span><button class="btn ghost new" type="button" style="margin-left:auto">New answer</button></div>`;
+  $("qs").appendChild(el);
+  const c={i,q,key,el,mic:el.querySelector(".mic"),prog:el.querySelector(".prog"),time:el.querySelector(".time"),bars:[...el.querySelectorAll(".meter span")],
+    state:el.querySelector(".state"),take:el.querySelector(".take"),audio:el.querySelector("audio"),send:el.querySelector(".send"),again:el.querySelector(".again"),
+    done:el.querySelector(".done"),dtext:el.querySelector(".dtext"),blob:null,url:null,sec:0,sent:null};
+  cards.push(c);
+  if(!canRecord||!code)c.mic.disabled=true;
+  c.mic.onclick=()=>busy===c?stop(c):start(c);
+  c.again.onclick=()=>{clearTake(c);start(c)};
+  c.send.onclick=()=>send(c);
+  el.querySelector(".new").onclick=()=>{c.done.hidden=true;c.el.classList.remove("sent");c.mic.parentElement.parentElement.hidden=false;setState(c,"Record a new answer. It will replace the old one for Polina.")};
+});
+
+function setState(c,t,cls){c.state.textContent=t||"";c.state.className="state"+(cls?" "+cls:"")}
+function showTime(c,s){c.time.innerHTML=`${mmss(s)} <small>/ ${mmss(MAX)}</small>`;c.prog.style.strokeDashoffset=R*(1-Math.min(1,s/MAX))}
+function clearTake(c){if(c.url)URL.revokeObjectURL(c.url);c.blob=null;c.url=null;c.take.hidden=true;c.audio.removeAttribute("src");showTime(c,0)}
+function showSent(c,info){c.sent=info;c.take.hidden=true;c.mic.parentElement.parentElement.hidden=true;c.done.hidden=false;c.el.classList.add("sent");
+  const when=info.ts?new Date(info.ts).toLocaleString("en-GB",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}):"";
+  c.dtext.textContent=`Sent${info.sec?" · "+mmss(info.sec):""}${when?" · "+when:""}`;setState(c,"");
+  $("foot").hidden=!cards.every(x=>x.sent)}
+
+let rec=null,stream=null,ctx=null,raf=0,tick=0,t0=0,chunks=[];
+async function start(c){
+  if(busy)stop(busy);
+  clearTake(c);setState(c,"Allow the microphone if your phone asks…");
+  try{stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}})}
+  catch(e){setState(c,e&&e.name==="NotAllowedError"?"The microphone is blocked. Allow it in the browser settings (the 🔒 or aA icon next to the address), then try again.":"Couldn't find a microphone. Check that one is connected and try again.","bad");return}
+  chunks=[];
+  try{rec=new MediaRecorder(stream,MIME?{mimeType:MIME,audioBitsPerSecond:48000}:{audioBitsPerSecond:48000})}catch(e){rec=new MediaRecorder(stream)}
+  rec.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};
+  rec.onstop=()=>finish(c);
+  rec.start(1000);busy=c;t0=Date.now();
+  c.el.classList.add("rec");$("lamp").classList.add("on");
+  c.mic.classList.add("stop");c.mic.setAttribute("aria-label","Stop recording");c.mic.innerHTML='<span class="sq"></span><span>Stop</span>';
+  setState(c,"Recording… press Stop when you finish.");
+  tick=setInterval(()=>{const s=(Date.now()-t0)/1000;showTime(c,s);if(s>=MAX){stop(c)}else if(MAX-s<=15&&MAX-s>14)setState(c,"15 seconds left…")},250);
+  try{ctx=new (window.AudioContext||window.webkitAudioContext)();const an=ctx.createAnalyser();an.fftSize=64;ctx.createMediaStreamSource(stream).connect(an);
+    const buf=new Uint8Array(an.frequencyBinCount);
+    const draw=()=>{an.getByteFrequencyData(buf);c.bars.forEach((b,k)=>{const v=buf[k+1]/255;b.style.transform=`scaleY(${Math.max(.12,v)})`});raf=requestAnimationFrame(draw)};draw()}catch(e){}
+}
+function stop(c){
+  if(busy!==c)return;busy=null;clearInterval(tick);cancelAnimationFrame(raf);
+  c.sec=Math.round((Date.now()-t0)/1000);
+  try{rec&&rec.state!=="inactive"&&rec.stop()}catch(e){finish(c)}
+  stream&&stream.getTracks().forEach(t=>t.stop());
+  try{ctx&&ctx.close()}catch(e){}ctx=null;
+  c.el.classList.remove("rec");$("lamp").classList.remove("on");c.bars.forEach(b=>b.style.transform="");
+  c.mic.classList.remove("stop");c.mic.setAttribute("aria-label","Start recording");
+  c.mic.innerHTML='<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-2.08A7 7 0 0 0 19 12h-2z"/></svg><span>Record</span>';
+}
+function finish(c){
+  const type=(rec&&rec.mimeType)||MIME||"audio/webm";
+  const blob=new Blob(chunks,{type:type.split(";")[0]});rec=null;
+  if(c.sec<3||blob.size<1000){setState(c,"That was very short. Press the red button and try again.","bad");return}
+  c.blob=blob;c.url=URL.createObjectURL(blob);c.audio.src=c.url;c.take.hidden=false;
+  setState(c,"Listen if you like, then send it.");
+}
+
+async function send(c){
+  if(!c.blob||!online)return;
+  c.send.disabled=c.again.disabled=true;c.send.textContent="Sending…";setState(c,"");
+  const type=c.blob.type||"audio/webm",ts=Date.now();
+  const path=`${code}/${c.key}/${ts}.${extOf(type)}`;
+  try{
+    const up=await fetch(`${C.url}/storage/v1/object/voice/${path.split("/").map(encodeURIComponent).join("/")}`,{method:"POST",
+      headers:{apikey:C.key,"Content-Type":type,"x-upsert":"false","cache-control":"3600"},body:c.blob});
+    if(!up.ok)throw new Error("upload "+up.status);
+    const info={audio:path,q:c.q,sec:c.sec,mime:type,bytes:c.blob.size,ts};
+    const r=await fetch(C.url+"/rest/v1/rpc/log_result",{method:"POST",headers:{"Content-Type":"application/json",apikey:C.key},
+      body:JSON.stringify({p_code:code,p_activity:"speak/"+c.key,p_score:1,p_total:1,p_details:info})});
+    if(!r.ok)throw new Error("log "+r.status);
+    local[c.key]={sec:c.sec,ts};keepLocal();
+    clearTake(c);showSent(c,info);
+  }catch(e){
+    console.error(e);setState(c,"Couldn't send. Check your internet and press Send again.","bad");
+  }finally{c.send.disabled=c.again.disabled=false;c.send.textContent="Send to Polina"}
+}
+
+addEventListener("beforeunload",e=>{if(busy||cards.some(c=>c.blob)){e.preventDefault();e.returnValue=""}});
+
+// Show what was already sent
+(async()=>{
+  let server={};
+  if(online){try{const r=await fetch(C.url+"/rest/v1/rpc/get_portal",{method:"POST",headers:{"Content-Type":"application/json",apikey:C.key},body:JSON.stringify({p_code:code})});
+    if(r.ok){const d=await r.json();server=(d&&d.state)||{}}}catch(e){}}
+  cards.forEach(c=>{const s=server["speak/"+c.key],l=local[c.key];const pick=s&&s.audio?s:l;if(pick)showSent(c,pick)});
+})();
+})();
+</script>
+</body>
+</html>

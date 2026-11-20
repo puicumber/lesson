@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="../assets/portal.css?v=2">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.js"></script>
 <script src="../assets/config.js?v=18"></script>
-<script src="../assets/portal.js?v=3"></script>
+<script src="../assets/portal.js?v=4"></script>
 </head>
 <body>
 <div class="wrap">
@@ -50,6 +50,11 @@
         <p class="muted" id="ansMeta"></p>
         <div class="table-wrap"><table><thead><tr><th>#</th><th>Question</th><th>Answer</th><th>Correct</th><th></th></tr></thead><tbody id="ansRows"></tbody></table></div>
       </div>
+      <div class="panel" id="voiceBox" hidden style="padding:16px;gap:12px">
+        <div class="row" style="justify-content:space-between"><h3 id="voiceTitle"></h3><button class="btn ghost small" id="voiceClose">Close</button></div>
+        <p id="voiceQ" style="font-weight:700;white-space:pre-line"></p>
+        <div id="voiceTakes" style="display:flex;flex-direction:column;gap:12px"></div>
+      </div>
       <h3>Most missed</h3>
       <div class="weak" id="dWeak"></div>
     </section>
@@ -57,6 +62,21 @@
     <section class="panel">
       <h2>Recent activity</h2>
       <div class="table-wrap"><table><thead><tr><th>When</th><th>Student</th><th>Exercise</th><th>Score</th></tr></thead><tbody id="recent"></tbody></table></div>
+    </section>
+
+    <section class="panel">
+      <h2>Give a speaking task 🎙</h2>
+      <p class="muted">The student opens it from the portal, records an answer to each question (phone or computer) and sends it. You listen in the student's card under Progress.</p>
+      <form class="form" id="spForm">
+        <label>Student<select id="spStudent" required></select></label>
+        <label>Title<input id="spTitle" required placeholder="Talk about your weekend"></label>
+        <label>Max length per answer<select id="spMax"><option value="60">1 min</option><option value="120" selected>2 min</option><option value="180">3 min</option><option value="300">5 min</option></select></label>
+        <label>Due (optional)<input id="spDue" type="date"></label>
+        <label style="grid-column:1/-1">Questions (one per line)<textarea id="spQs" rows="4" required placeholder="What did you do last weekend?&#10;What would you do differently?"></textarea></label>
+        <label style="grid-column:1/-1">Note (optional)<input id="spNote"></label>
+        <button class="btn" type="submit">Give</button>
+      </form>
+      <p class="muted" id="spMsg"></p>
     </section>
 
     <section class="panel">
@@ -93,7 +113,11 @@ const PORTAL_URL=new URL("../my/",location.href).href;
 let S=[],M=[],R=[],DONE=[],LOOK={};
 const $=id=>document.getElementById(id);
 const when=d=>new Date(d).toLocaleString("en-GB",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});
-const actName=a=>{const [m,s]=a.split("/");return ACT[m]&&ACT[m][s]?`${m} · ${ACT[m][s]}`:a};
+const actName=a=>{const [m,s]=a.split("/");if(m==="speak")return"🎙 Speaking · answer "+((s||"").split("-").pop()||"");return ACT[m]&&ACT[m][s]?`${m} · ${ACT[m][s]}`:a};
+const hasSet=k=>!!(k&&(ACT[k]||k==="speak"));
+const mmss=s=>{s=Math.max(0,Math.round(s||0));return Math.floor(s/60)+":"+String(s%60).padStart(2,"0")};
+const scoreCell=r=>r.activity.startsWith("speak/")?`🎙 ${mmss(r.details&&r.details.sec)}`:r.total?`${r.score} / ${r.total}`:"–";
+const esc=t=>String(t==null?"":t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const link=c=>PORTAL_URL+"?c="+encodeURIComponent(c);
 function slug(n){return n.toLowerCase().normalize("NFD").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")||"student"}
 function rand(){const a="abcdefghjkmnpqrstuvwxyz23456789";let s="";for(let i=0;i<4;i++)s+=a[Math.floor(Math.random()*a.length)];return s}
@@ -112,15 +136,15 @@ function draw(){
     b.onclick=()=>detail(x);st.appendChild(b)});
   const rc=$("recent");rc.innerHTML="";
   const seen=new Set();R.filter(r=>{if(!isPartial(r))return true;const k=r.student_code+"|"+r.activity;if(seen.has(k))return false;seen.add(k);return true}).slice(0,25).forEach(r=>{const n=(S.find(x=>x.code===r.student_code)||{}).name||r.student_code;
-    rc.insertAdjacentHTML("beforeend",`<tr><td>${when(r.created_at)}</td><td>${n}</td><td>${actName(r.activity)}${isPartial(r)?' <span class="muted">· in progress</span>':""}</td><td>${r.total?`${r.score} / ${r.total}`:"–"}</td></tr>`)});
+    rc.insertAdjacentHTML("beforeend",`<tr><td>${when(r.created_at)}</td><td>${n}</td><td>${actName(r.activity)}${isPartial(r)?' <span class="muted">· in progress</span>':""}</td><td>${scoreCell(r)}</td></tr>`)});
   if(!R.length)rc.innerHTML='<tr><td colspan="4" class="muted">No results yet. They will appear here when students do the exercises.</td></tr>';
-  $("mStudent").innerHTML=S.map(x=>`<option value="${x.code}">${x.name}</option>`).join("");
+  $("mStudent").innerHTML=$("spStudent").innerHTML=S.map(x=>`<option value="${x.code}">${x.name}</option>`).join("");
 }
 const URLSET={movement:"move",adverbs:"adv","grivas-28":"g28","grivas-30":"g30","grivas-33":"g33","reading-1":"read1","return-to-earth":"rte","grivas-36":"g36"};
-function guessSet(u){u=(u||"").split(/[?#]/)[0].replace(/\/index\.html$/,"").replace(/\/+$/,"");const seg=u.split("/").pop();
+function guessSet(u){if(Portal.speakTask(u||""))return"speak";u=(u||"").split(/[?#]/)[0].replace(/\/index\.html$/,"").replace(/\/+$/,"");const seg=u.split("/").pop();
   if(ACT[seg])return seg;if(URLSET[seg]&&ACT[URLSET[seg]])return URLSET[seg];
   return Object.keys(ACT).find(k=>u.includes("/"+k+"/")||u.includes("/"+k+"-"))||null}
-async function repairSets(){const fix=M.filter(m=>!(m.activity&&ACT[m.activity])&&guessSet(m.url));for(const m of fix){m.activity=guessSet(m.url);try{await db.from("materials").update({activity:m.activity}).eq("id",m.id)}catch(e){}}}
+async function repairSets(){const fix=M.filter(m=>!hasSet(m.activity)&&guessSet(m.url));for(const m of fix){m.activity=guessSet(m.url);try{await db.from("materials").update({activity:m.activity}).eq("id",m.id)}catch(e){}}}
 function alertMsg(t){$("msg").hidden=false;$("msg").textContent=t}
 function detail(x){
   $("detail").hidden=false;$("dName").textContent=`${x.name} · ${x.level||""}`;$("dLink").textContent=link(x.code);
@@ -153,16 +177,20 @@ function detail(x){
     tr.lastElementChild.appendChild(d);tr.lastElementChild.appendChild(b);mt.appendChild(tr)});
   const mine=R.filter(r=>r.student_code===x.code);const tb=$("dRes");tb.innerHTML="";
   M.filter(m=>m.student_code===x.code).forEach(m=>{
-    const subs=m.activity&&ACT[m.activity]?Object.keys(ACT[m.activity]):[];
+    const sp=m.activity==="speak"?Portal.speakTask(m.url):null;
+    const subs=sp?sp.keys:m.activity&&ACT[m.activity]?Object.keys(ACT[m.activity]):[];
     if(!subs.length){tb.insertAdjacentHTML("beforeend",`<tr><td>${m.title}</td><td class="muted">no exercises</td><td></td><td></td><td></td></tr>`);return}
     subs.forEach((s,i)=>{const rs=mine.filter(r=>r.activity===m.activity+"/"+s);const fin=rs.filter(r=>!isPartial(r));
       const best=rs.reduce((a,r)=>r.total&&(!a||r.score/r.total>a.score/a.total)?r:a,null);
       const tr=document.createElement("tr");
-      tr.innerHTML=`<td>${i?"":m.title}</td><td>${ACT[m.activity][s]}</td><td>${best?`${best.score} / ${best.total}`:"–"}</td><td>${fin.length||"–"}${rs[0]&&isPartial(rs[0])?' <span class="muted">· in progress</span>':""}</td><td>${rs[0]?when(rs[0].created_at):"–"}</td><td></td>`;
+      const label=sp?`🎙 ${sp.qs[i].length>60?sp.qs[i].slice(0,58)+"…":sp.qs[i]}`:ACT[m.activity][s];
+      tr.innerHTML=`<td>${i?"":m.title}</td><td style="white-space:normal;min-width:200px">${esc(label)}</td><td>${sp?(rs[0]?`🎙 ${mmss(rs[0].details&&rs[0].details.sec)}`:"–"):best?`${best.score} / ${best.total}`:"–"}</td><td>${fin.length||"–"}${rs[0]&&isPartial(rs[0])?' <span class="muted">· in progress</span>':""}</td><td>${rs[0]?when(rs[0].created_at):"–"}</td><td></td>`;
+      if(sp&&rs.some(r=>r.details&&r.details.audio)){const b=document.createElement("button");b.className="btn small";b.textContent="▶ Listen";b.onclick=()=>listen(x,m,sp,i,rs);tr.lastElementChild.appendChild(b)}
       if(rs.some(r=>r.details&&r.details.answers&&Object.keys(r.details.answers).length)){const b=document.createElement("button");b.className="btn ghost small";b.textContent="Answers";b.onclick=()=>answers(x,m,s,rs);tr.lastElementChild.appendChild(b)}
       if(rs.length){const c=document.createElement("button");c.className="btn ghost small del";c.style.marginLeft="6px";c.textContent="Clear";c.title="Delete this student's results for this exercise (for test runs or a fresh start)";let armed=null;
         c.onclick=async()=>{if(!armed){c.textContent="Sure? Click again";c.classList.add("armed");armed=setTimeout(()=>{armed=null;c.textContent="Clear";c.classList.remove("armed")},3000);return}
           clearTimeout(armed);c.disabled=true;c.textContent="Clearing…";
+          const files=rs.map(r=>r.details&&r.details.audio).filter(Boolean);if(files.length){try{await db.storage.from("voice").remove(files)}catch(e){}}
           const {error}=await db.from("results").delete().eq("student_code",x.code).eq("activity",m.activity+"/"+s);
           if(error){c.disabled=false;c.textContent="Error, try again";return}
           await load();detail(S.find(z=>z.code===x.code)||x)};tr.lastElementChild.appendChild(c)}
@@ -181,10 +209,10 @@ function siteLink(u){const m=(u||"").match(/^https?:\/\/(?:www\.)?github\.com\/p
   return m?"https://puicumber.github.io/lesson/"+(m[1]?m[1]+"/":""):null}
 let warnArmed=false,warnSig="";
 function linkProblem(){const k=$("mAct").value.trim(),u=$("mUrl").value.trim();if(!u)return null;
-  if(!SITE.test(u))return{site:false,set:!!(k&&ACT[k])};
-  if(!(k&&ACT[k]))return{site:true,set:false};return null}
+  if(!SITE.test(u))return{site:false,set:hasSet(k)};
+  if(!hasSet(k))return{site:true,set:false};return null}
 function showAct(){const k=$("mAct").value.trim(),u=$("mUrl").value.trim();
-  $("actInfo").textContent=k&&ACT[k]?`Exercise set: ${k} ✓ (${Object.values(ACT[k]).join(", ")})`:u?"No exercise set for this link.":"Exercise set: paste a link and it will be detected automatically.";
+  $("actInfo").textContent=k==="speak"?"Speaking task ✓ (answers are recorded)":k&&ACT[k]?`Exercise set: ${k} ✓ (${Object.values(ACT[k]).join(", ")})`:u?"No exercise set for this link.":"Exercise set: paste a link and it will be detected automatically.";
   const w=$("linkWarn"),p=linkProblem(),sig=u+"|"+k;if(sig!==warnSig){warnSig=sig;warnArmed=false;$("matForm").querySelector("button[type=submit]").textContent="Add"}
   if(!p){w.hidden=true;w.innerHTML="";return}
   const fix=siteLink(u);
@@ -199,6 +227,25 @@ $("mAct").addEventListener("input",()=>{actManual=!!$("mAct").value.trim();showA
 $("matForm").addEventListener("reset",()=>{actManual=false;setTimeout(showAct,0)});
 $("dClose").onclick=()=>$("detail").hidden=true;
 $("ansClose").onclick=()=>$("ansBox").hidden=true;
+$("voiceClose").onclick=()=>{$("voiceBox").hidden=true;$("voiceTakes").innerHTML=""};
+async function listen(x,m,sp,i,rs){
+  const takes=rs.filter(r=>r.details&&r.details.audio);
+  $("voiceTitle").textContent=`${x.name} · ${m.title} · question ${i+1}`;$("voiceQ").textContent=sp.qs[i];
+  const box=$("voiceTakes");box.innerHTML='<p class="muted">Loading…</p>';$("voiceBox").hidden=false;$("voiceBox").scrollIntoView({behavior:"smooth"});
+  const rows=await Promise.all(takes.map(async(r,n)=>{const d=r.details;
+    const [a,b]=await Promise.all([db.storage.from("voice").createSignedUrl(d.audio,3600),db.storage.from("voice").createSignedUrl(d.audio,3600,{download:true})]);
+    const head=`<div class="row" style="justify-content:space-between"><b>${n?"Earlier answer":"Latest answer"} · ${when(r.created_at)} · ${mmss(d.sec)}</b>${b.data?`<a class="btn ghost small" href="${b.data.signedUrl}">Download</a>`:""}</div>`;
+    if(a.error)return`<div>${head}<p class="error">Couldn't open the recording: ${esc(a.error.message)}</p></div>`;
+    return`<div style="display:flex;flex-direction:column;gap:6px;${n?"opacity:.8":""}">${head}<audio controls preload="metadata" src="${a.data.signedUrl}" style="width:100%"></audio></div>`}));
+  box.innerHTML=rows.join("")||'<p class="muted">No recordings.</p>'}
+$("spForm").onsubmit=async e=>{e.preventDefault();
+  const qs=$("spQs").value.split("\n").map(q=>q.trim()).filter(Boolean);if(!qs.length)return;
+  const u=new URL("https://puicumber.github.io/lesson/speak/");u.searchParams.set("id",rand()+rand());u.searchParams.set("t",$("spTitle").value.trim());
+  qs.forEach(q=>u.searchParams.append("q",q));u.searchParams.set("max",$("spMax").value);
+  const row={student_code:$("spStudent").value,title:$("spTitle").value.trim(),url:u.href,kind:"speaking",activity:"speak",due:$("spDue").value||null,note:$("spNote").value.trim()||null};
+  const {error}=await db.from("materials").insert(row);
+  $("spMsg").innerHTML=error?"Error: "+esc(error.message):`Given "${esc(row.title)}" (${qs.length} question${qs.length>1?"s":""}). <a href="${u.href}" target="_blank" rel="noopener">Preview</a>`;
+  if(!error){e.target.reset();await load()}};
 function answers(x,m,s,rs){const r=rs.find(z=>z.details&&z.details.answers&&Object.keys(z.details.answers).length);const a=r.details.answers;
   $("ansTitle").textContent=`${x.name} · ${m.title} · ${ACT[m.activity][s]}`;
   $("ansMeta").textContent=`${isPartial(r)?"In progress":"Finished"} · last saved ${when(r.created_at)} · ${r.score} / ${r.total}. Shows the first answer to each question.`;
@@ -207,7 +254,7 @@ function answers(x,m,s,rs){const r=rs.find(z=>z.details&&z.details.answers&&Obje
   $("ansBox").hidden=false;$("ansBox").scrollIntoView({behavior:"smooth"})}
 $("matForm").onsubmit=async e=>{e.preventDefault();
   if(linkProblem()&&!warnArmed){warnArmed=true;$("matForm").querySelector("button[type=submit]").textContent="Add anyway";$("linkWarn").scrollIntoView({behavior:"smooth",block:"center"});return}
-  const row={student_code:$("mStudent").value,title:$("mTitle").value.trim(),url:$("mUrl").value.trim(),kind:$("mKind").value,activity:(ACT[$("mAct").value.trim()]?$("mAct").value.trim():guessSet($("mUrl").value)),due:$("mDue").value||null,note:$("mNote").value.trim()||null};
+  const row={student_code:$("mStudent").value,title:$("mTitle").value.trim(),url:$("mUrl").value.trim(),kind:$("mKind").value,activity:(hasSet($("mAct").value.trim())?$("mAct").value.trim():guessSet($("mUrl").value)),due:$("mDue").value||null,note:$("mNote").value.trim()||null};
   const {error}=await db.from("materials").insert(row);$("matMsg").textContent=error?"Error: "+error.message:`Added "${row.title}".`+(!SITE.test(row.url)?" ⚠ Not a site link: no progress will be tracked.":!row.activity?" ⚠ No exercise set.":"");
   if(!error){e.target.reset();await load()}};
 $("stForm").onsubmit=async e=>{e.preventDefault();const name=$("sName").value.trim();const code=slug(name)+"-"+rand();
