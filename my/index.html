@@ -12,6 +12,8 @@
 <script src="../assets/auto-materials.js?v=3"></script>
 <script src="../assets/groups.js?v=1"></script>
 <script src="../assets/group-board.js?v=1"></script>
+<script src="../assets/words.js?v=1"></script>
+<script src="../assets/srs.js?v=1"></script>
 <style id="themeCss"></style>
 <style>
 /* ---------- decorated hero ---------- */
@@ -98,6 +100,7 @@ body[data-pattern="confetti"]{background-image:radial-gradient(circle at 20% 30%
   </header>
 
   <section class="panel gb" id="groupBoard" hidden aria-label="Group competition"></section>
+  <section class="panel" id="wordsPanel" hidden></section>
 
   <section class="panel" id="todoPanel" hidden>
     <h2>To do</h2>
@@ -369,6 +372,7 @@ themeCss();
     RES=res;MATS=mats;
     if(window.GroupBoard){try{await GroupBoard.load(d,code)}catch(e){console.error(e)}}
     refreshBadges();
+    try{window.SRS&&SRS.renderPortal(document.getElementById("wordsPanel"),d.student,window.__state[SRS.KEY],code)}catch(e){console.error(e)}
     const todo=mats.filter(m=>!status(m,res).complete&&(m.activity||(m.kind==="homework"&&(!m.due||new Date(m.due)>=new Date(new Date().toDateString())))));
     const tracked=mats.filter(m=>m.activity);
     document.getElementById("sub").textContent=todo.length?`You have ${todo.length} thing${todo.length>1?"s":""} to do. Your progress saves automatically.`:tracked.length?"Everything is done. Great job!":"Here are your materials.";

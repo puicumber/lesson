@@ -11,6 +11,8 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.js"></script>
 <script src="../assets/config.js?v=18"></script>
 <script src="../assets/portal.js?v=4"></script>
+<script src="../assets/words.js?v=1"></script>
+<script src="../assets/srs.js?v=1"></script>
 </head>
 <body>
 <div class="wrap">
@@ -55,6 +57,8 @@
         <p id="voiceQ" style="font-weight:700;white-space:pre-line"></p>
         <div id="voiceTakes" style="display:flex;flex-direction:column;gap:12px"></div>
       </div>
+      <h3>Words</h3>
+      <div class="weak" id="dWords"></div>
       <h3>Most missed</h3>
       <div class="weak" id="dWeak"></div>
     </section>
@@ -110,7 +114,7 @@ const ACT=window.PORTAL_ACTIVITIES||{};
 const isPartial=r=>!!(r.details&&r.details.partial);
 const db=Portal.client;
 const PORTAL_URL=new URL("../my/",location.href).href;
-let S=[],M=[],R=[],DONE=[],LOOK={};
+let S=[],M=[],R=[],DONE=[],LOOK={},WORDS={};
 const $=id=>document.getElementById(id);
 const when=d=>new Date(d).toLocaleString("en-GB",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});
 const actName=a=>{const [m,s]=a.split("/");if(m==="speak")return"🎙 Speaking · answer "+((s||"").split("-").pop()||"");return ACT[m]&&ACT[m][s]?`${m} · ${ACT[m][s]}`:a};
@@ -126,7 +130,8 @@ async function load(){
   const [s,m,r]=await Promise.all([db.from("students").select("*").order("name"),db.from("materials").select("*").order("created_at",{ascending:false}),db.from("results").select("*").order("created_at",{ascending:false}).limit(1000)]);
   if(s.error||m.error||r.error){$("msg").hidden=false;$("msg").textContent="Couldn't load data: "+(s.error||m.error||r.error).message;return}
   S=s.data;M=m.data;DONE=r.data.filter(z=>z.activity.startsWith("done:"));R=r.data.filter(z=>!z.activity.startsWith("done:")&&!z.activity.startsWith("me:"));
-  LOOK={};r.data.filter(z=>z.activity==="me:style").forEach(z=>{if(!LOOK[z.student_code])LOOK[z.student_code]=z.details||{}});await repairSets();draw();
+  LOOK={};r.data.filter(z=>z.activity==="me:style").forEach(z=>{if(!LOOK[z.student_code])LOOK[z.student_code]=z.details||{}});
+  WORDS={};r.data.filter(z=>z.activity==="me:words").forEach(z=>{if(!WORDS[z.student_code])WORDS[z.student_code]=z.details||{}});await repairSets();draw();
 }
 function draw(){
   const st=$("students");st.innerHTML="";
@@ -199,6 +204,7 @@ function detail(x){
   mine.filter(r=>!isPartial(r)||lastBy[r.activity]===r).forEach(r=>(r.details&&r.details.wrong||[]).forEach(w=>cnt[w]=(cnt[w]||0)+1));
   const top=Object.entries(cnt).sort((a,b)=>b[1]-a[1]).slice(0,10);
   $("dWeak").innerHTML=top.length?`<ul>${top.map(([w,n])=>`<li>${w} <span class="muted">· missed ${n}×</span></li>`).join("")}</ul>`:'<p class="muted">Nothing yet.</p>';
+  try{window.SRS&&SRS.renderTeacher($("dWords"),x,WORDS[x.code],new URL("../words/",location.href).href)}catch(e){console.error(e)}
   $("detail").scrollIntoView({behavior:"smooth"});
 }
 $("actList").innerHTML=Object.keys(ACT).map(k=>`<option value="${k}">`).join("");
