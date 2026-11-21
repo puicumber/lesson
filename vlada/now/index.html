@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Now or Up to Now?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+/* Look: spotlight vs measuring tape. Cyan = present continuous (what's happening now),
+   tape yellow/orange = present perfect continuous (how long, measured up to now). */
+:root{
+  --bg:#f3f5f8; --card:#ffffff; --ink:#14161c; --muted:#5b6170; --line:#dde1ea;
+  --pc:#0b8fb3; --pc-soft:#0b8fb31c; --ppc:#d9730d; --ppc-soft:#f0a5302b; --tape:#f5b82e;
+  --ok:#1b8a52; --ok-soft:#1b8a521f; --bad:#c93636; --bad-soft:#c936361a;
+  --display:"Unbounded",system-ui,sans-serif;
+  --body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0e1015; --card:#171a22; --ink:#eceef3; --muted:#a3a9b8; --line:#2b303d;
+  --pc:#4fcbec; --pc-soft:#4fcbec1f; --ppc:#ffab52; --ppc-soft:#ffab5224; --tape:#f5c34e;
+  --ok:#6cd39a; --ok-soft:#6cd39a22; --bad:#ff8686; --bad-soft:#ff868622; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e1015; --card:#171a22; --ink:#eceef3; --muted:#a3a9b8; --line:#2b303d;
+  --pc:#4fcbec; --pc-soft:#4fcbec1f; --ppc:#ffab52; --ppc-soft:#ffab5224; --tape:#f5c34e;
+  --ok:#6cd39a; --ok-soft:#6cd39a22; --bad:#ff8686; --bad-soft:#ff868622; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:18px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 64px}
+.wrap{max-width:1000px;margin:0 auto;display:flex;flex-direction:column;gap:26px}
+h1,h2,h3{font-family:var(--display);margin:0;line-height:1.1;text-wrap:balance}
+h1{font-size:clamp(34px,7vw,62px);font-weight:800;letter-spacing:-.02em}
+h1 .a{color:var(--pc)} h1 .b{color:var(--ppc)}
+h2{font-size:clamp(22px,3.6vw,30px);font-weight:800}
+h3{font-size:18px;font-weight:500}
+p{margin:0}
+.eyebrow{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.lede{color:var(--muted);max-width:66ch}
+.ru{font-size:15px;color:var(--muted);font-style:italic}
+.pcw{color:var(--pc);font-weight:700}
+.ppcw{color:var(--ppc);font-weight:700}
+.no-way{text-decoration:line-through;color:var(--bad)}
+
+header,.panel{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:clamp(20px,4vw,34px);display:flex;flex-direction:column;gap:16px}
+header{border-top:8px solid;border-image:linear-gradient(90deg,var(--pc) 50%,var(--tape) 50%) 1;border-radius:0 0 22px 22px}
+
+/* big two-question cards */
+.duel{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:720px){.duel{grid-template-columns:1fr}}
+.side{border-radius:18px;padding:20px;display:flex;flex-direction:column;gap:10px;border:2px solid}
+.side.pc{border-color:var(--pc);background:var(--pc-soft)}
+.side.ppc{border-color:var(--ppc);background:var(--ppc-soft)}
+.side .name{font-family:var(--display);font-size:20px;font-weight:800}
+.side.pc .name{color:var(--pc)} .side.ppc .name{color:var(--ppc)}
+.side .form{font-weight:700}
+.side .q{font-family:var(--display);font-size:clamp(20px,3vw,26px);font-weight:500}
+.side ul{margin:0;padding-left:20px}
+.side svg{width:100%;height:auto;display:block}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border-radius:999px;padding:3px 12px;font-size:15px;font-weight:700;background:var(--card);border:1px solid var(--line)}
+
+/* pairs */
+.pairs{display:flex;flex-direction:column;gap:10px}
+.pair{display:grid;grid-template-columns:44px 1fr 1fr;gap:10px;align-items:stretch}
+@media (max-width:720px){.pair{grid-template-columns:1fr}.pair .em{text-align:left}}
+.pair .em{font-size:32px;text-align:center;align-self:center}
+.pair div{border-radius:14px;padding:12px 16px;display:flex;flex-direction:column;gap:4px}
+.pair .l{background:var(--pc-soft);border-left:6px solid var(--pc)}
+.pair .r{background:var(--ppc-soft);border-left:6px solid var(--ppc)}
+.pair b.pcw,.pair b.ppcw{font-size:19px}
+.pair .tag{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.headrow{display:grid;grid-template-columns:44px 1fr 1fr;gap:10px;font-family:var(--display);font-size:14px}
+@media (max-width:720px){.headrow{display:none}}
+
+/* test */
+.test{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:center;background:var(--bg);border-radius:18px;padding:18px 20px}
+.test .big{font-size:48px}
+.test p{font-size:19px}
+
+/* this year */
+.ty{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:720px){.ty{grid-template-columns:1fr}}
+.ty>div{border-radius:16px;padding:16px 18px;display:flex;flex-direction:column;gap:6px;background:var(--bg)}
+.ty .pc{border-top:5px solid var(--pc)} .ty .ppc{border-top:5px solid var(--ppc)}
+
+/* mistakes */
+.mis{display:flex;flex-direction:column;gap:10px}
+.mis>div{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;background:var(--bg);border-radius:14px;padding:12px 16px}
+@media (max-width:720px){.mis>div{grid-template-columns:1fr}.mis .arr{transform:rotate(90deg);justify-self:start}}
+.mis .bad{color:var(--bad);text-decoration:line-through}
+.mis .good{color:var(--ok);font-weight:700}
+.mis .why{grid-column:1/-1;font-size:15px;color:var(--muted)}
+
+/* quiz */
+.qs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:720px){.qs{grid-template-columns:1fr}}
+.qq{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.qq .s{font-weight:700}
+.opts{display:flex;gap:6px;flex-wrap:wrap}
+.opt{appearance:none;cursor:pointer;font:inherit;font-size:16px;border-radius:10px;padding:6px 12px;background:var(--card);color:var(--ink);border:2px solid var(--line)}
+.opt:hover{border-color:var(--ink)}
+.opt.ok{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.opt.no{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.why2{font-size:15px;color:var(--muted)}
+.score{font-weight:700;font-variant-numeric:tabular-nums}
+.btn{appearance:none;cursor:pointer;font:inherit;font-weight:700;border-radius:999px;padding:8px 18px;border:2px solid var(--ink);background:transparent;color:var(--ink)}
+.opt:focus-visible,.btn:focus-visible{outline:3px solid var(--tape);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <span class="eyebrow">Present continuous vs present perfect continuous</span>
+    <h1><span class="a">Now</span> or <span class="b">Up to Now?</span></h1>
+    <p class="lede">Both tenses talk about something that is happening around now. The difference is the question they answer. One shines a <span class="pcw">spotlight</span> on now. The other takes out a <span class="ppcw">measuring tape</span> and measures from the start up to now.</p>
+  </header>
+
+  <section class="panel">
+    <div class="duel">
+      <div class="side pc">
+        <span class="name">🔦 Present continuous</span>
+        <span class="form">am / is / are + -ing</span>
+        <svg viewBox="0 0 320 110" role="img" aria-label="Timeline: a spotlight on now">
+          <defs><radialGradient id="g1"><stop offset="0" stop-color="var(--pc)" stop-opacity=".55"/><stop offset="1" stop-color="var(--pc)" stop-opacity="0"/></radialGradient></defs>
+          <ellipse cx="200" cy="62" rx="70" ry="34" fill="url(#g1)"/>
+          <line x1="10" y1="62" x2="310" y2="62" stroke="var(--muted)" stroke-width="3"/>
+          <polygon points="310,62 300,56 300,68" fill="var(--muted)"/>
+          <path d="M200 6 L168 50 L232 50 Z" fill="var(--pc)" opacity=".35"/>
+          <circle cx="200" cy="62" r="8" fill="var(--pc)"/>
+          <text x="200" y="100" text-anchor="middle" font-size="15" font-weight="700" fill="var(--pc)" font-family="Atkinson Hyperlegible, sans-serif">NOW</text>
+          <text x="20" y="50" font-size="13" fill="var(--muted)" font-family="Atkinson Hyperlegible, sans-serif">past</text>
+        </svg>
+        <span class="q">What's happening now / these days?</span>
+        <span>We don't say how long. We just look at the picture now.</span>
+        <div class="chips"><span class="chip">now</span><span class="chip">at the moment</span><span class="chip">today</span><span class="chip">this week</span><span class="chip">this year</span><span class="chip">these days</span></div>
+        <p><b class="pcw">I'm learning English.</b><br><span class="ru">Я учу английский (сейчас, в этот период).</span></p>
+      </div>
+      <div class="side ppc">
+        <span class="name">📏 Present perfect continuous</span>
+        <span class="form">have / has + been + -ing</span>
+        <svg viewBox="0 0 320 110" role="img" aria-label="Timeline: a measuring tape from September up to now">
+          <line x1="10" y1="62" x2="310" y2="62" stroke="var(--muted)" stroke-width="3"/>
+          <polygon points="310,62 300,56 300,68" fill="var(--muted)"/>
+          <rect x="70" y="40" width="130" height="22" rx="3" fill="var(--tape)"/>
+          <g stroke="var(--ink)" stroke-width="1.5" opacity=".6"><line x1="83" y1="40" x2="83" y2="50"/><line x1="96" y1="40" x2="96" y2="46"/><line x1="109" y1="40" x2="109" y2="50"/><line x1="122" y1="40" x2="122" y2="46"/><line x1="135" y1="40" x2="135" y2="50"/><line x1="148" y1="40" x2="148" y2="46"/><line x1="161" y1="40" x2="161" y2="50"/><line x1="174" y1="40" x2="174" y2="46"/><line x1="187" y1="40" x2="187" y2="50"/></g>
+          <line x1="70" y1="20" x2="70" y2="62" stroke="var(--ppc)" stroke-width="3"/>
+          <polygon points="70,20 92,27 70,34" fill="var(--ppc)"/>
+          <circle cx="200" cy="62" r="8" fill="var(--ppc)"/>
+          <text x="70" y="86" text-anchor="middle" font-size="14" font-weight="700" fill="var(--ppc)" font-family="Atkinson Hyperlegible, sans-serif">September</text>
+          <text x="200" y="100" text-anchor="middle" font-size="15" font-weight="700" fill="var(--ppc)" font-family="Atkinson Hyperlegible, sans-serif">NOW</text>
+          <text x="135" y="33" text-anchor="middle" font-size="13" font-weight="700" fill="var(--ink)" font-family="Atkinson Hyperlegible, sans-serif">3 months</text>
+        </svg>
+        <span class="q">How long? Since when?</span>
+        <span>We measure the action from the start up to now.</span>
+        <div class="chips"><span class="chip">for…</span><span class="chip">since…</span><span class="chip">How long…?</span><span class="chip">all day</span><span class="chip">all morning</span><span class="chip">recently</span></div>
+        <p><b class="ppcw">I've been learning English since September.</b><br><span class="ru">Я учу английский с сентября / уже три месяца.</span></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <span class="eyebrow">Why it feels confusing</span>
+    <h2>In Russian, it's the same tense</h2>
+    <p>«Я учу английский» and «Я учу английский <b>уже три месяца</b>» are both present tense in Russian. In English, the moment you add <b>how long</b> (for / since / уже…), you <b>must</b> switch to the present perfect continuous.</p>
+    <div class="test"><span class="big">🧪</span>
+      <p><b>The test:</b> Is there <b>for</b>, <b>since</b>, <b>how long</b> or <b>«уже …»</b> in your sentence? <br>Yes → <span class="ppcw">have been + -ing</span>. &nbsp;No → <span class="pcw">am / is / are + -ing</span>.</p></div>
+  </section>
+
+  <section class="panel">
+    <span class="eyebrow">Side by side</span>
+    <h2>Same situation, two questions</h2>
+    <div class="headrow"><span></span><span class="pcw">🔦 What's happening?</span><span class="ppcw">📏 How long?</span></div>
+    <div class="pairs">
+      <div class="pair"><span class="em">📚</span>
+        <div class="l"><b class="pcw">I'm learning English this year.</b><span class="ru">Я учу английский в этом году.</span></div>
+        <div class="r"><b class="ppcw">I've been learning English since September.</b><span class="ru">Я учу английский с сентября.</span></div></div>
+      <div class="pair"><span class="em">🏠</span>
+        <div class="l"><b class="pcw">She's working from home this week.</b><span class="ru">Она работает из дома на этой неделе.</span></div>
+        <div class="r"><b class="ppcw">She's been working from home for three days.</b><span class="ru">Она работает из дома уже три дня.</span></div></div>
+      <div class="pair"><span class="em">🌧️</span>
+        <div class="l"><b class="pcw">It's raining.</b><span class="ru">Идёт дождь.</span></div>
+        <div class="r"><b class="ppcw">It's been raining all morning.</b><span class="ru">Дождь идёт всё утро.</span></div></div>
+      <div class="pair"><span class="em">📖</span>
+        <div class="l"><b class="pcw">I'm reading a great book.</b><span class="ru">Я читаю классную книгу.</span></div>
+        <div class="r"><b class="ppcw">I've been reading it for two weeks.</b><span class="ru">Я читаю её уже две недели.</span></div></div>
+      <div class="pair"><span class="em">⏰</span>
+        <div class="l"><b class="pcw">Are you waiting for the bus?</b><span class="ru">Ты ждёшь автобус?</span></div>
+        <div class="r"><b class="ppcw">How long have you been waiting?</b><span class="ru">Сколько ты уже ждёшь?</span></div></div>
+      <div class="pair"><span class="em">🏋️</span>
+        <div class="l"><b class="pcw">He's going to the gym a lot these days.</b><span class="ru">Он сейчас часто ходит в зал.</span></div>
+        <div class="r"><b class="ppcw">He's been going to the gym since the summer.</b><span class="ru">Он ходит в зал с лета.</span></div></div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <span class="eyebrow">The tricky one</span>
+    <h2>“this year” works with both</h2>
+    <p>With <b>this year</b> you can use either tense. The question you're answering is different.</p>
+    <div class="ty">
+      <div class="pc"><b class="pcw">I'm studying a lot this year.</b>
+        <span>🔦 A picture of this year: what my life is like now.</span>
+        <span class="ru">В этом году я много учусь (такой сейчас период).</span></div>
+      <div class="ppc"><b class="ppcw">I've been studying a lot this year.</b>
+        <span>📏 From January up to today. Often it explains a result now: <i>…so I'm really tired!</i></span>
+        <span class="ru">С начала года и до сегодня я много учусь (вот и устала).</span></div>
+    </div>
+    <p>⚠️ It's always <b>this year</b>, never <span class="no-way">in this year</span>. Same with <b>this week</b>, <b>this month</b>, <b>last year</b>, <b>next year</b>: no <i>in</i>.</p>
+  </section>
+
+  <section class="panel">
+    <span class="eyebrow">Watch out</span>
+    <h2>Typical mistakes</h2>
+    <div class="mis">
+      <div><span class="bad">I'm learning English for two years.</span><span class="arr">➜</span><span class="good">I've been learning English for two years.</span><span class="why">for = how long, so present perfect continuous.</span></div>
+      <div><span class="bad">I've studied English in this year.</span><span class="arr">➜</span><span class="good">I'm studying / I've been studying English this year.</span><span class="why">No “in” before this year. And for an action that's still going on, use the continuous.</span></div>
+      <div><span class="bad">I have been starting to learn English.</span><span class="arr">➜</span><span class="good">I started learning English in September.</span><span class="why">start is one moment (a click ⏯), not a process. A moment in the past = past simple.</span></div>
+      <div><span class="bad">How long are you living here?</span><span class="arr">➜</span><span class="good">How long have you been living here?</span><span class="why">How long = measuring tape = have been + -ing.</span></div>
+    </div>
+    <div class="test"><span class="big">🎬</span>
+      <p><b>One story, three tenses:</b> I <b>started</b> English in September (the start). I<b>'ve been learning</b> it for three months (the way up to today). Right now I<b>'m learning</b> the present perfect continuous (what's happening now).</p></div>
+  </section>
+
+  <section class="panel">
+    <span class="eyebrow">Quick check</span>
+    <h2>Spotlight or tape?</h2>
+    <p class="lede">Look for for / since / how long / all day. Then choose.</p>
+    <div class="qs" id="quiz"></div>
+    <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap"><span class="score" id="score"></span><button class="btn" id="again">Start again</button></div>
+  </section>
+</div>
+
+<script>
+const Q=[
+ ["I ___ English since September.",["'ve been learning","'m learning"],"'ve been learning","since = how long → have been + -ing."],
+ ["Shh! The baby ___ .",["'s sleeping","'s been sleeping"],"'s sleeping","Just the picture now, no how long."],
+ ["How long ___ in this flat?",["have you been living","are you living"],"have you been living","How long → have been + -ing."],
+ ["This week I ___ from home.",["'m working","'ve been working"],"'m working","this week, no how long: a picture of now."],
+ ["It ___ all morning. The streets are wet.",["'s been raining","'s raining"],"'s been raining","all morning = from the morning up to now."],
+ ["Can you call me back later? I ___ dinner right now.",["'m cooking","'ve been cooking"],"'m cooking","right now, no how long: a picture of now."],
+ ["My brother ___ for a new job for two months.",["'s been looking","'s looking"],"'s been looking","for two months = how long."],
+ ["I ___ English in September.",["started","have been starting"],"started","start = one moment in the past → past simple."],
+ ["Look! Someone ___ in our car!",["'s sitting","'s been sitting"],"'s sitting","Look! = right now."],
+ ["We ___ here for an hour! Let's go home.",["'ve been waiting","'re waiting"],"'ve been waiting","for an hour = how long."]
+];
+const quiz=document.getElementById("quiz"),sc=document.getElementById("score");
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+function build(){quiz.innerHTML="";let ok=0,done=0;sc.textContent="";
+  Q.forEach(([s,opts,ans,why],i)=>{const d=document.createElement("div");d.className="qq";
+    d.innerHTML=`<p class="s">${i+1}. ${s.replace("___","<u>&nbsp;?&nbsp;</u>")}</p><div class="opts"></div><p class="why2" hidden></p>`;
+    const o=d.querySelector(".opts"),w=d.querySelector(".why2");let answered=false;
+    shuffle(opts).forEach(t=>{const b=document.createElement("button");b.className="opt";b.textContent=t;
+      b.onclick=()=>{o.querySelectorAll(".opt").forEach(x=>x.classList.remove("no"));
+        if(t===ans){b.classList.add("ok");w.hidden=false;w.textContent=why;d.querySelector("u").innerHTML=`&nbsp;${ans}&nbsp;`;if(!answered){answered=true;done++;ok++}}
+        else{b.classList.add("no");if(!answered){answered=true;done++}}
+        sc.textContent=`First try: ${ok} / ${done}`+(done===Q.length?(ok>=8?" 🎉":" · read the test again 🧪"):"")};o.appendChild(b)});
+    quiz.appendChild(d)})}
+document.getElementById("again").onclick=build;build();
+</script>
+</body>
+</html>
