@@ -13,17 +13,18 @@
   --bg:#f3f5f8; --card:#ffffff; --ink:#14161c; --muted:#5b6170; --line:#dde1ea;
   --pc:#0b8fb3; --pc-soft:#0b8fb31c; --ppc:#d9730d; --ppc-soft:#f0a5302b; --tape:#f5b82e;
   --ok:#1b8a52; --ok-soft:#1b8a521f; --bad:#c93636; --bad-soft:#c936361a;
+  --pp:#7a3fd0; --pp-soft:#7a3fd01a;
   --display:"Unbounded",system-ui,sans-serif;
   --body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#0e1015; --card:#171a22; --ink:#eceef3; --muted:#a3a9b8; --line:#2b303d;
   --pc:#4fcbec; --pc-soft:#4fcbec1f; --ppc:#ffab52; --ppc-soft:#ffab5224; --tape:#f5c34e;
-  --ok:#6cd39a; --ok-soft:#6cd39a22; --bad:#ff8686; --bad-soft:#ff868622; color-scheme:dark}}
+  --ok:#6cd39a; --ok-soft:#6cd39a22; --bad:#ff8686; --bad-soft:#ff868622; --pp:#b993ff; --pp-soft:#b993ff22; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#0e1015; --card:#171a22; --ink:#eceef3; --muted:#a3a9b8; --line:#2b303d;
   --pc:#4fcbec; --pc-soft:#4fcbec1f; --ppc:#ffab52; --ppc-soft:#ffab5224; --tape:#f5c34e;
-  --ok:#6cd39a; --ok-soft:#6cd39a22; --bad:#ff8686; --bad-soft:#ff868622; color-scheme:dark}
+  --ok:#6cd39a; --ok-soft:#6cd39a22; --bad:#ff8686; --bad-soft:#ff868622; --pp:#b993ff; --pp-soft:#b993ff22; color-scheme:dark}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:18px;line-height:1.55;
@@ -40,14 +41,22 @@ p{margin:0}
 .ru{font-size:15px;color:var(--muted);font-style:italic}
 .pcw{color:var(--pc);font-weight:700}
 .ppcw{color:var(--ppc);font-weight:700}
+.ppw{color:var(--pp);font-weight:700}
 .no-way{text-decoration:line-through;color:var(--bad)}
 
 header,.panel{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:clamp(20px,4vw,34px);display:flex;flex-direction:column;gap:16px}
-header{border-top:8px solid;border-image:linear-gradient(90deg,var(--pc) 50%,var(--tape) 50%) 1;border-radius:0 0 22px 22px}
+header{border-top:8px solid;border-image:linear-gradient(90deg,var(--pc) 33%,var(--tape) 33% 66%,var(--pp) 66%) 1;border-radius:0 0 22px 22px}
+h1 .c{color:var(--pp)}
 
-/* big two-question cards */
-.duel{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-@media (max-width:720px){.duel{grid-template-columns:1fr}}
+/* big question cards */
+.duel{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+@media (max-width:900px){.duel{grid-template-columns:1fr}}
+.side.pp{border-color:var(--pp);background:var(--pp-soft)}
+.side.pp .name{color:var(--pp)}
+.pair .r2{background:var(--pp-soft);border-left:6px solid var(--pp)}
+.ty3{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+@media (max-width:900px){.ty3{grid-template-columns:1fr!important}}
+.ty .pp{border-top:5px solid var(--pp)}
 .side{border-radius:18px;padding:20px;display:flex;flex-direction:column;gap:10px;border:2px solid}
 .side.pc{border-color:var(--pc);background:var(--pc-soft)}
 .side.ppc{border-color:var(--ppc);background:var(--ppc-soft)}
@@ -112,9 +121,9 @@ header{border-top:8px solid;border-image:linear-gradient(90deg,var(--pc) 50%,var
 <body>
 <div class="wrap">
   <header>
-    <span class="eyebrow">Present continuous vs present perfect continuous</span>
-    <h1><span class="a">Now</span> or <span class="b">Up to Now?</span></h1>
-    <p class="lede">Both tenses talk about something that is happening around now. The difference is the question they answer. One shines a <span class="pcw">spotlight</span> on now. The other takes out a <span class="ppcw">measuring tape</span> and measures from the start up to now.</p>
+    <span class="eyebrow">Present continuous · present perfect continuous · present perfect</span>
+    <h1><span class="a">Now</span>, <span class="b">Up to Now</span> or <span class="c">Done?</span></h1>
+    <p class="lede">Three tenses, three different questions. The <span class="pcw">spotlight</span> shows what's happening now. The <span class="ppcw">measuring tape</span> measures how long, from the start up to now. The <span class="ppw">checklist</span> counts the results: what's done, how many, how much.</p>
   </header>
 
   <section class="panel">
@@ -157,15 +166,40 @@ header{border-top:8px solid;border-image:linear-gradient(90deg,var(--pc) 50%,var
         <div class="chips"><span class="chip">for…</span><span class="chip">since…</span><span class="chip">How long…?</span><span class="chip">all day</span><span class="chip">all morning</span><span class="chip">recently</span></div>
         <p><b class="ppcw">I've been learning English since September.</b><br><span class="ru">Я учу английский с сентября / уже три месяца.</span></p>
       </div>
+      <div class="side pp">
+        <span class="name">✅ Present perfect</span>
+        <span class="form">have / has + past participle</span>
+        <svg viewBox="0 0 320 110" role="img" aria-label="Timeline: three ticks between September and now">
+          <line x1="10" y1="62" x2="310" y2="62" stroke="var(--muted)" stroke-width="3"/>
+          <polygon points="310,62 300,56 300,68" fill="var(--muted)"/>
+          <g font-family="Atkinson Hyperlegible, sans-serif" font-weight="700" text-anchor="middle">
+            <circle cx="95" cy="40" r="13" fill="var(--pp)"/><text x="95" y="45" font-size="15" fill="#fff">✓</text>
+            <circle cx="135" cy="40" r="13" fill="var(--pp)"/><text x="135" y="45" font-size="15" fill="#fff">✓</text>
+            <circle cx="172" cy="40" r="13" fill="var(--pp)"/><text x="172" y="45" font-size="15" fill="#fff">✓</text>
+            <circle cx="200" cy="62" r="8" fill="var(--pp)"/>
+            <text x="135" y="14" font-size="14" fill="var(--pp)">3 books read</text>
+            <text x="200" y="100" font-size="15" fill="var(--pp)">NOW</text>
+          </g>
+        </svg>
+        <span class="q">What's the result? How many? Ever?</span>
+        <span>We count what is done up to now. The action itself isn't important, the result is.</span>
+        <div class="chips"><span class="chip">how many</span><span class="chip">how much</span><span class="chip">already</span><span class="chip">just</span><span class="chip">yet</span><span class="chip">ever / never</span><span class="chip">so far</span></div>
+        <p><b class="ppw">I've read three books this month.</b><br><span class="ru">Я прочитала три книги в этом месяце (результат).</span></p>
+      </div>
     </div>
+    <p>⚠️ Non-action verbs (know, like, love, want, have = own) can't take -ing, so they use the <span class="ppw">present perfect</span> even with how long: <b>We've known each other for ten years.</b> <span class="no-way">We've been knowing…</span></p>
   </section>
 
   <section class="panel">
     <span class="eyebrow">Why it feels confusing</span>
     <h2>In Russian, it's the same tense</h2>
     <p>«Я учу английский» and «Я учу английский <b>уже три месяца</b>» are both present tense in Russian. In English, the moment you add <b>how long</b> (for / since / уже…), you <b>must</b> switch to the present perfect continuous.</p>
+    <p>And Russian has a hint for the present perfect too: «я <b>прочитала</b> / <b>сделала</b> / <b>выучила</b>» (a result, it's done) usually means <span class="ppw">have read / have done / have learned</span>, while «я читаю уже…» is <span class="ppcw">have been reading</span>.</p>
     <div class="test"><span class="big">🧪</span>
-      <p><b>The test:</b> Is there <b>for</b>, <b>since</b>, <b>how long</b> or <b>«уже …»</b> in your sentence? <br>Yes → <span class="ppcw">have been + -ing</span>. &nbsp;No → <span class="pcw">am / is / are + -ing</span>.</p></div>
+      <p><b>The test, three questions:</b><br>
+      1. Am I counting a result: how many, how much, done or not done, ever? → <span class="ppw">have + past participle</span><br>
+      2. Is there <b>for</b>, <b>since</b>, <b>how long</b>, <b>all day</b> or <b>«уже …»</b>? → <span class="ppcw">have been + -ing</span><br>
+      3. Just a picture of now, no length, no result? → <span class="pcw">am / is / are + -ing</span></p></div>
   </section>
 
   <section class="panel">
@@ -195,17 +229,45 @@ header{border-top:8px solid;border-image:linear-gradient(90deg,var(--pc) 50%,var
   </section>
 
   <section class="panel">
+    <span class="eyebrow">Side by side</span>
+    <h2>The process or the result?</h2>
+    <p class="lede">Both use <i>have</i>. The tape measures the <b>activity</b> (how long). The checklist shows the <b>result</b> (how many, what's done).</p>
+    <div class="headrow"><span></span><span class="ppcw">📏 The process: how long?</span><span class="ppw">✅ The result: how many / done?</span></div>
+    <div class="pairs">
+      <div class="pair"><span class="em">📚</span>
+        <div class="r"><b class="ppcw">I've been studying English since September.</b><span class="ru">Я учу английский с сентября.</span></div>
+        <div class="r2"><b class="ppw">I've learned 400 new words.</b><span class="ru">Я выучила 400 новых слов.</span></div></div>
+      <div class="pair"><span class="em">📖</span>
+        <div class="r"><b class="ppcw">I've been reading this book for a week.</b><span class="ru">Я читаю эту книгу уже неделю.</span></div>
+        <div class="r2"><b class="ppw">I've read 100 pages.</b><span class="ru">Я прочитала 100 страниц.</span></div></div>
+      <div class="pair"><span class="em">🍪</span>
+        <div class="r"><b class="ppcw">She's been baking all morning.</b><span class="ru">Она печёт всё утро.</span></div>
+        <div class="r2"><b class="ppw">She's baked 40 cookies.</b><span class="ru">Она испекла 40 печенек.</span></div></div>
+      <div class="pair"><span class="em">🎨</span>
+        <div class="r"><b class="ppcw">I've been painting the kitchen.</b><span class="ru">Я крашу кухню (вот почему я в краске).</span></div>
+        <div class="r2"><b class="ppw">I've painted the kitchen. Look!</b><span class="ru">Я покрасила кухню. Смотри! (готово)</span></div></div>
+      <div class="pair"><span class="em">🏃</span>
+        <div class="r"><b class="ppcw">I've been running. I'm so tired!</b><span class="ru">Я бегала (поэтому устала).</span></div>
+        <div class="r2"><b class="ppw">I've run 5 km today.</b><span class="ru">Я пробежала сегодня 5 км.</span></div></div>
+    </div>
+  </section>
+
+  <section class="panel">
     <span class="eyebrow">The tricky one</span>
-    <h2>“this year” works with both</h2>
-    <p>With <b>this year</b> you can use either tense. The question you're answering is different.</p>
-    <div class="ty">
+    <h2>“this year” works with all three</h2>
+    <p>With <b>this year</b> you can use any of the three tenses. The question you're answering is different.</p>
+    <div class="ty ty3">
       <div class="pc"><b class="pcw">I'm studying a lot this year.</b>
         <span>🔦 A picture of this year: what my life is like now.</span>
         <span class="ru">В этом году я много учусь (такой сейчас период).</span></div>
       <div class="ppc"><b class="ppcw">I've been studying a lot this year.</b>
         <span>📏 From January up to today. Often it explains a result now: <i>…so I'm really tired!</i></span>
         <span class="ru">С начала года и до сегодня я много учусь (вот и устала).</span></div>
+      <div class="pp"><b class="ppw">I've passed two exams this year.</b>
+        <span>✅ The result so far: how many, what's done.</span>
+        <span class="ru">В этом году я сдала два экзамена (результат).</span></div>
     </div>
+    <p>💡 <b>I've studied English this year</b> on its own sounds like a finished result («отучилась, всё»). If you're still studying, use <span class="pcw">I'm studying</span> or <span class="ppcw">I've been studying</span>. Use <span class="ppw">I've studied</span> with a result: <i>I've studied five grammar topics this year.</i></p>
     <p>⚠️ It's always <b>this year</b>, never <span class="no-way">in this year</span>. Same with <b>this week</b>, <b>this month</b>, <b>last year</b>, <b>next year</b>: no <i>in</i>.</p>
   </section>
 
@@ -214,18 +276,19 @@ header{border-top:8px solid;border-image:linear-gradient(90deg,var(--pc) 50%,var
     <h2>Typical mistakes</h2>
     <div class="mis">
       <div><span class="bad">I'm learning English for two years.</span><span class="arr">➜</span><span class="good">I've been learning English for two years.</span><span class="why">for = how long, so present perfect continuous.</span></div>
-      <div><span class="bad">I've studied English in this year.</span><span class="arr">➜</span><span class="good">I'm studying / I've been studying English this year.</span><span class="why">No “in” before this year. And for an action that's still going on, use the continuous.</span></div>
+      <div><span class="bad">I've studied English in this year.</span><span class="arr">➜</span><span class="good">I'm studying / I've been studying English this year.</span><span class="why">No “in” before this year. And for an action that's still going on, use the continuous. The present perfect needs a result: I've studied five topics this year.</span></div>
+      <div><span class="bad">I've been reading three books this month.</span><span class="arr">➜</span><span class="good">I've read three books this month.</span><span class="why">three books = how many = a result → present perfect.</span></div>
       <div><span class="bad">I have been starting to learn English.</span><span class="arr">➜</span><span class="good">I started learning English in September.</span><span class="why">start is one moment (a click ⏯), not a process. A moment in the past = past simple.</span></div>
       <div><span class="bad">How long are you living here?</span><span class="arr">➜</span><span class="good">How long have you been living here?</span><span class="why">How long = measuring tape = have been + -ing.</span></div>
     </div>
     <div class="test"><span class="big">🎬</span>
-      <p><b>One story, three tenses:</b> I <b>started</b> English in September (the start). I<b>'ve been learning</b> it for three months (the way up to today). Right now I<b>'m learning</b> the present perfect continuous (what's happening now).</p></div>
+      <p><b>One story, four tenses:</b> I <b>started</b> English in September (the start). I<b>'ve been learning</b> it for three months (the way up to today). I<b>'ve learned</b> 400 new words (the result). Right now I<b>'m learning</b> the present perfect continuous (what's happening now).</p></div>
   </section>
 
   <section class="panel">
     <span class="eyebrow">Quick check</span>
-    <h2>Spotlight or tape?</h2>
-    <p class="lede">Look for for / since / how long / all day. Then choose.</p>
+    <h2>Spotlight, tape or checklist?</h2>
+    <p class="lede">Ask the three questions: a result (how many)? how long? or just now? Then choose.</p>
     <div class="qs" id="quiz"></div>
     <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap"><span class="score" id="score"></span><button class="btn" id="again">Start again</button></div>
   </section>
@@ -233,16 +296,19 @@ header{border-top:8px solid;border-image:linear-gradient(90deg,var(--pc) 50%,var
 
 <script>
 const Q=[
- ["I ___ English since September.",["'ve been learning","'m learning"],"'ve been learning","since = how long → have been + -ing."],
- ["Shh! The baby ___ .",["'s sleeping","'s been sleeping"],"'s sleeping","Just the picture now, no how long."],
- ["How long ___ in this flat?",["have you been living","are you living"],"have you been living","How long → have been + -ing."],
- ["This week I ___ from home.",["'m working","'ve been working"],"'m working","this week, no how long: a picture of now."],
- ["It ___ all morning. The streets are wet.",["'s been raining","'s raining"],"'s been raining","all morning = from the morning up to now."],
- ["Can you call me back later? I ___ dinner right now.",["'m cooking","'ve been cooking"],"'m cooking","right now, no how long: a picture of now."],
- ["My brother ___ for a new job for two months.",["'s been looking","'s looking"],"'s been looking","for two months = how long."],
- ["I ___ English in September.",["started","have been starting"],"started","start = one moment in the past → past simple."],
- ["Look! Someone ___ in our car!",["'s sitting","'s been sitting"],"'s sitting","Look! = right now."],
- ["We ___ here for an hour! Let's go home.",["'ve been waiting","'re waiting"],"'ve been waiting","for an hour = how long."]
+ ["I ___ English since September.",["'ve been learning","'m learning","'ve learned"],"'ve been learning","since = how long → have been + -ing."],
+ ["Shh! The baby ___ .",["'s sleeping","'s been sleeping","'s slept"],"'s sleeping","Just the picture now: present continuous."],
+ ["I ___ three books this month.",["'ve read","'ve been reading","'m reading"],"'ve read","three books = how many = a result → present perfect."],
+ ["How long ___ for the bus?",["have you been waiting","are you waiting","have you waited"],"have you been waiting","How long + an action verb → have been + -ing."],
+ ["I can't talk now, I ___ dinner.",["'m cooking","'ve been cooking","'ve cooked"],"'m cooking","now, no length, no result: present continuous."],
+ ["It ___ all morning. The streets are wet.",["'s been raining","'s raining","'s rained"],"'s been raining","all morning = from the morning up to now."],
+ ["Look! I ___ the whole kitchen. It's so clean now!",["'ve cleaned","'ve been cleaning","'m cleaning"],"'ve cleaned","It's finished, look at the result: present perfect."],
+ ["My brother ___ for a new job for two months.",["'s been looking","'s looking","'s looked"],"'s been looking","for two months = how long."],
+ ["I ___ English in September.",["started","have been starting","have started"],"started","start = one moment in the past → past simple."],
+ ["We ___ each other for ten years.",["'ve known","'ve been knowing","'re knowing"],"'ve known","know is a non-action verb: no -ing, so present perfect."],
+ ["She ___ 40 cookies today!",["'s baked","'s been baking","'s baking"],"'s baked","40 cookies = how many = a result."],
+ ["Why are you so tired? — I ___ all day.",["'ve been working","'ve worked","'m working"],"'ve been working","all day + a result we can see (tired): have been + -ing."],
+ ["___ your homework yet?",["Have you done","Have you been doing","Are you doing"],"Have you done","yet = is it done or not? A result → present perfect."]
 ];
 const quiz=document.getElementById("quiz"),sc=document.getElementById("score");
 const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
@@ -254,7 +320,7 @@ function build(){quiz.innerHTML="";let ok=0,done=0;sc.textContent="";
       b.onclick=()=>{o.querySelectorAll(".opt").forEach(x=>x.classList.remove("no"));
         if(t===ans){b.classList.add("ok");w.hidden=false;w.textContent=why;d.querySelector("u").innerHTML=`&nbsp;${ans}&nbsp;`;if(!answered){answered=true;done++;ok++}}
         else{b.classList.add("no");if(!answered){answered=true;done++}}
-        sc.textContent=`First try: ${ok} / ${done}`+(done===Q.length?(ok>=8?" 🎉":" · read the test again 🧪"):"")};o.appendChild(b)});
+        sc.textContent=`First try: ${ok} / ${done}`+(done===Q.length?(ok>=10?" 🎉":" · read the test again 🧪"):"")};o.appendChild(b)});
     quiz.appendChild(d)})}
 document.getElementById("again").onclick=build;build();
 </script>
