@@ -124,6 +124,28 @@ function grade(item, raw) {
   };
 }
 
+function draftStorage(name) {
+  const keyPrefix = "grivas-unit-2:draft:";
+  let key;
+  try {
+    const code = window.STUDENT_CODE || new URLSearchParams(location.search).get("c") ||
+      localStorage.getItem("portal-code");
+    key = keyPrefix + JSON.stringify([code, name]);
+  } catch {
+    return { values: {}, save() {} };
+  }
+  let values = {};
+  try {
+    values = JSON.parse(localStorage.getItem(key) || "{}") || {};
+  } catch {}
+  return { values, save() {
+    try {
+      if (Object.keys(values).length) localStorage.setItem(key, JSON.stringify(values));
+      else localStorage.removeItem(key);
+    } catch {}
+  }};
+}
+
 function render(lesson) {
   const section = document.querySelector("#section").content.firstElementChild.cloneNode(true);
   section.id = lesson.id;
@@ -135,6 +157,7 @@ function render(lesson) {
   const all = section.querySelector(".all");
   const score = section.querySelector(".score");
   const name = "g2_" + lesson.id;
+  const draft = draftStorage(name);
   const rows = lesson.items.map((item, index) => {
     const article = document.createElement("article");
     const id = name + "-" + index;
@@ -175,7 +198,10 @@ function render(lesson) {
     article.append(label, input, output, example);
     form.querySelector(".questions").append(article);
     const row = {article,input,output,example,item,state:"unchecked"};
+    if (Object.hasOwn(draft.values, index)) input.value = draft.values[index];
     input.addEventListener("input", () => {
+      draft.values[index] = input.value;
+      draft.save();
       row.state = "unchecked";
       output.textContent = "";
       input.removeAttribute("aria-invalid");
@@ -212,7 +238,9 @@ function render(lesson) {
       if (!visible.includes(row) || row.state === "blank") return;
       const question = [row.item.source, row.item.key, row.item.prompt].filter(Boolean).join(" · ");
       window.Track.answer(name, index, question, row.input.value, row.item.answers[0], row.state === "correct", correct, rows.length);
+      delete draft.values[index];
     });
+    draft.save();
     if (!pending) window.Track.finish(name, correct, rows.length);
   });
 
@@ -237,10 +265,10 @@ function render(lesson) {
     rows[0].input.focus();
   });
   document.querySelector("#practice").append(section);
-  return {form, restore(state) {
+  return {restore(state) {
     rows.forEach((row, index) => {
       const answer = state?.[name]?.answers?.[index];
-      if (answer && !row.input.value) {
+      if (answer && !Object.hasOwn(draft.values, index) && row.state === "unchecked") {
         row.input.value = answer.a;
         feedback(row);
       }
@@ -257,16 +285,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (!window.Track.online) return;
     status.textContent = {saving:"Saving progress…",saved:"Progress saved.",offline:"Progress saved on this device. Sync will retry."}[state] || "";
   });
-  // Permit immediate practice even if the portal is slow. Track sets its activity before awaiting the server.
-  let edited = false;
-  const markEdited = () => { edited = true; };
-  sections.forEach(({form}) => {
-    form.addEventListener("input", markEdited);
-    form.addEventListener("submit", markEdited);
-  });
   try {
     const state = await window.Track.init("grivas-unit-2");
-    if (!edited) sections.forEach(section => section.restore(state));
+    sections.forEach(section => section.restore(state));
   } catch {
     status.textContent = "Progress sync is unavailable in this browser.";
   }
