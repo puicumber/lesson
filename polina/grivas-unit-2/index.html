@@ -4,9 +4,20 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Grivas Unit 2 · The Grammar Edit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&amp;family=IBM+Plex+Mono:wght@600&amp;family=Instrument+Sans:wght@400;500;600&amp;display=swap">
 <style>
 :root{color-scheme:light;--paper:#fff9ed;--ink:#241921;--pink:#f480b9;--rose:#f9dcea;--line:#9d7385;font:100%/1.55 system-ui,sans-serif;color:var(--ink);background:#f4e7df}
 *{box-sizing:border-box}body{margin:0}main{max-width:56rem;margin:auto;padding:clamp(1rem,4vw,3rem) clamp(.85rem,3vw,2rem) 4rem}header{position:relative;background:var(--ink);color:var(--paper);border:2px solid var(--ink);box-shadow:6px 6px 0 #d85997;padding:clamp(1.2rem,5vw,3.5rem);overflow:hidden}header::after{content:"";position:absolute;right:-5rem;bottom:-7rem;width:16rem;height:16rem;border:2px solid var(--pink);border-radius:50%;box-shadow:0 0 0 8px #f480b92a,0 0 0 22px #f480b91a;pointer-events:none}h1,h2{font-family:Georgia,serif;line-height:1.05}h1{font-size:clamp(2.55rem,9vw,6rem);letter-spacing:-.065em;margin:.15em 0 .2em}h1 em{color:var(--pink)}h2{font-size:clamp(1.8rem,5vw,2.6rem);margin:.1em 0}.meta,summary,.key{font:700 .82rem/1.4 ui-monospace,monospace;letter-spacing:.055em}.meta,.key{text-transform:uppercase}header p{max-width:30rem;margin-bottom:0}nav{display:flex;gap:.5rem;flex-wrap:wrap;margin:1.6rem 0}nav a,button{display:inline-flex;align-items:center;justify-content:center;min-height:44px;border:1px solid var(--ink);border-radius:.4rem;padding:.55rem .85rem;color:var(--ink);background:var(--rose);text-decoration:none;font:700 1rem system-ui;cursor:pointer}section{margin:2.5rem 0;scroll-margin:1rem}details,article{background:var(--paper);border:1px solid var(--line);border-radius:.65rem;padding:1rem;margin:.75rem 0;min-width:0}summary{cursor:pointer;padding:.25rem 0;font-size:.95rem}details p:last-child{margin-bottom:0}article{box-shadow:2px 3px 0 #e8adca}article p{margin:.4rem 0 .75rem}.key{display:inline-block;background:var(--pink);padding:.2rem .5rem;margin-bottom:.25rem}input,select{display:block;width:100%;min-height:48px;background:#fff;color:var(--ink);border:1px solid #77576a;border-radius:.35rem;padding:.55rem .7rem;font:inherit}label{display:block;font-weight:600;margin-bottom:.45rem}.source{font-family:Georgia,serif;font-size:1.12rem}button[type=submit]{background:var(--ink);color:var(--paper)}button:disabled{opacity:.6;cursor:default}:focus-visible{outline:3px solid #9e175d;outline-offset:3px}header :focus-visible{outline-color:var(--pink)}.actions{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1rem}output{display:block;margin:.5rem 0}output:empty{display:none}.result{border-left:4px solid #a83865;padding-left:.7rem}.result[data-state=correct]{border-color:#28805c}.score{font-weight:700}.speech{border-top:1px dashed var(--line);padding-top:.65rem}.grid{display:grid;gap:.5rem;grid-template-columns:repeat(auto-fit,minmax(min(100%,20rem),1fr))}.grid details{margin:0}[hidden]{display:none!important}
+
+:root{--display:"Bricolage Grotesque",system-ui,sans-serif;--body:"Instrument Sans",system-ui,sans-serif;--mono:"IBM Plex Mono",ui-monospace,monospace;font-family:var(--body)}
+h1,h2{font-family:var(--display);font-weight:800;text-wrap:balance}
+h1{letter-spacing:-.055em}
+.meta,summary,.key{font-family:var(--mono);font-weight:600}
+button,nav a,.source{font-family:var(--body)}
+button,nav a,label,.score{font-weight:600}
+.source{font-weight:500}
 </style>
 <script defer src="../../assets/config.js?v=grivas2"></script>
 <script defer src="../../assets/portal.js?v=3"></script>
