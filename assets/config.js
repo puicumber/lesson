@@ -5,6 +5,7 @@ window.PORTAL_CONFIG = {
 };
 // Exercises inside each material, used to show progress
 window.PORTAL_ACTIVITIES = {
+  "grivas-unit-2": { g2_forms: "Word choice", g2_patterns: "Patterns & similes", g2_rewrite: "Key word transformations" },
   money: { cards: "Flashcards", nouns: "Nouns", verbs: "Verbs", preps: "Prepositions", phrasal: "Phrasal verbs", spell: "Spelling" },
   cpe: { mc: "Part 1 · Multiple choice", cloze: "Part 2 · Open cloze", wordform: "Part 3 · Word formation", kwt: "Part 4 · Transformations" },
   g28: { cards: "Flashcards", preps: "Prepositions", idioms: "Idioms", at: "At-phrases" },
