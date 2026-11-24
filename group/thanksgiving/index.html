@@ -112,12 +112,12 @@ section h2{color:#473326}
 .finale p{margin-bottom:0}
 .finale img{width:100%;height:auto}
 .word-match{margin-top:1.25rem}
-.word-match label{display:grid;grid-template-columns:minmax(0,1fr) minmax(10rem,14rem);align-items:center;gap:.65rem}
-.word-match select{width:100%}
-.word-match select[data-result="correct"]{border-color:#627747;background:#edf2df}
-.word-match select[data-result="retry"]{border-color:#a74b36;background:#fff2ed}
-.word-match [role="status"]:empty{display:none}
-@media(max-width:580px){.word-match label{grid-template-columns:1fr}}
+.vocab-choices{display:flex;flex-wrap:wrap;gap:.45rem;margin:1rem 0}
+.vocab-choices button[aria-pressed="true"]{background:var(--accent);color:white;border-color:var(--accent)}
+.vocab-choices button:disabled{opacity:.55;cursor:default}
+.vocab-status{min-height:1.55em}
+.vocab-rounds{display:flex;flex-wrap:wrap;gap:.45rem}
+.vocab-rounds button[aria-pressed="true"]{background:var(--tint);border-color:var(--accent)}
 </style>
 </head>
 <body>
@@ -162,17 +162,21 @@ section h2{color:#473326}
 <details><summary>Check the answers</summary><ol><li>The fourth Thursday in November.</li><li>Plymouth.</li><li>English settlers and Wampanoag people took part. The celebration lasted three days.</li><li>Turkey. Other foods mentioned include stuffing, mashed potatoes, gravy, cranberry sauce and pumpkin pie.</li></ol></details>
 <aside>The Wampanoag already had their own traditions of giving thanks. The 1621 harvest celebration is one part of the story of Thanksgiving. <a href="https://plimoth.org/for-students/homework-help/thanksgiving">Plimoth Patuxet Museums</a></aside>
 <fieldset class="word-match">
-<legend><strong>Thanksgiving words</strong></legend>
-<p>Match the words to their meanings. Then use two of them to describe a Thanksgiving dinner.</p>
-<label><span>The food that farmers collect when it’s ready</span><select data-answer="harvest"></select></label>
-<label><span>A big meal for a special occasion</span><select data-answer="feast"></select></label>
-<label><span>Something people do regularly on special occasions</span><select data-answer="tradition"></select></label>
-<label><span>To say that you’re grateful for something</span><select data-answer="give thanks"></select></label>
-<label><span>Food that’s still there after a meal</span><select data-answer="leftovers"></select></label>
-<button type="button" id="check-words">Check the words</button>
-<p id="word-feedback" role="status"></p>
-<p><i>At Thanksgiving, people often …</i> · <i>After dinner, they can …</i></p>
-<p><strong>Ask your partner.</strong> <i>What food tradition do you have at home? What do you usually do with leftovers?</i></p>
+<legend><strong>Thanksgiving Words</strong></legend>
+<div id="vocab-rounds" class="vocab-rounds" aria-label="Vocabulary rounds">
+<button type="button" aria-pressed="true">Match the meaning</button>
+<button type="button" aria-pressed="false">Finish the line</button>
+<button type="button" aria-pressed="false">Pass the question</button>
+</div>
+<p id="vocab-instructions"></p>
+<p id="vocab-progress"></p>
+<p class="prompt" id="vocab-clue" tabindex="-1"></p>
+<div class="vocab-choices" id="vocab-choices"></div>
+<p class="vocab-status" id="vocab-feedback" role="status"></p>
+<div class="controls">
+<button type="button" id="vocab-hint">Show a hint</button>
+<button type="button" class="primary" id="vocab-next">Next card</button>
+</div>
 </fieldset>
 </section>
 <section id="menu">
@@ -517,27 +521,93 @@ roundButtons.forEach(button => {
     showRound();
   });
 });
-const wordChoices = ['feast', 'give thanks', 'harvest', 'leftovers', 'tradition'];
-const wordFields = [...document.querySelectorAll('.word-match select')];
-wordFields.forEach(field => {
-  field.add(new Option('Choose a word', ''));
-  wordChoices.forEach(word => field.add(new Option(word)));
-  field.addEventListener('change', () => {
-    field.removeAttribute('data-result');
-    get('word-feedback').textContent = '';
+const vocabulary = [
+  ['harvest', 'The food farmers collect when it’s ready.', 'In 1621, people got together to celebrate the ___.', 'It starts with h.'],
+  ['feast', 'A big meal for a special occasion.', 'Everyone brought a dish to the Thanksgiving ___.', 'It rhymes with least.'],
+  ['tradition', 'Something people do regularly on special occasions.', 'Making pumpkin pie every year is a family ___.', 'It begins with trad-.'],
+  ['give thanks', 'Say that you’re grateful for something.', 'Before we eat, let’s ___ for the good things in our lives.', 'Two words. The second is something you say when someone helps you.'],
+  ['leftovers', 'Food that’s still there after a meal.', 'We can make turkey sandwiches with the ___.', 'Think of what’s left after dinner.'],
+  ['host', 'The person who invites guests and welcomes them.', 'The ___ opened the door and invited everyone inside.', 'It starts with h and ends with t.'],
+  ['side dish', 'Something served with the main course.', 'We’re serving mashed potatoes as a ___.', 'Two words. The first tells you where it goes on the plate.'],
+  ['get together', 'Meet to spend time with other people.', 'We usually ___ at my aunt’s place for family celebrations.', 'Two words. Think of the opposite of being apart.']
+];
+const speakingCards = [
+  ['tradition', 'Guest A · Describe one food tradition in your family.', 'Guest B · Who started it, or how did it start?'],
+  ['host', 'Guest B · Imagine you’re the host. How would you welcome a guest who has never been to Thanksgiving dinner?', 'Guest A · What would you say or offer first?'],
+  ['leftovers', 'Guest A · You have leftovers. Say what you’d do with them.', 'Guest B · Would you share them or make another meal?'],
+  ['feast', 'Guest B · You can invite anyone to your feast. Who would you choose, and why?', 'Guest A · What would you serve them?']
+];
+const rounds = [
+  {instructions:'Choose the word that matches each definition.', cards:vocabulary},
+  {instructions:'Choose the word or phrase that completes each line.', cards:[...vocabulary].reverse()},
+  {instructions:'Use the word in your answer. Your partner asks a follow-up.', cards:speakingCards}
+];
+const vocabButtons = [...get('vocab-rounds').querySelectorAll('button')];
+const vocabState = rounds.map(() => ({index:0, solved:false, complete:false, hint:false}));
+let vocabRound = 0;
+function paintVocabulary(moveFocus = false) {
+  const round = rounds[vocabRound];
+  const state = vocabState[vocabRound];
+  const card = round.cards[state.index];
+  const speaking = vocabRound === 2;
+  const choices = get('vocab-choices');
+  const clue = get('vocab-clue');
+  get('vocab-instructions').textContent = round.instructions;
+  get('vocab-progress').textContent = state.complete ? 'Round complete' : 'Card ' + (state.index + 1) + ' of ' + round.cards.length;
+  clue.textContent = state.complete ? 'Well done! Choose another round or play this one again.' : speaking ? card[0] + ' · ' + card[1] : card[vocabRound + 1];
+  choices.replaceChildren();
+  if (!speaking && !state.complete) {
+    const options = vocabulary.map(([word]) => word).sort();
+    options.forEach(word => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.textContent = word;
+      button.disabled = state.solved;
+      button.setAttribute('aria-pressed', String(state.solved && word === card[0]));
+      button.addEventListener('click', () => {
+        if (word !== card[0]) {
+          get('vocab-feedback').textContent = 'Try another word.';
+          return;
+        }
+        state.solved = true;
+        paintVocabulary();
+        get('vocab-next').focus();
+      });
+      choices.append(button);
+    });
+  }
+  const hint = get('vocab-hint');
+  hint.hidden = state.complete || state.solved;
+  hint.textContent = speaking ? 'Show a follow-up' : 'Show a hint';
+  get('vocab-feedback').textContent = state.complete ? '' : state.solved ? 'Correct · ' + card[0] : state.hint ? card[speaking ? 2 : 3] : '';
+  const next = get('vocab-next');
+  next.disabled = !speaking && !state.solved && !state.complete;
+  next.textContent = state.complete ? 'Play again' : state.index + 1 === round.cards.length ? 'Finish round' : 'Next card';
+  if (moveFocus) clue.focus();
+}
+vocabButtons.forEach((button, index) => {
+  button.addEventListener('click', () => {
+    vocabRound = index;
+    vocabButtons.forEach((choice, position) => choice.setAttribute('aria-pressed', String(position === index)));
+    paintVocabulary(true);
   });
 });
-get('check-words').addEventListener('click', () => {
-  let correct = 0;
-  wordFields.forEach(field => {
-    const matches = field.value === field.dataset.answer;
-    if (matches) correct++;
-    field.dataset.result = matches ? 'correct' : 'retry';
-  });
-  get('word-feedback').textContent = correct === wordFields.length
-    ? 'All five correct! Now try using two words out loud.'
-    : correct + ' of ' + wordFields.length + ' correct. Take another look at the highlighted answers.';
+get('vocab-hint').addEventListener('click', () => {
+  vocabState[vocabRound].hint = true;
+  paintVocabulary();
 });
+get('vocab-next').addEventListener('click', () => {
+  const state = vocabState[vocabRound];
+  if (state.complete) {
+    Object.assign(state, {index:0, solved:false, complete:false, hint:false});
+  } else if (state.index + 1 === rounds[vocabRound].cards.length) {
+    state.complete = true;
+  } else {
+    Object.assign(state, {index:state.index + 1, solved:false, hint:false});
+  }
+  paintVocabulary(true);
+});
+paintVocabulary();
 </script>
 </body>
 </html>
