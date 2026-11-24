@@ -1,0 +1,543 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Thanksgiving Dinner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&family=Nunito:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:light;--paper:#ecebe2;--ink:#262d22;--accent:#963e29;--line:#cfd2bd}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:600 clamp(1.1rem,1.04rem + .3vw,1.2rem)/1.55 Nunito,system-ui,sans-serif}
+header,main,nav{max-width:62rem;margin:auto;padding:0 1.25rem}
+header{display:grid;grid-template-columns:1.15fr .85fr;align-items:center;padding-top:2rem;padding-bottom:1rem}
+header img{width:100%;max-height:17rem;object-fit:contain}
+h1,h2,h3{font-family:"Bricolage Grotesque",ui-rounded,system-ui,sans-serif;font-weight:800;letter-spacing:-.035em;line-height:1.12}
+h1{font-size:clamp(3rem,8vw,6rem);margin:.2em 0;color:var(--accent)}
+h2{font-size:clamp(1.9rem,5vw,3rem);margin:.2em 0 .55em}
+h3{margin:.5em 0}
+nav{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1rem}
+a{color:var(--accent)}
+nav a,button,select,input{border:1px solid var(--line);border-radius:.65rem;padding:.55rem .75rem;background:var(--surface, #fffdf5);color:inherit;font:inherit}
+nav a{text-decoration:none;font-weight:800}
+nav a[aria-selected="true"]{background:var(--accent);color:white;border-color:var(--accent)}
+section[hidden]{display:none}
+.lesson-picture{margin:1rem 0;max-width:24rem}
+.lesson-picture img{display:block;width:100%;height:auto;border-radius:.85rem}
+.lesson-picture figcaption{margin-top:.55rem}
+.sticker{display:block;width:clamp(6rem,20vw,10rem);height:auto}
+.dialogue-extra{display:grid;grid-template-columns:minmax(0,1fr);gap:1rem;align-items:center;margin:1rem 0;padding:1rem;background:var(--tint);border-radius:.85rem;max-width:33rem}
+.dialogue-extra .lesson-picture{max-width:none;margin:0}
+.lesson-controls[hidden]{display:none}
+.lesson-controls{display:flex;justify-content:space-between;gap:.5rem;margin:1rem 0}
+.choice-buttons{display:flex;flex-wrap:wrap;gap:.5rem}
+.choice-buttons button[aria-pressed="true"]{background:var(--tint, #efe0ba);border-color:var(--accent)}
+#lesson-title{font-size:clamp(2rem,5vw,3.6rem)}
+header{display:block}
+[role="tabpanel"]:focus{outline:none}
+button{cursor:pointer;font-weight:800}
+button.primary{background:var(--accent);color:white;border-color:var(--accent)}
+:focus-visible{outline:3px solid #9b5125;outline-offset:4px}
+section{padding:clamp(1rem,4vw,2.5rem);background:var(--surface, #fffdf5);border:1px solid var(--line);border-radius:1.2rem;margin-bottom:1.25rem;scroll-margin-top:1rem}
+aside,blockquote,.prompt{margin:1rem 0;padding:1rem;background:var(--tint, #efe0ba);border-radius:.75rem}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.8rem}
+.grid>article{border:1px solid var(--line);padding:.85rem;border-radius:.8rem}
+.dishes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.75rem;padding:0;list-style:none}
+.dishes li{border:1px solid var(--line);border-radius:.8rem;overflow:hidden;padding-bottom:.65rem}
+.dish-photo{aspect-ratio:1;background:var(--tint, #efe0ba) url(dishes.webp) no-repeat;background-size:300% 200%}
+.dishes p,.dishes select,.dishes small{margin:.55rem .55rem 0}
+.dishes select{width:calc(100% - 1.1rem);font-size:1rem}
+.dishes small{display:block}
+fieldset{border:1px solid var(--line);border-radius:.8rem;margin:1rem 0;padding:1rem;min-width:0}
+fieldset label{display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;margin:.4rem 0}
+fieldset select,fieldset input{max-width:100%}
+.stage{position:relative;aspect-ratio:3/2;max-width:34rem;margin:auto}
+.slice,.bones{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+.slice{background:transparent url(turkey.webp) center/contain no-repeat;border:0;padding:0;transition:opacity .45s,transform .45s}
+.slice:hover,.slice:focus-visible{filter:brightness(1.2)}
+.slice:focus-visible{outline:none;filter:brightness(1.42)}
+.slice.gone{opacity:0;transform:translate(var(--dx),var(--dy));pointer-events:none}
+.bones[hidden]{display:none}
+.controls{display:flex;gap:.65rem;flex-wrap:wrap}
+@media(prefers-reduced-motion:reduce){.slice{transition:none}}
+.picture-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:clamp(1rem,4vw,2rem);align-items:start}
+.picture-layout .lesson-picture{width:100%;max-width:none;margin:0}
+.picture-layout .lesson-picture img{max-height:25rem;object-fit:cover}
+.picture-layout .lesson-picture figcaption{font-size:1rem}
+.picture-layout .activity > :first-child{margin-top:0}
+#welcome,#after{--surface:#f5f6e9;--tint:#e2e8ce}
+#story,#menu{--surface:#fffaf0;--tint:#f3e4be}
+#thanks,#eat{--surface:#fff4ed;--tint:#f2dcd1}
+#question{font-size:1.2em}
+@media(max-width:640px){.picture-layout{grid-template-columns:1fr}.picture-layout .lesson-picture{max-width:24rem}.picture-layout .lesson-picture img{max-height:17rem}}
+summary{cursor:pointer;color:var(--accent)}
+footer{padding:0 0 2rem}
+@media(max-width:620px){header{grid-template-columns:1fr}header img{max-height:11rem}.dishes,.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:420px){.grid{grid-template-columns:1fr}}
+
+.candle-tray[hidden]{display:none}
+.candle-tray{display:flex;align-items:center;justify-content:space-between;gap:.75rem 1.25rem;flex-wrap:wrap;margin:0 0 1rem;padding:.8rem 1.1rem;background:#303b29;color:#fff3d8;border:1px solid #536045;border-radius:.85rem}
+.candle-tray p{margin:0}
+.candle-row{display:flex;align-items:end;gap:clamp(.55rem,2vw,1.1rem);min-height:3.5rem}
+.candle{position:relative;width:.9rem;height:2rem;border-radius:.25rem .25rem .14rem .14rem;background:linear-gradient(90deg,#748064,#a6ab92 58%,#778364)}
+.candle:nth-child(even){height:1.7rem}
+.candle::before{content:"";position:absolute;top:-.22rem;left:calc(50% - 1px);width:2px;height:.25rem;background:#b69970}
+.candle::after{content:"";position:absolute;left:50%;bottom:calc(100% + .15rem);width:.68rem;height:1rem;border-radius:70% 45% 55% 55%;background:radial-gradient(ellipse at 54% 72%,#fff9d6 13%,#ffd57a 49%,#e78233 95%);opacity:0;transform:translateX(-50%);transform-origin:50% 90%;box-shadow:0 0 .95rem .2rem #efa84c99;transition:opacity .18s}
+.candle.lit{background:linear-gradient(90deg,#d1b783,#fff2cf 56%,#e0c694)}
+.candle.lit::after{opacity:1;animation:candle-flicker 2.4s ease-in-out infinite}
+.candle:nth-child(even)::after{animation-delay:-.85s}
+@keyframes candle-flicker{0%,100%{transform:translateX(-50%) scale(1)}45%{transform:translateX(-55%) scale(1.09,.94)}70%{transform:translateX(-46%) scale(.94,1.06)}}
+.candle-tray.complete{background:#3c442c;border-color:#d4a95f;box-shadow:0 0 1.4rem #e4ae5a80;transition:background .4s,box-shadow .4s}
+@media(prefers-reduced-motion:reduce){.candle::after,.candle.lit::after,.candle-tray.complete{animation:none;transition:none}}
+body{background:radial-gradient(ellipse at 15% 0%,#f4e3bb,transparent 45rem),var(--paper)}
+header{padding-top:clamp(1.4rem,4vw,3rem)}
+#lesson-title{font-size:clamp(2.4rem,6vw,4.3rem);color:#823b2a}
+nav a{border-radius:2rem}
+nav a:hover,button:not(:disabled):hover{border-color:var(--accent)}
+section{border-top:4px solid var(--stripe,#b4873f);box-shadow:0 .5rem 1.5rem #4c382811}
+#welcome,#after{--stripe:#808e59}
+#thanks,#eat{--stripe:#b96347}
+section h2{color:#473326}
+.saved-menu{padding:.85rem 1rem;background:var(--tint);border-radius:.75rem;margin:1rem 0}
+.saved-menu ul{display:flex;flex-wrap:wrap;gap:.4rem;margin:.45rem 0 0;padding:0;list-style:none}
+.saved-menu li{padding:.22rem .65rem;background:var(--surface);border-radius:2rem}
+.round-controls{margin-top:1rem}
+#after-prompt{border-left:4px solid var(--stripe)}
+.finale{display:grid;grid-template-columns:minmax(0,1fr) minmax(5rem,10rem);align-items:center;gap:.7rem;margin:1.2rem 0 0;padding:clamp(.9rem,3vw,1.7rem);background:#f8e7b6;border:1px solid #c59a56;border-radius:1rem}
+.finale[hidden]{display:none}
+.finale h3{font-size:clamp(1.4rem,4vw,2.4rem);color:#823b2a}
+.finale p{margin-bottom:0}
+.finale img{width:100%;height:auto}
+.word-match{margin-top:1.25rem}
+.word-match label{display:grid;grid-template-columns:minmax(0,1fr) minmax(10rem,14rem);align-items:center;gap:.65rem}
+.word-match select{width:100%}
+.word-match select[data-result="correct"]{border-color:#627747;background:#edf2df}
+.word-match select[data-result="retry"]{border-color:#a74b36;background:#fff2ed}
+.word-match [role="status"]:empty{display:none}
+@media(max-width:580px){.word-match label{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header><h1 id="lesson-title">Thanksgiving Dinner</h1></header>
+<nav aria-label="Lesson stages">
+<a href="#welcome">Welcome</a><a href="#story">The story</a><a href="#menu">Plan the menu</a><a href="#thanks">Say thanks</a><a href="#eat">Let’s eat</a><a href="#after">After dinner</a>
+</nav>
+<main>
+<div class="candle-tray" id="candle-tray" hidden>
+<div class="candle-row" id="candle-row" aria-hidden="true"></div>
+<p id="candle-status" role="status"></p>
+</div>
+<section id="welcome">
+<h2>Welcome!</h2>
+<div class="picture-layout">
+<figure class="lesson-picture">
+<img src="dinner-table.webp" alt="Cartoon guests around an outdoor table decorated with pumpkins" width="600" height="600">
+<figcaption>Look at the table. What can you see? Where would you sit?</figcaption>
+</figure>
+<div class="activity"><p>You’re coming to your first Thanksgiving dinner. You can bring one thing and ask the host one question.</p>
+<ul><li>What would you bring?</li><li>What would you ask?</li></ul>
+<p>Pick something to bring. Explain your choice, then ask your partner what they would bring.</p>
+<div class="choice-buttons" id="welcome-choices">
+<button type="button" aria-pressed="false" data-prompt="Who would you share it with?">A dessert</button>
+<button type="button" aria-pressed="false" data-prompt="What would you write on the card?">A thank-you card</button>
+<button type="button" aria-pressed="false" data-prompt="What would you choose, and why?">Something else</button>
+</div>
+<p class="prompt" id="welcome-prompt" role="status">I’d bring … because …</p>
+</div></div>
+</section>
+<section id="story">
+<h2>The story behind Thanksgiving</h2>
+<p><a href="https://www.youtube.com/watch?v=Z6tK1fx8xTw" target="_blank" rel="noopener">Watch <i>What Is Thanksgiving?</i> on YouTube</a></p>
+<p><strong>First watch.</strong> Which three topics does the video talk about? <i>Dates · history · food · music · sports</i></p>
+<p><strong>Second watch.</strong> Both of you answer the same questions. Write a few words, then compare answers.</p>
+<ol>
+<li>When is Thanksgiving in the US?</li>
+<li>Where did the 1621 harvest celebration take place?</li>
+<li>Who took part? How long did it last?</li>
+<li>What’s the main dish? Can you name two other foods from the video?</li>
+</ol>
+<details><summary>Check the answers</summary><ol><li>The fourth Thursday in November.</li><li>Plymouth.</li><li>English settlers and Wampanoag people took part. The celebration lasted three days.</li><li>Turkey. Other foods mentioned include stuffing, mashed potatoes, gravy, cranberry sauce and pumpkin pie.</li></ol></details>
+<aside>The Wampanoag already had their own traditions of giving thanks. The 1621 harvest celebration is one part of the story of Thanksgiving. <a href="https://plimoth.org/for-students/homework-help/thanksgiving">Plimoth Patuxet Museums</a></aside>
+<fieldset class="word-match">
+<legend><strong>Thanksgiving words</strong></legend>
+<p>Match the words to their meanings. Then use two of them to describe a Thanksgiving dinner.</p>
+<label><span>The food that farmers collect when it’s ready</span><select data-answer="harvest"></select></label>
+<label><span>A big meal for a special occasion</span><select data-answer="feast"></select></label>
+<label><span>Something people do regularly on special occasions</span><select data-answer="tradition"></select></label>
+<label><span>To say that you’re grateful for something</span><select data-answer="give thanks"></select></label>
+<label><span>Food that’s still there after a meal</span><select data-answer="leftovers"></select></label>
+<button type="button" id="check-words">Check the words</button>
+<p id="word-feedback" role="status"></p>
+<p><i>At Thanksgiving, people often …</i> · <i>After dinner, they can …</i></p>
+<p><strong>Ask your partner.</strong> <i>What food tradition do you have at home? What do you usually do with leftovers?</i></p>
+</fieldset>
+</section>
+<section id="menu">
+<h2>Plan the menu</h2>
+<p>Match each dish to its photo and description. Then choose what to serve with the turkey.</p>
+<ol class="dishes" id="dishes"></ol>
+<button type="button" id="check">Check the dishes</button>
+<p id="match-feedback" role="status"></p>
+<div class="grid">
+<article><h3>Guest A</h3><p>Choose something you’ve never tried. Ask your partner about it before you decide.</p><p><i>What does it taste like? What would you serve it with?</i></p></article>
+<article><h3>Guest B</h3><p>Suggest something that reminds you of family celebrations. Explain why you’d serve it.</p><p><i>We usually have … at family celebrations. Could we add it to our menu?</i></p></article>
+</div>
+<fieldset>
+<legend>Your dinner menu</legend>
+<p>Agree on two different sides, a sauce and a dessert. You already have roast turkey.</p>
+<label>First side <select id="side-one"><option value="">Choose a side</option><option>Stuffing</option><option>Mashed potatoes</option><option>Family dish</option></select></label>
+<label>Second side <select id="side-two"><option value="">Choose a side</option><option>Stuffing</option><option>Mashed potatoes</option><option>Family dish</option></select></label>
+<label>Sauce <select id="sauce"><option value="">Choose a sauce</option><option>Gravy</option><option>Cranberry sauce</option></select></label>
+<label>Dessert <select id="dessert"><option value="">Choose a dessert</option><option>Pumpkin pie</option><option>Family dish</option></select></label>
+<label>Family dish <input id="family" placeholder="e.g. apple pie" maxlength="80"></label>
+<button type="button" class="primary" id="menu-button">Set the table</button>
+<p id="table-menu" role="status"></p>
+</fieldset>
+<p>Present your menu together. Each of you explains one choice. <i>We chose … because …</i></p>
+</section>
+<section id="thanks">
+<h2>Say thanks</h2>
+<div class="picture-layout">
+<figure class="lesson-picture">
+<img src="thankful-toast.webp" alt="A vintage Thanksgiving poster with two people raising their glasses above a roast turkey" width="735" height="868" loading="lazy">
+<figcaption>These guests are making a toast. What would you say before dinner?</figcaption>
+</figure>
+<div class="activity"><p>Before you eat, take a moment to thank someone or talk about something good from this week.</p>
+<blockquote>I’m thankful for my friend because she always makes me laugh.</blockquote>
+<p>Pick a prompt, take a moment to think, then say your thanks aloud.</p>
+<div class="choice-buttons" id="thanks-choices">
+<button type="button" aria-pressed="false" data-prompt="I’d like to thank … for helping me with …">Someone who helped me</button>
+<button type="button" aria-pressed="false" data-prompt="I’m thankful for … because it made me feel …">Something good this week</button>
+<button type="button" aria-pressed="false" data-prompt="I’m thankful for … because it always makes me smile.">A small everyday thing</button>
+</div>
+<p class="prompt" id="thanks-prompt" role="status">I’m thankful for … because …</p>
+</div></div>
+</section>
+<section id="eat">
+<h2>Let’s eat!</h2>
+<p>Take turns. Pick a piece, answer the question and let your partner ask one follow-up.</p>
+<div class="stage" id="stage"><img class="bones" id="bones" src="bones.webp" alt="A plate with the leftover turkey bones" hidden></div>
+<div class="prompt" id="question" role="status">Guest A, choose the first piece.</div>
+<div class="controls"><button type="button" id="next-piece">Take a piece</button><button type="button" id="reset">Reset turkey</button></div>
+<p><strong>Follow-up ideas</strong> · <i>Who usually makes it? Have you ever tried it? What would you do next?</i></p>
+</section>
+<section id="after">
+<h2>After dinner</h2>
+<p>One of you is the host and one is the guest. Use a dish from your menu, then swap roles and choose a different dish.</p>
+<div class="grid">
+<article><h3>Guest</h3><p>Thank the host, name your favourite dish and ask a question about it. Accept or politely decline the offer to take some home.</p></article>
+<article><h3>Host</h3><p>Answer your guest’s question, then offer some leftovers to take home.</p></article>
+</div>
+<div class="saved-menu" id="saved-menu" hidden>
+<strong>On your table</strong>
+<ul id="saved-dishes" aria-label="Your dinner menu"></ul>
+</div>
+<div class="choice-buttons round-controls" id="after-choices">
+<button type="button" aria-pressed="false" data-round="0">Draw a card</button>
+<button type="button" aria-pressed="false" data-round="1">Swap roles</button>
+</div>
+<p class="prompt" id="after-prompt" role="status">Choose a round to reveal your roles.</p>
+<details><summary>See a model conversation</summary>
+<p><strong>Guest</strong> · Thanks for dinner! I loved the pumpkin pie. Do you make it every year?<br><strong>Host</strong> · Yes, we do. Would you like some to take home?<br><strong>Guest</strong> · Yes, please! That’s really kind of you.</p>
+<p>To decline, try <i>No, thank you. It was delicious, though!</i></p>
+</details>
+<details>
+<summary>One last laugh</summary>
+<div class="dialogue-extra">
+<figure class="lesson-picture">
+<img src="turkey-meme.webp" alt="A person wearing a turkey on their head" width="500" height="545" loading="lazy">
+<figcaption>You open the door and see this guest. What do you say? Give your partner one line to reply to.</figcaption>
+</figure>
+
+</div>
+</details>
+<div class="finale" id="finale" hidden tabindex="-1">
+<div><h3>Happy Thanksgiving!</h3><p>Thanks for coming to dinner.</p></div>
+<img src="turkey-cat.webp" alt="A cat in a turkey costume" loading="lazy">
+</div>
+</section>
+<div class="lesson-controls" id="lesson-controls" hidden>
+<button type="button" id="previous-stage">Previous</button>
+<button type="button" class="primary" id="next-stage">Next stage</button>
+</div>
+</main>
+<script>
+const dishes = [
+  ['Roast turkey', 'A large bird cooked in the oven.'],
+  ['Stuffing', 'A savoury dish often made with bread, onions and herbs.'],
+  ['Mashed potatoes', 'Cooked potatoes mixed until soft and smooth.'],
+  ['Gravy', 'A warm sauce you can pour over meat or potatoes.'],
+  ['Cranberry sauce', 'A sweet, slightly sour sauce made with red berries.'],
+  ['Pumpkin pie', 'A sweet pie made with pumpkin and spices.']
+];
+const get = id => document.getElementById(id);
+const dishControls = dishes.map(([name, description], index) => {
+  const card = document.createElement('li');
+  const photo = document.createElement('div');
+  photo.className = 'dish-photo';
+  photo.style.backgroundPosition = (index % 3) * 50 + '% ' + Math.floor(index / 3) * 100 + '%';
+  const clue = document.createElement('p');
+  clue.textContent = description;
+  const select = document.createElement('select');
+  select.setAttribute('aria-label', description);
+  select.add(new Option('Choose a dish', ''));
+  [...dishes].sort((a,b) => a[0].localeCompare(b[0])).forEach(([dish]) => select.add(new Option(dish)));
+  const feedback = document.createElement('small');
+  card.append(photo, clue, select, feedback);
+  get('dishes').append(card);
+  select.addEventListener('change', () => {
+    feedback.textContent = '';
+    get('match-feedback').textContent = '';
+  });
+  return {name, select, feedback};
+});
+get('check').addEventListener('click', () => {
+  let correct = 0;
+  dishControls.forEach(({name, select, feedback}) => {
+    const matches = select.value === name;
+    if (matches) correct++;
+    feedback.textContent = matches ? 'Correct' : select.value ? 'Try again' : 'Choose a dish';
+  });
+  get('match-feedback').textContent = correct + ' of ' + dishes.length + ' correct.';
+});
+let dinnerMenu = [];
+get('menu-button').addEventListener('click', () => {
+  const selections = ['side-one','side-two','sauce','dessert'].map(id => get(id).value);
+  const family = get('family').value.trim();
+  const feedback = get('table-menu');
+  if (selections.includes('')) {
+    feedback.textContent = 'Choose two sides, a sauce and a dessert.';
+    return;
+  }
+  if (selections.includes('Family dish') && !family) {
+    feedback.textContent = 'Enter the name of your family dish.';
+    return;
+  }
+  const [first, second, sauce, dessert] = selections.map(dish => dish === 'Family dish' ? family : dish);
+  if (first.toLowerCase() === second.toLowerCase()) {
+    feedback.textContent = 'Choose two different sides.';
+    return;
+  }
+  dinnerMenu = ['Roast turkey', first, second, sauce, dessert];
+  feedback.textContent = dinnerMenu.join(' · ');
+  const items = dinnerMenu.map(dish => {
+    const item = document.createElement('li');
+    item.textContent = dish;
+    return item;
+  });
+  get('saved-dishes').replaceChildren(...items);
+  get('saved-menu').hidden = false;
+  showRound();
+});
+const questions = [
+  'Which dish from our menu would you try first? Why?',
+  'What’s one thing you learned about the harvest celebration in 1621?',
+  'What dish from a family celebration would you bring to this dinner?',
+  'Would you rather cook dinner or bring a dessert? Why?',
+  'If you could invite one more person to this dinner, who would you invite?',
+  'What would you do after dinner: chat, play a game or go for a walk? Why?'
+];
+const shapes = [
+  '0 0, 34% 0, 40% 45%, 23% 54%, 0 48%',
+  '34% 0, 66% 0, 62% 49%, 40% 45%',
+  '66% 0, 100% 0, 100% 53%, 80% 45%, 62% 49%',
+  '0 48%, 23% 54%, 40% 45%, 34% 100%, 0 100%',
+  '40% 45%, 62% 49%, 66% 100%, 34% 100%',
+  '62% 49%, 80% 45%, 100% 53%, 100% 100%, 66% 100%'
+];
+let turn = 0;
+function takePiece(piece) {
+  if (!piece || piece.disabled) return;
+  piece.disabled = true;
+  piece.classList.add('gone');
+  const guest = turn % 2 === 0 ? 'Guest A' : 'Guest B';
+  get('question').textContent = guest + ' · ' + questions[turn];
+  turn++;
+  const done = turn === questions.length;
+  get('bones').hidden = !done;
+  get('next-piece').disabled = done;
+  get(done ? 'reset' : 'next-piece').focus();
+}
+const slices = shapes.map((shape, index) => {
+  const piece = document.createElement('button');
+  piece.type = 'button';
+  piece.className = 'slice';
+  piece.setAttribute('aria-label', 'Take turkey piece ' + (index + 1));
+  piece.style.clipPath = 'polygon(' + shape + ')';
+  piece.style.setProperty('--dx', [-90, 0, 90][index % 3] + 'px');
+  piece.style.setProperty('--dy', (index < 3 ? -55 : 55) + 'px');
+  piece.addEventListener('click', () => takePiece(piece));
+  get('stage').append(piece);
+  return piece;
+});
+get('next-piece').addEventListener('click', () => takePiece(slices.find(piece => !piece.disabled)));
+get('reset').addEventListener('click', () => {
+  turn = 0;
+  slices.forEach(piece => {
+    piece.classList.remove('gone');
+    piece.disabled = false;
+  });
+  get('bones').hidden = true;
+  get('next-piece').disabled = false;
+  get('question').textContent = 'Guest A, choose the first piece.';
+  get('next-piece').focus();
+});
+const stageNav = document.querySelector('nav');
+const tabs = [...stageNav.querySelectorAll('a')];
+const panels = tabs.map(tab => get(tab.hash.slice(1)));
+stageNav.setAttribute('role', 'tablist');
+tabs.forEach((tab, index) => {
+  tab.id = 'tab-' + panels[index].id;
+  tab.setAttribute('role', 'tab');
+  tab.setAttribute('aria-controls', panels[index].id);
+  panels[index].setAttribute('role', 'tabpanel');
+  panels[index].setAttribute('aria-labelledby', tab.id);
+  panels[index].tabIndex = 0;
+  tab.addEventListener('click', event => {
+    event.preventDefault();
+    activateTab(index);
+  });
+  tab.addEventListener('keydown', event => {
+    const destinations = {
+      ArrowLeft: (index - 1 + tabs.length) % tabs.length,
+      ArrowRight: (index + 1) % tabs.length,
+      Home: 0,
+      End: tabs.length - 1,
+      ' ': index
+    };
+    if (!Object.hasOwn(destinations, event.key)) return;
+    event.preventDefault();
+    activateTab(destinations[event.key], 'tab');
+  });
+});
+
+const completedStages = new Set();
+const candles = tabs.map(() => {
+  const candle = document.createElement('span');
+  candle.className = 'candle';
+  get('candle-row').append(candle);
+  return candle;
+});
+function updateCandles() {
+  candles.forEach((candle, index) => candle.classList.toggle('lit', completedStages.has(index)));
+  const allLit = completedStages.size === tabs.length;
+  get('candle-tray').classList.toggle('complete', allLit);
+  get('candle-status').textContent = allLit
+    ? 'All six candles are lit. Happy Thanksgiving!'
+    : completedStages.size + ' of ' + tabs.length + ' candles lit';
+}
+get('candle-tray').hidden = false;
+updateCandles();
+
+let activeStage = 0;
+let nextTimer;
+const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
+function activateTab(index, focus = '', updateUrl = true) {
+  clearTimeout(nextTimer);
+  nextTimer = undefined;
+  activeStage = index;
+  tabs.forEach((tab, position) => {
+    const selected = position === index;
+    tab.setAttribute('aria-selected', String(selected));
+    tab.tabIndex = selected ? 0 : -1;
+    panels[position].hidden = !selected;
+  });
+  get('previous-stage').disabled = index === 0;
+  const last = index === tabs.length - 1;
+  get('next-stage').disabled = last && completedStages.has(index);
+  get('next-stage').textContent = last ? 'Finish dinner' : 'Next · ' + tabs[index + 1].textContent;
+  if (updateUrl && location.hash !== tabs[index].hash) history.pushState(null, '', tabs[index].hash);
+  if (focus === 'tab') tabs[index].focus();
+  if (focus === 'panel') {
+    panels[index].focus({preventScroll:true});
+    stageNav.scrollIntoView({block:'start'});
+  }
+}
+
+function syncTab() {
+  const index = tabs.findIndex(tab => tab.hash === location.hash);
+  activateTab(Math.max(0, index), '', false);
+}
+get('lesson-controls').hidden = false;
+get('previous-stage').addEventListener('click', () => activateTab(activeStage - 1, 'panel'));
+get('next-stage').addEventListener('click', () => {
+  if (nextTimer !== undefined) return;
+  const isFinal = activeStage === tabs.length - 1;
+  if (isFinal) {
+    tabs.forEach((_, index) => completedStages.add(index));
+  } else {
+    completedStages.add(activeStage);
+  }
+  updateCandles();
+  if (activeStage < tabs.length - 1) {
+    const nextIndex = activeStage + 1;
+    if (motionPreference.matches) {
+      activateTab(nextIndex, 'panel');
+    } else {
+      get('candle-tray').scrollIntoView({block:'nearest'});
+      nextTimer = setTimeout(() => activateTab(nextIndex, 'panel'), 500);
+    }
+  } else {
+    get('next-stage').disabled = true;
+    get('finale').hidden = false;
+    get('finale').focus();
+  }
+});
+window.addEventListener('hashchange', syncTab);
+syncTab();
+
+for (const section of ['welcome', 'thanks']) {
+  const buttons = [...get(section + '-choices').querySelectorAll('button')];
+  buttons.forEach(button => {
+    button.addEventListener('click', () => {
+      buttons.forEach(choice => choice.setAttribute('aria-pressed', String(choice === button)));
+      get(section + '-prompt').textContent = button.dataset.prompt;
+    });
+  });
+}
+const roundButtons = [...get('after-choices').querySelectorAll('button')];
+let activeRound = null;
+function showRound() {
+  if (activeRound === null) return;
+  const [,, side, , dessert] = dinnerMenu;
+  const favourite = dessert || 'a dessert from dinner';
+  const alternative = side || 'another dish from dinner';
+  const prompt = activeRound === 0
+    ? 'Guest A, you loved ' + favourite + '. Ask how it’s made and accept some to take home. Guest B, answer and offer leftovers.'
+    : 'Guest B, ask if there’s any ' + favourite + ' left. Guest A, it’s all gone. Offer ' + alternative + ' instead. Guest B, politely decline.';
+  get('after-prompt').textContent = prompt;
+}
+roundButtons.forEach(button => {
+  button.addEventListener('click', () => {
+    activeRound = Number(button.dataset.round);
+    roundButtons.forEach(choice => choice.setAttribute('aria-pressed', String(choice === button)));
+    showRound();
+  });
+});
+const wordChoices = ['feast', 'give thanks', 'harvest', 'leftovers', 'tradition'];
+const wordFields = [...document.querySelectorAll('.word-match select')];
+wordFields.forEach(field => {
+  field.add(new Option('Choose a word', ''));
+  wordChoices.forEach(word => field.add(new Option(word)));
+  field.addEventListener('change', () => {
+    field.removeAttribute('data-result');
+    get('word-feedback').textContent = '';
+  });
+});
+get('check-words').addEventListener('click', () => {
+  let correct = 0;
+  wordFields.forEach(field => {
+    const matches = field.value === field.dataset.answer;
+    if (matches) correct++;
+    field.dataset.result = matches ? 'correct' : 'retry';
+  });
+  get('word-feedback').textContent = correct === wordFields.length
+    ? 'All five correct! Now try using two words out loud.'
+    : correct + ' of ' + wordFields.length + ' correct. Take another look at the highlighted answers.';
+});
+</script>
+</body>
+</html>
