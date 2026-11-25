@@ -18,6 +18,18 @@
     if (!ready || !c) return null;
     return rpc("get_portal", { p_code: c });
   }
+  function getRecommendations(c) {
+    return rpc("get_recommendations", { p_code: c });
+  }
+  function tryRecommendation(c, id) {
+    return rpc("try_recommendation", { p_code: c, p_id: id });
+  }
+  function recommendationUrl(value) {
+    try {
+      const url = new URL(value);
+      return ["http:", "https:"].includes(url.protocol) ? url.href : null;
+    } catch (e) { return null; }
+  }
   async function log(activity, score, total, details) {
     const c = code();
     if (!ready || !c) return false;
@@ -42,5 +54,5 @@
       return { id, title: u.searchParams.get("t") || "Speaking", qs, max, keys: qs.map((_, i) => id + "-" + (i + 1)) };
     } catch (e) { return null; }
   }
-  window.Portal = { client, ready, code, getPortal, log, withCode, speakTask };
+  window.Portal = { client, ready, code, getPortal, getRecommendations, tryRecommendation, recommendationUrl, log, withCode, speakTask };
 })();

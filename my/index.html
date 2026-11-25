@@ -8,7 +8,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
 <link rel="stylesheet" href="../assets/portal.css?v=2">
 <script src="../assets/config.js?v=19"></script>
-<script src="../assets/portal.js?v=4"></script>
+<script src="../assets/portal.js?v=5"></script>
 <script src="../assets/auto-materials.js?v=3"></script>
 <script src="../assets/groups.js?v=1"></script>
 <script src="../assets/group-board.js?v=1"></script>
@@ -56,7 +56,7 @@ body[data-pattern="confetti"]{background-image:radial-gradient(circle at 20% 30%
 .preview{font-size:44px;line-height:1}
 .dtabs{display:flex;gap:6px;flex-wrap:wrap}
 .dtab{appearance:none;cursor:pointer;font:inherit;font-weight:700;font-size:14px;border-radius:999px;padding:6px 14px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
-.dtab[aria-selected="true"]{background:var(--green);border-color:var(--green);color:var(--card)}
+.dtab[aria-pressed="true"],.dtab[aria-selected="true"]{background:var(--green);border-color:var(--green);color:var(--card)}
 .dbody{overflow-y:auto;min-height:180px;padding:2px}
 .hint{font-size:14px;color:var(--muted);margin-bottom:10px}
 .opts{display:grid;gap:8px}
@@ -97,6 +97,19 @@ body[data-pattern="confetti"]{background-image:radial-gradient(circle at 20% 30%
     </div>
   </header>
 
+  <nav class="dtabs" id="portalViews" aria-label="Portal sections" hidden>
+    <button class="dtab" type="button" id="materialsView" aria-controls="materialsPage" aria-pressed="true">My materials</button>
+    <button class="dtab" type="button" id="recommendationsView" aria-controls="recommendationsPage" aria-pressed="false">Recommended by Polina</button>
+  </nav>
+
+  <section class="panel" id="recommendationsPage" hidden>
+    <h2>Recommended by Polina</h2>
+    <p class="muted">Optional ideas for using English in everyday life.</p>
+    <p class="muted" id="recommendationStatus" role="status"></p>
+    <div class="grid" id="recommendations"></div>
+  </section>
+
+  <div id="materialsPage" style="display:grid;gap:24px">
   <section class="panel gb" id="groupBoard" hidden aria-label="Group competition"></section>
 
   <section class="panel" id="todoPanel" hidden>
@@ -106,7 +119,7 @@ body[data-pattern="confetti"]{background-image:radial-gradient(circle at 20% 30%
 
   <section class="panel" id="badgePanel" hidden>
     <div class="row" style="justify-content:space-between"><h2>My badges</h2><span class="count" id="badgeCount"></span></div>
-    <p class="muted">Do your homework to collect badges. Some badges unlock new avatars and stickers.</p>
+    <p class="muted">Collect badges by practising English. Some badges unlock new avatars and stickers.</p>
     <div class="badges" id="badges"></div>
   </section>
 
@@ -115,6 +128,8 @@ body[data-pattern="confetti"]{background-image:radial-gradient(circle at 20% 30%
     <div class="tabs" id="filters"></div>
     <div class="grid" id="lib"></div>
   </section>
+
+  </div>
 
   <p class="notice" id="msg" hidden></p>
 </div>
@@ -288,7 +303,7 @@ async function saveLook(){
 }
 
 /* =================== Badges =================== */
-let RES=[],MATS=[],earnedIds=new Set();
+let RES=[],MATS=[],earnedIds=new Set(), recommendationBadge=null;
 function badgeList(){
   const ex=RES.filter(r=>!r.activity.startsWith("done:")&&!r.activity.startsWith("me:")&&r.activity.includes("/"));
   const pass=ex.filter(r=>r.total&&r.best/r.total>=0.8),perfect=ex.filter(r=>r.total&&r.best>=r.total);
@@ -311,6 +326,9 @@ function badgeList(){
     {id:"perfect5",e:"🌟",t:"Star student",d:"Get 100% in 5 exercises",ok:perfect.length>=5},
     {id:"hw3",e:"🏆",t:"Champion",d:"Finish 3 homeworks",ok:done.length>=3},
     {id:"twenty",e:"🚀",t:"Unstoppable",d:"Finish 20 exercises",ok:pass.length>=20},
+    ...(recommendationBadge === null ? [] : [
+      {id:"english-in-real-life",e:"🌍",t:"English in Real Life",d:"Try a recommendation from Polina",ok:recommendationBadge}
+    ]),
     ...(window.GroupBoard?GroupBoard.badges():[])
   ];
 }
@@ -336,6 +354,108 @@ function celebrate(fresh){
   for(let i=0;i<18;i++){const s=document.createElement("span");s.className="burst";s.textContent=bits[i%bits.length];
     s.style.left="50%";s.style.top="70%";s.style.setProperty("--x",(Math.random()*600-300)+"px");s.style.setProperty("--y",(-200-Math.random()*350)+"px");s.style.setProperty("--r",(Math.random()*540-270)+"deg");
     document.body.appendChild(s);setTimeout(()=>s.remove(),1500)}
+}
+
+/* =================== Recommendations =================== */
+function setupRecommendations(code) {
+  const get = id => document.getElementById(id);
+  const status = get("recommendationStatus");
+  const list = get("recommendations");
+  const materials = get("materialsView");
+  const recommendations = get("recommendationsView");
+  function show(open) {
+    materials.setAttribute("aria-pressed", !open);
+    recommendations.setAttribute("aria-pressed", open);
+    get("materialsPage").hidden = open;
+    get("recommendationsPage").hidden = !open;
+  }
+  materials.onclick = () => show(false);
+  recommendations.onclick = () => { show(true); if (!list.querySelector("button[data-saving]")) load(); };
+  get("badgeLink").onclick = () => show(false);
+  get("portalViews").hidden = false;
+
+  async function load() {
+    if (recommendations.getAttribute("aria-busy") === "true") return;
+    recommendations.setAttribute("aria-busy", "true");
+    status.textContent = "Loading recommendations…";
+    try {
+      const {items, earned} = await Portal.getRecommendations(code);
+      list.replaceChildren();
+      status.textContent = items.length ? "" : "Polina hasn’t added any recommendations yet.";
+      const hasBadge = Boolean(recommendationBadge || earned);
+      if (recommendationBadge !== hasBadge) {
+        recommendationBadge = hasBadge;
+        refreshBadges();
+      }
+      for (const item of items) {
+        const card = document.createElement("article");
+        card.className = "item";
+        card.style.overflowWrap = "anywhere";
+        const title = document.createElement("h3");
+        title.textContent = item.title;
+        card.append(title);
+        if (item.note) {
+          const note = document.createElement("p");
+          note.textContent = item.note;
+          note.style.whiteSpace = "pre-wrap";
+          card.append(note);
+        }
+        const actions = document.createElement("div");
+        actions.className = "row";
+        card.append(actions);
+        const url = Portal.recommendationUrl(item.url);
+        if (url) {
+          const link = document.createElement("a");
+          link.className = "btn ghost small";
+          link.href = url;
+          link.target = "_blank";
+          link.rel = "noopener noreferrer";
+          link.textContent = "Open link";
+          link.setAttribute("aria-label", "Open link for " + item.title + " (new tab)");
+          actions.append(link);
+        }
+        const tried = document.createElement("button");
+        tried.type = "button";
+        tried.className = "btn small";
+        tried.textContent = item.tried_at ? "Tried" : "I tried it";
+        tried.disabled = Boolean(item.tried_at);
+        tried.onclick = async () => {
+          tried.disabled = true;
+          tried.dataset.saving = "";
+          status.textContent = "";
+          try {
+            if (!await Portal.tryRecommendation(code, item.id)) {
+              await load();
+              recommendations.focus();
+              status.textContent = "This recommendation is no longer active.";
+              return;
+            }
+            tried.textContent = "Tried";
+            if (!recommendationBadge) {
+              recommendationBadge = true;
+              refreshBadges();
+            }
+            status.textContent = "Marked as tried.";
+            if (!get("recommendationsPage").hidden) recommendations.focus();
+          } catch (error) {
+            tried.disabled = false;
+            status.textContent = "Couldn’t save. Please try again.";
+            if (!get("recommendationsPage").hidden) tried.focus();
+          } finally {
+            delete tried.dataset.saving;
+          }
+        };
+        actions.append(tried);
+        list.append(card);
+      }
+    } catch (error) {
+      status.textContent = "Couldn’t load recommendations. Select this section to try again.";
+    } finally {
+      recommendations.removeAttribute("aria-busy");
+    }
+  }
+
+  load();
 }
 
 /* =================== Page =================== */
@@ -379,6 +499,7 @@ themeCss();
       fl.querySelectorAll(".tab").forEach(b=>b.setAttribute("aria-selected",b.dataset.k===k))}
     kinds.forEach(k=>{const b=document.createElement("button");b.className="tab";b.dataset.k=k;b.textContent=k==="all"?"All":(KIND[k]||k);b.onclick=()=>draw(k);fl.appendChild(b)});
     draw("all");
+    setupRecommendations(code);
   }catch(e){msg.hidden=false;msg.textContent="Something went wrong while loading. Please refresh the page.";console.error(e)}
 })();
 </script>
