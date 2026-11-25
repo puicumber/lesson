@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex">
 <title>Before the Encore</title>
-<script src="../../assets/config.js?v=20"></script>
+<script src="../../assets/config.js?v=21"></script>
 <script src="../../assets/portal.js?v=3"></script>
 <script src="../../assets/track.js?v=3"></script>
 <style>
@@ -20,6 +20,8 @@ h2{font-size:clamp(1.65rem,5vw,2.4rem)}
 p{margin:.7em 0}
 nav{display:flex;flex-wrap:wrap;gap:.5rem 1.15rem;margin:1rem 0}
 a{color:var(--accent);text-underline-offset:.25em}
+nav a{padding:.35rem .7rem;border:1px solid var(--edge);border-radius:.45rem;text-decoration:none}
+nav a[aria-current="page"]{background:var(--accent);border-color:var(--accent);color:var(--bg);font-weight:700}
 section{margin-top:2.5rem;scroll-margin-top:1rem}
 fieldset{margin:.85rem 0;padding:.8rem 1rem 1rem;border:1px solid var(--edge);border-radius:.75rem;background:var(--panel);min-width:0}
 legend{padding:0 .4rem;font-weight:650;max-width:100%}
@@ -46,15 +48,15 @@ summary{font-weight:700;color:var(--accent)}
 <header>
 <h1>Before the Encore</h1>
 <p>Music vocabulary, narrative tenses, and the story of Sixto Rodriguez.</p>
-<nav aria-label="Homework sections"><a href="#words">Vocabulary</a><a href="#forms">Two past perfect forms</a><a href="#gig">The gig</a><a href="#retell">Oral retell</a></nav>
+<nav aria-label="Homework sections"><a href="#words">Vocabulary</a><a href="#forms">Narrative tenses</a><a href="#gig">The gig</a><a href="#retell">Oral retell</a></nav>
 <p id="save" role="status">Loading saved answers…</p>
 </header>
 
 <section id="words"><h2>How do you listen?</h2><p>Choose the word or phrase that best fits each description.</p></section>
-<section id="forms"><h2>What happened before?</h2><p>Choose the form that best fits the context. Select <strong>Both work</strong> if either form sounds natural here.</p></section>
-<section id="gig"><h2>The wrong recording</h2><p>Complete the story. Choose a form that puts each event in the right place on the timeline.</p><div class="story" id="story"></div></section>
+<section id="forms" hidden><h2>Narrative tenses</h2><p>Choose the form that best fits the context. Select <strong>Both work</strong> if either form sounds natural here.</p></section>
+<section id="gig" hidden><h2>The wrong recording</h2><p>Complete the story. Choose a form that puts each event in the right place on the timeline.</p><div class="story" id="story"></div></section>
 
-<section id="retell">
+<section id="retell" hidden>
 <h2>The musician with two lives</h2>
 <p>Read the story, close the reading, and retell it aloud in about a minute. You can use the cue words below.</p>
 <details id="reading" open>
@@ -110,6 +112,27 @@ const passages = [
 const Track = window.Track;
 const activities = new Map();
 const byId = id => document.getElementById(id);
+const screens = Array.from(document.querySelectorAll("nav a"), link => ({
+ link,
+ id: link.getAttribute("href").slice(1)
+}));
+function showScreen(moveFocus = false) {
+ const id = location.hash.slice(1);
+ const active = screens.find(screen => screen.id === id) || screens[0];
+ for (const screen of screens) {
+  byId(screen.id).hidden = screen !== active;
+  if (screen === active) screen.link.setAttribute("aria-current", "page");
+  else screen.link.removeAttribute("aria-current");
+ }
+ if (moveFocus) {
+  const heading = byId(active.id).querySelector("h2");
+  heading.tabIndex = -1;
+  heading.focus({ preventScroll: true });
+  window.scrollTo(0, 0);
+ }
+}
+showScreen();
+window.addEventListener("hashchange", () => showScreen(true));
 function make(tag, text = "") {
  const element = document.createElement(tag);
  element.textContent = text;

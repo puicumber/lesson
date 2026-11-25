@@ -5,7 +5,7 @@ window.PORTAL_CONFIG = {
 };
 // Exercises inside each material, used to show progress
 window.PORTAL_ACTIVITIES = {
-  encore: { encoreWords: "Music vocabulary", encoreForms: "Past perfect forms", encoreGig: "Narrative tenses", encoreRetell: "Rodriguez oral retell" },
+  encore: { encoreWords: "Music vocabulary", encoreForms: "Narrative tenses", encoreGig: "The gig", encoreRetell: "Rodriguez oral retell" },
   "grivas-unit-2": { g2_forms: "Word choice", g2_patterns: "Patterns & similes", g2_rewrite: "Key word transformations" },
   money: { cards: "Flashcards", nouns: "Nouns", verbs: "Verbs", preps: "Prepositions", phrasal: "Phrasal verbs", spell: "Spelling" },
   cpe: { mc: "Part 1 · Multiple choice", cloze: "Part 2 · Open cloze", wordform: "Part 3 · Word formation", kwt: "Part 4 · Transformations" },
