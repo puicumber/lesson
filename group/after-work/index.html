@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>After Work · English Lesson</title>
+<style>
+:root {color-scheme:light; --ink:#20352f; --green:#22584a; --paper:#f7f4ec; --line:#c8d5c9}
+* {box-sizing:border-box}
+body {margin:0;background:var(--paper);color:var(--ink);font:1.06rem/1.6 system-ui,sans-serif}
+header {background:#183c34;color:#fff;padding:3rem max(1rem,calc((100% - 52rem)/2))}
+h1,h2 {font-family:Georgia,serif;line-height:1.15;margin:0 0 .65em}
+h1 {font-size:clamp(3rem,9vw,6rem);margin:.12em 0}
+h2 {font-size:clamp(1.8rem,5vw,2.6rem)}
+header p {margin:.4rem 0 0}
+main {max-width:54rem;margin:auto;padding:1rem}
+nav, .options {display:flex;flex-wrap:wrap;gap:.55rem}
+nav {margin:.6rem 0 1.3rem}
+section {background:#fff;border:1px solid var(--line);border-radius:1rem;padding:clamp(1rem,4vw,2rem);margin-bottom:1rem;scroll-margin-top:1rem}
+a,button,summary {cursor:pointer}
+nav a,button {display:inline-block;border:1px solid var(--green);border-radius:.6rem;padding:.45rem .85rem;color:var(--green);background:#fff;font:inherit;text-decoration:none}
+button:hover,nav a:hover {background:#e7f0e9}
+:focus-visible {outline:3px solid #a1502a;outline-offset:3px}
+details {border-bottom:1px solid var(--line);padding:.55rem 0}
+summary {font-weight:650}
+details p {margin:.35rem 0 .25rem}
+fieldset {border:0;padding:0;margin:1rem 0;min-width:0}
+legend {font-weight:650;margin-bottom:.35rem}
+.feedback {min-height:1.6em;margin:.25rem 0}
+[aria-pressed="true"],[data-state="correct"] {font-weight:bold;background:#dceee2}
+[data-state="retry"] {border-color:#a1502a}
+.prompt {background:#edf3ed;padding:.9rem 1rem;border-radius:.6rem}
+label {display:block;font-weight:650}
+textarea {width:100%;font:inherit;border:1px solid var(--green);border-radius:.6rem;padding:.65rem}
+</style>
+</head>
+<body>
+<header>
+<p>English lesson · Work and evenings</p>
+<h1>After Work</h1>
+<p>Say when you finish work and what you do next.</p>
+</header>
+<main>
+<nav aria-label="Lesson sections">
+<a href="#check-in">Check in</a><a href="#start">Start</a><a href="#phrases">Warm-up</a><a href="#story">Read</a><a href="#practice">Practise</a><a href="#choices">Make a plan</a><a href="#speak">Speak</a><a href="#finish">Finish</a>
+</nav>
+<section id="check-in">
+<h2>How are you doing?</h2>
+<p>Answer for today first. Then pick a card and answer as that person. Can your teacher guess what happened?</p>
+<div class="options" id="check-in-cards" aria-label="Pick a mystery card">
+<button type="button" data-card="0">Card A</button>
+<button type="button" data-card="1">Card B</button>
+<button type="button" data-card="2">Card C</button>
+<button type="button" data-card="3">Card D</button>
+</div>
+<p class="prompt" id="check-in-situation" aria-live="polite">Pick a card. If you’re screen-sharing, ask your teacher to look away while you read it.</p>
+<details id="check-in-model" hidden>
+<summary>Show a possible answer</summary>
+<p id="check-in-example"></p>
+</details>
+<p>Swap roles. After you answer, ask <strong>How about you?</strong></p>
+<details>
+<summary>Help me answer for real</summary>
+<p><strong>Answer</strong> · Pretty good. / I’m okay. / I’m a bit tired. / I’m a little stressed.</p>
+<p><strong>Add one detail</strong> · I had a busy day. / I didn’t sleep well. / I had a quiet day. / I finished work early.</p>
+<p><strong>Example</strong> · I’m a bit tired. I had a busy day. How about you?</p>
+</details>
+</section>
+<section id="start">
+<h2>Let’s talk</h2>
+<p>What time do you finish work? What do you do after work?</p>
+<p class="prompt">Need a word? Ask <strong>How do you say … in English?</strong></p>
+</section>
+<section id="phrases">
+<h2>Quick recall</h2>
+<p>Say three phrases in English. Open the cards to check.</p>
+<details><summary>Заканчиваю работу</summary><p>I finish work <strong>at</strong> six.</p></details>
+<details><summary>Иду сразу домой</summary><p>I go straight home after work.</p></details>
+<details><summary>Ужинаю</summary><p>I have dinner <strong>at</strong> home.</p></details>
+<details><summary>Обычно устаю</summary><p>I’m usually tired after work.</p></details>
+<details><summary>Отдыхаю вечером</summary><p>I relax <strong>in</strong> the evening.</p></details>
+<details><summary>А ты?</summary><p>What about you?</p></details>
+</section>
+<section id="story">
+<h2>Two evenings after work</h2>
+<p>Read the messages. Who has to do something before going home?</p>
+<div class="prompt">
+<p><strong>Anna · Monday</strong><br>I finish work at six. I <strong>pick up some groceries</strong> on my way home. At home, I <strong>make something quick</strong> for dinner. I’m tired, so I <strong>have an early night</strong>.</p>
+<p><strong>Ben · Monday</strong><br>I finish work at seven. I come home, <strong>get changed</strong> and <strong>order takeaway</strong>. I <strong>feel like watching</strong> something funny, so I watch a comedy.</p>
+</div>
+<fieldset data-answer="Anna"><legend>Who stops somewhere before going home?</legend>
+<div class="options"><button type="button">Anna</button><button type="button">Ben</button></div>
+<p class="feedback" role="status"></p></fieldset>
+<fieldset data-answer="Ben"><legend>Who changes clothes after work?</legend>
+<div class="options"><button type="button">Anna</button><button type="button">Ben</button></div>
+<p class="feedback" role="status"></p></fieldset>
+<fieldset data-answer="Anna"><legend>Who goes to bed early?</legend>
+<div class="options"><button type="button">Anna</button><button type="button">Ben</button></div>
+<p class="feedback" role="status"></p></fieldset>
+<h3>What do the phrases mean?</h3>
+<p>Find each phrase in the messages. Guess the meaning, then open the card. Choose three you could use this week.</p>
+<details><summary>pick up some groceries</summary><p>Buy some food to take home. <span lang="ru">Купить продукты по пути.</span></p></details>
+<details><summary>make something quick</summary><p>Make food that takes a short time. <span lang="ru">Приготовить что-нибудь на скорую руку.</span></p></details>
+<details><summary>have an early night</summary><p>Go to bed early. <span lang="ru">Лечь спать пораньше.</span></p></details>
+<details><summary>get changed</summary><p>Put on different clothes. <span lang="ru">Переодеться.</span></p></details>
+<details><summary>order takeaway</summary><p>Order food from a restaurant to eat at home. <span lang="ru">Заказать готовую еду.</span></p></details>
+<details><summary>feel like watching a comedy</summary><p>Want to watch a comedy. <span lang="ru">Хочется посмотреть комедию.</span></p></details>
+</section>
+<section id="practice">
+<h2>Build the phrases</h2>
+<p>Choose the phrase that fits the situation. Then say what you do in that situation.</p>
+<fieldset data-answer="pick up some groceries"><legend>There’s no milk or bread at home. I stop at the shop to …</legend>
+<div class="options"><button type="button">get changed</button><button type="button">pick up some groceries</button><button type="button">have an early night</button></div>
+<p class="feedback" role="status"></p></fieldset>
+<fieldset data-answer="make something quick"><legend>I’ve got eggs and ten minutes. I can …</legend>
+<div class="options"><button type="button">make something quick</button><button type="button">get changed</button><button type="button">pick up some groceries</button></div>
+<p class="feedback" role="status"></p></fieldset>
+<fieldset data-answer="order takeaway"><legend>I want pizza from the restaurant. I think I’ll …</legend>
+<div class="options"><button type="button">have an early night</button><button type="button">pick up some groceries</button><button type="button">order takeaway</button></div>
+<p class="feedback" role="status"></p></fieldset>
+<fieldset data-answer="watching"><legend>I want to see something funny. I feel like ___ a comedy.</legend>
+<div class="options"><button type="button">making</button><button type="button">watching</button><button type="button">ordering</button></div>
+<p class="feedback" role="status"></p></fieldset>
+<fieldset data-answer="get changed"><legend>I’m still in my work clothes. I’m going to …</legend>
+<div class="options"><button type="button">order takeaway</button><button type="button">get changed</button><button type="button">make something quick</button></div>
+<p class="feedback" role="status"></p></fieldset>
+<fieldset data-answer="have an early night"><legend>I’m really tired, and I want to go to bed at nine. I’ll …</legend>
+<div class="options"><button type="button">have an early night</button><button type="button">pick up some groceries</button><button type="button">get changed</button></div>
+<p class="feedback" role="status"></p></fieldset>
+<details><summary>Quick review · at, in or on?</summary>
+<fieldset data-answer="on"><legend>I finish at seven ___ Mondays.</legend><div class="options"><button type="button">at</button><button type="button">in</button><button type="button">on</button></div><p class="feedback" role="status"></p></fieldset>
+<fieldset data-answer="at"><legend>I get home ___ seven.</legend><div class="options"><button type="button">on</button><button type="button">at</button><button type="button">in</button></div><p class="feedback" role="status"></p></fieldset>
+<fieldset data-answer="in"><legend>I relax ___ the evening.</legend><div class="options"><button type="button">on</button><button type="button">in</button><button type="button">at</button></div><p class="feedback" role="status"></p></fieldset>
+</details>
+</section>
+<section id="choices">
+<h2>What’s the plan?</h2>
+<p>Choose a situation. Tell your teacher two things you want to do. Ask what they want to do, then agree on a plan.</p>
+<div class="options" id="scenarios">
+<button type="button" data-scene="late" aria-pressed="true">A late finish</button>
+<button type="button" data-scene="empty" aria-pressed="false">An empty fridge</button>
+<button type="button" data-scene="free" aria-pressed="false">A free evening</button>
+</div>
+<p class="prompt" id="scene" aria-live="polite">It’s 8 p.m. You’ve just got home. You’re hungry and tired.</p>
+<details><summary>Show a model conversation</summary>
+<p><strong>A</strong> I feel like ordering takeaway. What about you?<br>
+<strong>B</strong> I can make something quick. I’ve got some eggs.<br>
+<strong>A</strong> Okay. Let’s eat, then have an early night.</p></details>
+<p>Try again with a different situation. This time, give one reason using <strong>because</strong>.</p>
+</section>
+<section id="speak">
+<h2>Your turn</h2>
+<p>Take turns asking and answering. Use real details when you can.</p>
+<p class="prompt" id="question" aria-live="polite">What time do you finish work?</p>
+<button type="button" id="next">Next question</button>
+<details id="hint"><summary>Show a sentence starter</summary><p id="starter">I finish work at …</p></details>
+<p>After you answer, ask <strong>What about you?</strong></p>
+</section>
+<section id="finish">
+<h2>Before you go</h2>
+<p>Try the check-in again. <strong>How are you doing?</strong> Give a real answer, add one detail, and ask back.</p>
+<p>Describe a real evening. Say when you finish work and what you do next. Use two phrases from the lesson and ask your teacher one question.</p>
+<p class="prompt"><strong>finish work</strong> · <strong>after work</strong> · <strong>in the evening</strong></p>
+<label for="notes">Three phrases to practise before next time</label>
+<textarea id="notes" rows="3" aria-describedby="note-help"></textarea>
+<p id="note-help">Copy your phrases before closing the page.</p>
+</section>
+</main>
+<script>
+const checkInCards = [
+  ['You had lots to do at work today.', 'I’m a bit tired. I had a busy day.'],
+  ['You’re home early and have time to relax.', 'Pretty good. I finished work early.'],
+  ['You went to bed late and woke up early.', 'I’m a bit tired. I didn’t sleep well.'],
+  ['Work was calm today. You had time for lunch.', 'I’m doing well. I had a quiet day.']
+];
+const checkInButtons = document.querySelectorAll('#check-in-cards button');
+const checkInModel = document.querySelector('#check-in-model');
+for (const button of checkInButtons) {
+  button.setAttribute('aria-pressed', 'false');
+  button.addEventListener('click', () => {
+    const [situation, example] = checkInCards[Number(button.dataset.card)];
+    checkInModel.open = false;
+    checkInModel.hidden = false;
+    document.querySelector('#check-in-situation').textContent = situation;
+    document.querySelector('#check-in-example').textContent = example;
+    for (const option of checkInButtons) {
+      option.setAttribute('aria-pressed', String(option === button));
+    }
+  });
+}
+
+function completeSentence(prompt, answer) {
+  if (prompt.includes('___')) return prompt.replace('___', answer);
+  if (prompt.endsWith(' …')) return prompt.replace(/ …$/, ' ' + answer + '.');
+  return 'Correct!';
+}
+
+const scenes = {
+  late: 'It’s 8 p.m. You’ve just got home. You’re hungry and tired.',
+  empty: 'You finish work at six. There’s almost nothing to eat at home.',
+  free: 'It’s Friday. You finish work early and have no plans for the evening.'
+};
+const scenarioButtons = document.querySelectorAll('#scenarios button');
+for (const button of scenarioButtons) {
+  button.addEventListener('click', () => {
+    for (const option of scenarioButtons) option.setAttribute('aria-pressed', String(option === button));
+    document.querySelector('#scene').textContent = scenes[button.dataset.scene];
+  });
+}
+
+for (const exercise of document.querySelectorAll('fieldset[data-answer]')) {
+  const choices = exercise.querySelectorAll('button');
+  const feedback = exercise.querySelector('.feedback');
+  for (const choice of choices) {
+    choice.addEventListener('click', () => {
+      for (const button of choices) delete button.dataset.state;
+      const correct = choice.textContent === exercise.dataset.answer;
+      choice.dataset.state = correct ? 'correct' : 'retry';
+      feedback.textContent = correct
+        ? completeSentence(exercise.querySelector('legend').textContent, choice.textContent)
+        : 'Try another word.';
+    });
+  }
+}
+const prompts = [
+  ['What time do you finish work?', 'I finish work at …'],
+  ['Where do you go after work?', 'I go …'],
+  ['When do you pick up groceries?', 'I pick up groceries …'],
+  ['What can you make when you only have ten minutes?', 'I can make …'],
+  ['When do you order takeaway?', 'I order takeaway when …'],
+  ['What do you feel like watching tonight?', 'I feel like watching …'],
+  ['Are you usually tired after work?', 'Yes, I am. / No, I’m not.'],
+  ['What do you do in the evening?', 'In the evening, I …']
+];
+let current = 0;
+document.querySelector('#next').addEventListener('click', () => {
+  current = (current + 1) % prompts.length;
+  const [question, starter] = prompts[current];
+  document.querySelector('#hint').open = false;
+  document.querySelector('#question').textContent = question;
+  document.querySelector('#starter').textContent = starter;
+});
+</script>
+</body>
+</html>
