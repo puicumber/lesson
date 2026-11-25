@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>After Work · Homework</title>
+<script src="../../assets/config.js?v=after-work-homework-1"></script>
+<script src="../../assets/portal.js?v=3"></script>
+<script src="../../assets/track.js?v=3"></script>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#faf1e6;color:#30243e;font:1.05rem/1.55 system-ui,sans-serif}
+main{max-width:48rem;margin:auto;padding:1rem}header{background:#39284e;color:#fff;padding:clamp(1.5rem,5vw,3rem);border-radius:1.2rem}
+h1,h2{font-family:Georgia,serif;line-height:1.15;margin:.2em 0 .45em}h1{font-size:clamp(2.6rem,8vw,4.4rem)}h2{font-size:1.8rem}
+header p{margin:.25rem 0}section{background:#fffdf9;border:1px solid #d9cadb;border-radius:1rem;margin:1rem 0;padding:clamp(1rem,4vw,1.75rem)}
+fieldset{border:0;border-top:1px solid #e3d6e5;padding:.6rem 0 0;margin:1.15rem 0;min-width:0}legend{font-weight:650;padding-right:.5rem}
+.options{display:flex;flex-wrap:wrap;gap:.5rem}button{font:inherit;background:#fff;color:#472459;border:1px solid #78558b;padding:.42rem .75rem;border-radius:.6rem;cursor:pointer}
+button:hover{background:#f5e9fa}button:focus-visible,summary:focus-visible{outline:3px solid #9e4a11;outline-offset:3px}
+button[aria-pressed=true][data-result=correct]{background:#e2f1df;color:#214c29}
+button[aria-pressed=true][data-result=retry]{background:#ffeddf;color:#792f16}
+.feedback{margin:.35rem 0;min-height:1.5em}.summary{font-weight:650}.cue{background:#f1e8f5;padding:.8rem;border-radius:.6rem}summary{cursor:pointer}
+</style>
+</head>
+<body>
+<main>
+<header><p>Homework</p><h1>After Work</h1><p>Practise what you do after work and what to say when someone checks in.</p></header>
+<p id="save" role="status">Loading your answers…</p>
+<section id="awhVocab" aria-labelledby="vocab-title">
+<h2 id="vocab-title">On the way home</h2>
+<p>Choose the best phrase for each situation.</p>
+<div class="items"></div><p class="summary" role="status"></p><button type="button" class="reset" disabled>Start this exercise again</button>
+</section>
+<section id="awhCheckin" aria-labelledby="checkin-title">
+<h2 id="checkin-title">How are you doing?</h2>
+<p>Choose the reply that fits. Say it out loud.</p>
+<div class="items"></div><p class="summary" role="status"></p><button type="button" class="reset" disabled>Start this exercise again</button>
+</section>
+<section>
+<h2>Say it for real</h2>
+<p>Imagine your lesson is starting. Answer out loud with one true detail about today. Then ask the question back.</p>
+<p class="cue">How are you doing?</p>
+<details><summary>I need a little help</summary>
+<p>I’m pretty good. / I’m okay. / I’m a bit tired.</p>
+<p>I had a busy day. / I finished work early. / I didn’t sleep well.</p>
+<p>How about you?</p>
+</details>
+<p>Try again with the help closed.</p>
+</section>
+</main>
+<script>
+const tasks = {
+  awhVocab: [
+    ['We need bread and milk. Can you stop at the shop?', ['Pick up some groceries.', 'Get changed.', 'Have an early night.'], 0],
+    ['You get home in your work clothes. You want to put on a T-shirt.', ['Order takeaway.', 'Get changed.', 'Make something quick.'], 1],
+    ['You have some pasta and fifteen minutes to cook.', ['Have an early night.', 'Pick up some groceries.', 'Make something quick.'], 2],
+    ['You don’t want to cook. You call a restaurant for pizza.', ['Make something quick.', 'Order takeaway.', 'Pick up some groceries.'], 1],
+    ['You’re tired and want to go to bed at nine.', ['Have an early night.', 'Get changed.', 'Order takeaway.'], 0]
+  ],
+  awhCheckin: [
+    ['You had lots to do at work. You’re tired now.', ['Pretty good. I finished early.', 'I’m a bit tired. I had a busy day.', 'I’m doing well. I had a quiet day.'], 1],
+    ['You finished work early and feel good.', ['I’m a bit tired. I didn’t sleep well.', 'I’m a little stressed. I had a busy day.', 'Pretty good. I finished work early.'], 2],
+    ['You woke up three times last night.', ['I’m a bit tired. I didn’t sleep well.', 'Pretty good. I had a quiet day.', 'I’m doing well. I finished early.'], 0],
+    ['You feel okay. It was calm at work today.', ['I’m tired. I had a busy day.', 'I’m okay. I had a quiet day.', 'I’m a bit tired. I didn’t sleep well.'], 1],
+    ['“How are you doing?” “Pretty good. I had a quiet day.” Ask the question back.', ['Which day?', 'What time do you finish?', 'How about you?'], 2]
+  ]
+};
+const tracker = window.Track;
+const save = document.querySelector('#save');
+const exercises = Object.entries(tasks).map(([name, questions]) => {
+  const section = document.getElementById(name);
+  const summary = section.querySelector('.summary');
+  const reset = section.querySelector('.reset');
+  const answers = new Map();
+  function scores() {
+    const points = questions.filter((question, index) => answers.get(index) === question[1][question[2]]).length;
+    summary.textContent = answers.size ? points + ' / ' + questions.length + ' correct' : '';
+    return points;
+  }
+  const rows = questions.map(([question, choices, correctIndex], index) => {
+    const field = document.createElement('fieldset');
+    field.disabled = true;
+    const legend = document.createElement('legend');
+    legend.textContent = question;
+    const options = document.createElement('div');
+    options.className = 'options';
+    const feedback = document.createElement('p');
+    feedback.className = 'feedback';
+    feedback.setAttribute('role', 'status');
+    const correct = choices[correctIndex];
+    function render(choice) {
+      for (const button of options.children) {
+        const selected = button.textContent === choice;
+        button.setAttribute('aria-pressed', String(selected));
+        button.dataset.result = selected && choice === correct ? 'correct' : 'retry';
+      }
+      feedback.textContent = choice === undefined ? '' : choice === correct ? 'Correct!' : 'Try again.';
+    }
+    for (const choice of choices) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.textContent = choice;
+      button.setAttribute('aria-pressed', 'false');
+      button.addEventListener('click', () => {
+        answers.set(index, choice);
+        render(choice);
+        const points = scores();
+        tracker?.answer(name, index, question, choice, correct, choice === correct, points, questions.length);
+        if (points / questions.length >= .8 && answers.size === questions.length) {
+          tracker?.finish(name, points, questions.length);
+        }
+      });
+      options.append(button);
+    }
+    field.append(legend, options, feedback);
+    section.querySelector('.items').append(field);
+    return { field, render, choices };
+  });
+  reset.addEventListener('click', () => {
+    tracker?.reset(name);
+    answers.clear();
+    rows.forEach(row => row.render());
+    scores();
+    rows[0].field.querySelector('button').focus();
+  });
+  return saved => {
+    reset.disabled = false;
+    rows.forEach((row, index) => {
+      row.field.disabled = false;
+      const choice = saved[name]?.answers?.[index]?.a;
+      if (row.choices.includes(choice)) {
+        answers.set(index, choice);
+        row.render(choice);
+      }
+    });
+    scores();
+  };
+});
+async function start() {
+  let saved = {};
+  try {
+    if (tracker) saved = await tracker.init('after-work-homework');
+  } finally {
+    exercises.forEach(restore => restore(saved));
+  }
+  if (!tracker?.online) {
+    save.textContent = 'Open this homework from your student portal to send your answers to your teacher.';
+    return;
+  }
+  const messages = {
+    saving: 'Saving…',
+    offline: 'Offline. Your answers will sync when you’re back online.',
+    saved: 'Answers saved.'
+  };
+  tracker.onStatus(state => { save.textContent = messages[state] || 'Your answers save as you go.'; });
+}
+start().catch(() => { save.textContent = 'Couldn’t load saved answers. Reopen this homework from your student portal to try again.'; });
+</script>
+</body>
+</html>
