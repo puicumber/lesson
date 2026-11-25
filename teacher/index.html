@@ -11,6 +11,21 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.js"></script>
 <script src="../assets/config.js?v=19"></script>
 <script src="../assets/portal.js?v=5"></script>
+<style>
+  .form input, .form select { block-size: 44px; box-sizing: border-box; min-inline-size: 0; }
+  .form select {
+    appearance: none;
+    padding-inline-end: 32px;
+    background-image: linear-gradient(45deg, transparent 50%, currentColor 50%),
+                      linear-gradient(135deg, currentColor 50%, transparent 50%);
+    background-position: right 16px center, right 11px center;
+    background-size: 5px 5px;
+    background-repeat: no-repeat;
+  }
+  @media (forced-colors: active) {
+    .form select { appearance: auto; background-image: none; }
+  }
+</style>
 </head>
 <body>
 <div class="wrap">
@@ -38,17 +53,23 @@
       <div class="grid" id="students"></div>
     </section>
 
+    <section class="panel" aria-labelledby="addRecHeading">
+      <h2 id="addRecHeading">Recommended by Polina</h2>
+        <form class="form" id="recForm">
+          <label>Student<select name="student" id="recStudent" required></select></label>
+          <label>Title<input name="title" maxlength="120" required></label>
+          <label>Link (optional)<input name="url" type="url" maxlength="2048" placeholder="https://"></label>
+          <label style="grid-column:1/-1">Note (optional)<textarea name="note" rows="2" maxlength="1000"></textarea></label>
+          <button class="btn" type="submit" disabled>Add recommendation</button>
+        </form>
+      <p class="muted" id="addRecStatus" role="status"></p>
+    </section>
+
     <section class="panel" id="detail" hidden>
       <div class="row" style="justify-content:space-between"><h2 id="dName"></h2><button class="btn ghost small" id="dClose">Close</button></div>
       <div><span class="eyebrow">Personal link</span><p class="copy" id="dLink"></p></div>
       <section aria-labelledby="recHeading" style="display:grid;gap:12px">
         <h3 id="recHeading" tabindex="-1">Recommended by Polina</h3>
-        <form class="form" id="recForm">
-          <label>Title<input name="title" maxlength="120" required></label>
-          <label>Link (optional)<input name="url" type="url" maxlength="2048" placeholder="https://"></label>
-          <label style="grid-column:1/-1">Note (optional)<textarea name="note" rows="2" maxlength="1000"></textarea></label>
-          <button class="btn" type="submit">Add recommendation</button>
-        </form>
         <p class="muted" id="recStatus" role="status"></p>
         <div class="grid" id="recActive"></div>
         <details id="recHistory" hidden>
@@ -154,6 +175,14 @@ function draw(){
     rc.insertAdjacentHTML("beforeend",`<tr><td>${when(r.created_at)}</td><td>${n}</td><td>${actName(r.activity)}${isPartial(r)?' <span class="muted">· in progress</span>':""}</td><td>${scoreCell(r)}</td></tr>`)});
   if(!R.length)rc.innerHTML='<tr><td colspan="4" class="muted">No results yet. They will appear here when students do the exercises.</td></tr>';
   $("mStudent").innerHTML=$("spStudent").innerHTML=S.map(x=>`<option value="${x.code}">${x.name}</option>`).join("");
+  const recStudent = $("recStudent");
+  const selected = recStudent.value;
+  recStudent.replaceChildren(new Option("Choose a student", ""), ...S.map(x => new Option(x.name, x.code)));
+  recStudent.value = S.some(x => x.code === selected) ? selected : "";
+  recStudent.onchange = () => {
+    $("recForm").querySelector("button").disabled = !recStudent.value;
+  };
+  if (!$("recForm").hasAttribute("aria-busy")) recStudent.onchange();
 }
 const URLSET={movement:"move",adverbs:"adv","grivas-28":"g28","grivas-30":"g30","grivas-33":"g33","reading-1":"read1","return-to-earth":"rte","grivas-36":"g36"};
 function guessSet(u){if(Portal.speakTask(u||""))return"speak";u=(u||"").split(/[?#]/)[0].replace(/\/index\.html$/,"").replace(/\/+$/,"");const seg=u.split("/").pop();
@@ -215,18 +244,17 @@ function detail(x){
   mine.filter(r=>!isPartial(r)||lastBy[r.activity]===r).forEach(r=>(r.details&&r.details.wrong||[]).forEach(w=>cnt[w]=(cnt[w]||0)+1));
   const top=Object.entries(cnt).sort((a,b)=>b[1]-a[1]).slice(0,10);
   $("dWeak").innerHTML=top.length?`<ul>${top.map(([w,n])=>`<li>${w} <span class="muted">· missed ${n}×</span></li>`).join("")}</ul>`:'<p class="muted">Nothing yet.</p>';
-  $("detail").scrollIntoView({behavior:"smooth"});
+  $("detail").scrollIntoView();
 }
+let activeRecommendations = null;
 function showRecommendations(code) {
-  const form = $("recForm");
-  const submit = form.querySelector('button[type="submit"]');
   const status = $("recStatus");
   const active = $("recActive");
   const archived = $("recArchived");
   const history = $("recHistory");
-  const isCurrent = () => form.onsubmit === add;
-  form.onsubmit = add;
-  form.reset();
+  let loadVersion = 0;
+  const isCurrent = () => activeRecommendations?.reload === loadRecommendations;
+  activeRecommendations = {code, reload:loadRecommendations};
   history.open = false;
   active.replaceChildren();
   archived.replaceChildren();
@@ -234,12 +262,13 @@ function showRecommendations(code) {
   loadRecommendations();
 
   async function loadRecommendations(message) {
-    submit.disabled = true;
+    const version = ++loadVersion;
+    const isLatest = () => isCurrent() && version === loadVersion;
     status.textContent = "Loading recommendations…";
     try {
       const {data, error} = await db.from("recommendations").select("*")
         .eq("student_code", code).order("created_at", {ascending:false});
-      if (!isCurrent()) return;
+      if (!isLatest()) return;
       if (error) throw error;
       active.replaceChildren();
       archived.replaceChildren();
@@ -286,7 +315,6 @@ function showRecommendations(code) {
           button.onclick = async () => {
             const buttons = active.querySelectorAll("button");
             buttons.forEach(control => control.disabled = true);
-            submit.disabled = true;
             status.textContent = "Saving…";
             try {
               let update = db.from("recommendations")
@@ -303,7 +331,6 @@ function showRecommendations(code) {
               if (!isCurrent()) return;
               status.textContent = "Couldn’t save the change. Please try again.";
               buttons.forEach(control => control.disabled = false);
-              submit.disabled = false;
               if (!$("detail").hidden) button.focus();
             }
           };
@@ -312,9 +339,8 @@ function showRecommendations(code) {
       }
       history.hidden = !archived.children.length;
       status.textContent = message || (active.children.length ? "" : "No active recommendations.");
-      submit.disabled = false;
     } catch (error) {
-      if (!isCurrent()) return;
+      if (!isLatest()) return;
       const retry = document.createElement("button");
       retry.type = "button";
       retry.className = "btn ghost small";
@@ -324,41 +350,50 @@ function showRecommendations(code) {
     }
   }
 
-  async function add(event) {
-    event.preventDefault();
-    if (submit.disabled) return;
-    const title = form.elements.title.value.trim();
-    const note = form.elements.note.value.trim();
-    const rawUrl = form.elements.url.value.trim();
-    const url = rawUrl ? Portal.recommendationUrl(rawUrl) : null;
-    if (!title || (rawUrl && (!url || url.length > 2048))) {
-      status.textContent = !title ? "Enter a title." : "Enter a valid http or https link.";
-      form.elements[!title ? "title" : "url"].focus();
-      return;
-    }
-    const buttons = active.querySelectorAll("button");
-    buttons.forEach(control => control.disabled = true);
-    submit.disabled = true;
-    status.textContent = "Saving…";
-    try {
-      const {error} = await db.from("recommendations").insert({
-        student_code:code, title, note:note || null, url
-      });
-      if (error) throw error;
-      if (!isCurrent()) return;
-      form.reset();
-      await loadRecommendations("Recommendation added.");
-      if (isCurrent() && !$("detail").hidden) form.elements.title.focus();
-    } catch (error) {
-      if (!isCurrent()) return;
-      status.textContent = "Couldn’t add the recommendation. Please try again.";
-      buttons.forEach(control => control.disabled = false);
-      submit.disabled = false;
-      if (!$("detail").hidden) submit.focus();
-    }
-  }
 }
 
+$("recForm").onsubmit = async event => {
+  event.preventDefault();
+  const form = event.currentTarget;
+  const submit = form.querySelector('button[type="submit"]');
+  const status = $("addRecStatus");
+  const student = form.elements.student;
+  if (submit.disabled || !student.value) return;
+  const code = student.value;
+  const name = student.selectedOptions[0].textContent;
+  const title = form.elements.title.value.trim();
+  const note = form.elements.note.value.trim();
+  const rawUrl = form.elements.url.value.trim();
+  const url = rawUrl ? Portal.recommendationUrl(rawUrl) : null;
+  if (!title || (rawUrl && (!url || url.length > 2048))) {
+    status.textContent = !title ? "Enter a title." : "Enter a valid http or https link.";
+    form.elements[!title ? "title" : "url"].focus();
+    return;
+  }
+  form.setAttribute("aria-busy", "true");
+  submit.disabled = student.disabled = true;
+  status.textContent = "Saving…";
+  try {
+    const {error} = await db.from("recommendations").insert({
+      student_code:code, title, note:note || null, url
+    });
+    if (error) throw error;
+    form.reset();
+    status.textContent = "Recommendation added for " + name + ".";
+    if (activeRecommendations?.code === code && !$("detail").hidden) {
+      activeRecommendations.reload();
+    }
+    student.disabled = false;
+    student.focus();
+  } catch (error) {
+    status.textContent = "Couldn’t add the recommendation. Please try again.";
+    submit.disabled = false;
+    submit.focus();
+  } finally {
+    student.disabled = false;
+    form.removeAttribute("aria-busy");
+  }
+};
 $("actList").innerHTML=Object.keys(ACT).map(k=>`<option value="${k}">`).join("");
 let actManual=false;
 const SITE=/^https:\/\/puicumber\.github\.io\/lesson\//;
