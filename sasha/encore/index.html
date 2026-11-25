@@ -41,23 +41,46 @@ summary{font-weight:700;color:var(--accent)}
 .story .feedback{display:block}
 .story .feedback:empty{display:none}
 .actions{display:flex;align-items:center;flex-wrap:wrap;gap:.7rem;margin-top:1rem}
+.hero{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:1.5rem;align-items:center}
+.turntable{position:relative;display:grid;justify-items:center;gap:.7rem;padding:.9rem;border:1px solid var(--edge);border-radius:1rem;background:linear-gradient(145deg,#332740,#211a30)}
+.record{width:clamp(7.5rem,20vw,10rem);aspect-ratio:1;border-radius:50%;display:grid;place-items:center;background:conic-gradient(from 25deg,#ffffff00,#ffffff12 17%,#ffffff00 35%,#ffffff00 52%,#ffffff12 68%,#ffffff00 86%),repeating-radial-gradient(circle,#101017 0 2px,#30303b 3px 4px);border:1px solid #746781;box-shadow:0 .35rem 1rem #100d19}
+.record span{width:36%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,#181321 0 7%,#ffd474 8% 34%,#67423a 35% 38%,#ffd474 39%)}
+.turntable.playing .record{animation:spin 1.8s linear infinite}
+#record-status:empty{display:none}
+@keyframes spin{to{transform:rotate(1turn)}}
+.grammar{border:1px solid var(--accent);background:#282037}
+.grammar summary{font:700 1.4rem/1.3 Georgia,serif;padding:.15rem 0}
+.tense-cards{list-style:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,17rem),1fr));gap:.65rem;padding:0;margin:1rem 0}
+.tense-cards li{background:var(--bg);border-radius:.45rem;border-inline-start:3px solid var(--accent);padding:.65rem .8rem}
+.tense-cards strong{display:block;color:var(--accent)}
+@media(max-width:36rem){.hero{grid-template-columns:1fr;gap:.75rem}.turntable{width:fit-content}header{padding-top:1.5rem}}
+@media(prefers-reduced-motion:reduce){.turntable.playing .record{animation:none}}
 </style>
 </head>
 <body>
 <main>
 <header>
+<div class="hero">
+<div>
 <h1>Before the Encore</h1>
 <p>Music vocabulary, narrative tenses, and the story of Sixto Rodriguez.</p>
+</div>
+<div class="turntable">
+<div class="record" aria-hidden="true"><span></span></div>
+<button type="button" id="record-play">Play record</button>
+<span id="record-status" role="status"></span>
+</div>
+</div>
 <nav aria-label="Homework sections"><a href="#words">Vocabulary</a><a href="#forms">Narrative tenses</a><a href="#gig">The gig</a><a href="#retell">Oral retell</a></nav>
 <p id="save" role="status">Loading saved answers…</p>
 </header>
 
-<section id="words"><h2>How do you listen?</h2><p>Choose the word or phrase that best fits each description.</p></section>
+<section id="words"><h2>How do you listen?</h2><p>Choose the best word or phrase.</p></section>
 <section id="forms" hidden>
 <h2>Narrative tenses</h2>
-<details>
+<details class="grammar" open>
 <summary>Grammar reference</summary>
-<ul>
+<ul class="tense-cards">
 <li><strong>Past simple</strong> · past form. Tell the main events. <em>The lights went out.</em></li>
 <li><strong>Past continuous</strong> · <em>was/were + -ing</em>. Show what was in progress at that moment. <em>The band was playing when the lights went out.</em></li>
 <li><strong>Past perfect simple</strong> · <em>had + past participle</em>. Look back at an earlier event or result. <em>By the time the doors opened, the band had finished the soundcheck.</em></li>
@@ -65,9 +88,9 @@ summary{font-weight:700;color:var(--accent)}
 </ul>
 <p>Sometimes both past perfect forms work. <em>She had worked at the venue for five years</em> states a fact about her work history. <em>She had been working there for five years</em> puts more focus on the time she spent there.</p>
 </details>
-<p>Choose the form that best fits the context. Select <strong>Both work</strong> if either form sounds natural here.</p>
+<p>Choose the best form, or <strong>Both work</strong> if either fits.</p>
 </section>
-<section id="gig" hidden><h2>The wrong recording</h2><p>Complete the story. Choose a form that puts each event in the right place on the timeline.</p><div class="story" id="story"></div></section>
+<section id="gig" hidden><h2>The wrong recording</h2><p>Choose the right verb form for each gap.</p><div class="story" id="story"></div></section>
 
 <section id="retell" hidden>
 <h2>The musician with two lives</h2>
@@ -127,6 +150,59 @@ const portalCode = new URLSearchParams(location.search).get("c")?.trim();
 const Track = portalCode ? window.Track : undefined;
 const activities = new Map();
 const byId = id => document.getElementById(id);
+const recordButton = byId("record-play");
+let playingRecord;
+function stopRecord() {
+ const context = playingRecord;
+ playingRecord = undefined;
+ recordButton.closest(".turntable").classList.remove("playing");
+ recordButton.textContent = "Play record";
+ if (context && context.state !== "closed") void context.close().catch(() => {});
+}
+recordButton.addEventListener("click", async () => {
+ if (playingRecord) {
+  stopRecord();
+  return;
+ }
+ const status = byId("record-status");
+ status.textContent = "";
+ try {
+  const Audio = window.AudioContext || window.webkitAudioContext;
+  const context = new Audio();
+  playingRecord = context;
+  recordButton.textContent = "Stop record";
+  await context.resume();
+  if (playingRecord !== context) return;
+  recordButton.closest(".turntable").classList.add("playing");
+  const start = context.currentTime + .06;
+  const melody = [64, 67, 69, 72, 69, 67, 64, 62, 65, 69, 67, 64, 62, 64, 67, 60];
+  function note(pitch, offset, duration, type, volume) {
+   const voice = context.createOscillator();
+   const envelope = context.createGain();
+   const at = start + offset;
+   voice.type = type;
+   voice.frequency.value = 440 * 2 ** ((pitch - 69) / 12);
+   envelope.gain.setValueAtTime(.001, at);
+   envelope.gain.exponentialRampToValueAtTime(volume, at + .025);
+   envelope.gain.exponentialRampToValueAtTime(.001, at + duration);
+   voice.connect(envelope).connect(context.destination);
+   voice.start(at);
+   voice.stop(at + duration);
+   return voice;
+  }
+  [48, 45, 41, 43].forEach((pitch, index) => note(pitch, index * 1.36, .75, "sine", .08));
+  melody.forEach((pitch, index) => {
+   const voice = note(pitch, index * .34, index === melody.length - 1 ? .85 : .3, "triangle", .065);
+   if (index === melody.length - 1) voice.onended = () => {
+    if (playingRecord === context) stopRecord();
+   };
+  });
+ } catch {
+  stopRecord();
+  status.textContent = "Audio is unavailable.";
+ }
+});
+window.addEventListener("pagehide", stopRecord);
 const screens = Array.from(document.querySelectorAll("nav a"), link => ({
  link,
  id: link.getAttribute("href").slice(1)
