@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Before the Encore</title>
+<script src="../../assets/config.js?v=20"></script>
+<script src="../../assets/portal.js?v=3"></script>
+<script src="../../assets/track.js?v=3"></script>
+<style>
+:root{color-scheme:dark;--bg:#151221;--panel:#241e34;--text:#fff8ef;--muted:#ddcfe6;--accent:#ffd474;--edge:#726183;--green:#a3f0be;--pink:#ffb1c3}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:1rem/1.65 system-ui,sans-serif}
+main{width:min(100% - 2rem,52rem);margin:auto;padding-bottom:4rem}
+header{padding:3rem 0 2rem;border-bottom:1px solid var(--edge)}
+h1,h2{font-family:Georgia,serif;line-height:1.15;margin:.25em 0}
+h1{font-size:clamp(2.7rem,10vw,5.4rem);color:var(--accent)}
+h2{font-size:clamp(1.65rem,5vw,2.4rem)}
+p{margin:.7em 0}
+nav{display:flex;flex-wrap:wrap;gap:.5rem 1.15rem;margin:1rem 0}
+a{color:var(--accent);text-underline-offset:.25em}
+section{margin-top:2.5rem;scroll-margin-top:1rem}
+fieldset{margin:.85rem 0;padding:.8rem 1rem 1rem;border:1px solid var(--edge);border-radius:.75rem;background:var(--panel);min-width:0}
+legend{padding:0 .4rem;font-weight:650;max-width:100%}
+select,button{font:inherit;border:1px solid var(--edge);border-radius:.45rem;padding:.4rem .65rem;background:var(--bg);color:var(--text);max-width:100%}
+select{appearance:none;padding-right:2rem;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath d='m4 6 4 4 4-4' fill='none' stroke='%23ffd474' stroke-width='2'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .55rem center}
+button,summary,select{cursor:pointer}
+button{border-color:var(--accent)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.feedback{color:var(--green);margin-bottom:0}
+.feedback.retry{color:var(--pink)}
+.feedback:empty{display:none}
+#save,.score{color:var(--muted)}
+.story,details{background:var(--panel);border:1px solid var(--edge);border-radius:.75rem;padding:1rem;margin:1rem 0}
+summary{font-weight:700;color:var(--accent)}
+.story select{display:inline-block;width:auto;margin:.2rem .1rem;vertical-align:baseline}
+.story label{display:inline-block;max-width:100%}
+.story .feedback{display:block}
+.story .feedback:empty{display:none}
+.actions{display:flex;align-items:center;flex-wrap:wrap;gap:.7rem;margin-top:1rem}
+</style>
+</head>
+<body>
+<main>
+<header>
+<h1>Before the Encore</h1>
+<p>Music vocabulary, narrative tenses, and the story of Sixto Rodriguez.</p>
+<nav aria-label="Homework sections"><a href="#words">Vocabulary</a><a href="#forms">Two past perfect forms</a><a href="#gig">The gig</a><a href="#retell">Oral retell</a></nav>
+<p id="save" role="status">Loading saved answers…</p>
+</header>
+
+<section id="words"><h2>How do you listen?</h2><p>Choose the word or phrase that best fits each description.</p></section>
+<section id="forms"><h2>What happened before?</h2><p>Choose the form that best fits the context. Select <strong>Both work</strong> if either form sounds natural here.</p></section>
+<section id="gig"><h2>The wrong recording</h2><p>Complete the story. Choose a form that puts each event in the right place on the timeline.</p><div class="story" id="story"></div></section>
+
+<section id="retell">
+<h2>The musician with two lives</h2>
+<p>Read the story, close the reading, and retell it aloud in about a minute. You can use the cue words below.</p>
+<details id="reading" open>
+<summary>Read about Sixto Rodriguez</summary>
+<p>Sixto Rodriguez began performing in the 1960s and recorded two albums, <em>Cold Fact</em> and <em>Coming From Reality</em>, early in the next decade. By the mid-1970s, he had largely left professional music and was earning a living as a labourer in Detroit.</p>
+<p>While he was working in Detroit, his records were finding an audience overseas. In South Africa, his songs became associated with opposition to apartheid. Some listeners had heard false rumours that he had died.</p>
+<p>In 1997, two South African fans set out to find him. They eventually learned where he was through one of his daughters. Rodriguez later toured South Africa, where he performed for thousands of fans who had been listening to his music for years.</p>
+</details>
+<button type="button" id="hide-reading">Hide reading and start retelling</button>
+<p id="cues" tabindex="-1"><strong>Cues</strong> · two albums · Detroit · fans overseas · false rumours · two fans track him down · South African tour</p>
+<p>As you speak, try to include what happened next, what was going on in the background, what had already happened, and how long something had been going on.</p>
+<details><summary>Show sentence starters</summary><p>By the mid-1970s, he had already…<br>While he was working in Detroit, his music was…<br>When he finally toured South Africa, some fans had been…</p></details>
+<details><summary>Show a full model retell</summary><p>Rodriguez recorded two albums early in his career. By the mid-1970s, he’d mostly given up professional music and was working as a labourer in Detroit. Meanwhile, his songs were growing popular in South Africa, where some fans had heard a rumour that he’d died. In 1997, two fans decided to track him down and eventually made contact through one of his daughters. When he toured South Africa, he finally met people who’d been listening to his records for years.</p></details>
+<div class="actions"><button type="button" id="done">I’ve retold the story</button><button type="button" id="redo" hidden>Reset retell</button><span id="retell-status" role="status"></span></div>
+</section>
+</main>
+<script>
+const words = [
+ ["When the album ends, I let the next one start. It helps me ___ after work.", "kick back", "Kick back means relax and take it easy."],
+ ["Her listening habits are ___. One week she plays the same band nonstop. The next week she drops it completely.", "erratic", "Erratic describes a pattern that is unpredictable or inconsistent."],
+ ["His playlist is ___. It includes folk, hip-hop, opera and film scores.", "eclectic", "Eclectic describes a varied mix drawn from different styles."],
+ ["The final song was ___. It was so beautiful that the room went completely quiet.", "sublime", "Sublime means exceptionally beautiful or impressive."],
+ ["She stays ___ to the band even when a new album disappoints her.", "loyal", "Loyal emphasises sticking with someone over time."],
+ ["Music is a huge part of his life. He is ___ to this one artist and spends hours tracking down rare recordings.", "devoted", "Devoted emphasises deep commitment and how much time or attention someone gives."]
+];
+const forms = [
+ ["The producer could finally send the track because she ___ the last backing vocal.", "had recorded", "had been recording", 0, "The finished vocal is what made it possible to send the track."],
+ ["Before she got her first solo show, she ___ at the same music venue for five years.", "had worked", "had been working", 2, "Both work. The simple form states her work history. The continuous highlights the time she spent working there."],
+ ["The singer's voice was getting rough. She ___ the chorus over and over all afternoon.", "had sung", "had been singing", 1, "The continuous is the better fit here because sustained repetition explains how her voice was sounding."],
+ ["After the engineer ___ off the only faulty microphone, she handed the singer a spare.", "had switched", "had been switching", 0, "Switching it off is a single completed action before she hands over the spare."],
+ ["When the call finally came through, I ___ beside the stage for twenty minutes and was still there.", "had waited", "had been waiting", 1, "The continuous is more natural here because the wait was still in progress when the call came."],
+ ["The duo ___ in Glasgow for years before they moved to Bristol.", "had lived", "had been living", 2, "Both work. The simple form gives a biographical fact. The continuous emphasises the period leading up to the move."],
+ ["There was nothing left to edit because someone ___ the only copy of the recording.", "had deleted", "had been deleting", 0, "The loss of the only copy is the result of one completed deletion."],
+ ["Before the station changed its format, it ___ our song every Friday for two years.", "had played", "had been playing", 2, "Both work for repeated events. The simple form records the regular plays. The continuous foregrounds the recurring habit over time."]
+];
+const gig = [
+ ["arrive", ["arrived","was arriving","had arrived"], 0, "This is the first event in the story."],
+ ["test", ["tested","was testing","had tested"], 1, "The test was in progress when the singer arrived."],
+ ["never perform", ["never performed","was never performing","had never performed"], 2, "This looks back at Maya’s experience before the gig."],
+ ["rehearse", ["rehearsed","was rehearsing","had been rehearsing"], 2, "The rehearsals had been going on for weeks up to that night."],
+ ["press", ["pressed","was pressing","had pressed"], 0, "Pressing play is the next main event."],
+ ["load", ["loaded","was loading","had loaded"], 2, "The wrong file was already loaded when the engineer pressed play."],
+ ["sing", ["sang","was singing","had sung"], 1, "The singing was in progress when the sound cut out."],
+ ["cut out", ["cut out","was cutting out","had cut out"], 0, "The sudden loss of sound interrupts the singing."],
+ ["find", ["found","was finding","had been finding"], 0, "Finding the right file is the next event."],
+ ["finish", ["finished","was finishing","had finished"], 0, "Finishing the song moves the story to its end."]
+];
+const passages = [
+ ["Maya ", 0, " at the venue just before doors opened. The sound engineer ", 1, " the speakers when she walked in. She ", 2, " in front of a crowd that big before, although she ", 3, " with the band for weeks."],
+ ["When the engineer ", 4, " play for the opening number, an old demo came through the speakers. Someone ", 5, " the wrong file earlier that day. Maya ", 6, " the first line when the sound suddenly ", 7, "."],
+ ["The engineer ", 8, " the right recording, and Maya started again. The band ", 9, " the song to a huge cheer."]
+];
+const Track = window.Track;
+const activities = new Map();
+const byId = id => document.getElementById(id);
+function make(tag, text = "") {
+ const element = document.createElement(tag);
+ element.textContent = text;
+ return element;
+}
+function createItem(item, index, section, mount) {
+ const field = make(section === "encoreGig" ? "span" : "fieldset");
+ const label = make(section === "encoreGig" ? "label" : "legend", item.prompt);
+ const select = make("select");
+ select.id = section + "-" + index;
+ select.setAttribute("aria-label", item.prompt);
+ select.append(new Option("Choose…", ""));
+ select.options[0].disabled = true;
+ item.options.forEach(option => select.append(new Option(option, option)));
+ const feedback = make("span");
+ feedback.className = "feedback";
+ feedback.id = select.id + "-feedback";
+ feedback.setAttribute("role", "status");
+ select.setAttribute("aria-describedby", feedback.id);
+ if (label.tagName === "LABEL") {
+  label.append(" ", select);
+  field.append(label, feedback);
+ } else {
+  field.append(label, select, feedback);
+ }
+ mount.append(field);
+ return { ...item, select, feedback };
+}
+function showFeedback(item) {
+ const value = item.select.value;
+ const ok = value === item.answer;
+ item.feedback.classList.toggle("retry", !ok);
+ item.feedback.textContent = value ? (ok ? "Correct. " : "Try again. ") + item.reason : "";
+}
+function buildActivity(root, key, items, render) {
+ const fields = render(items, key);
+ const score = make("span", "0 / " + fields.length);
+ const reset = make("button", "Reset");
+ reset.type = "button";
+ const actions = make("div");
+ actions.className = "actions";
+ actions.append(reset, score);
+ root.append(actions);
+ function updateScore() {
+  const count = fields.filter(item => item.select.value === item.answer).length;
+  score.textContent = count + " / " + fields.length + " correct";
+  return count;
+ }
+ for (const [index,item] of fields.entries()) {
+  item.select.addEventListener("change", () => {
+   showFeedback(item);
+   const count = updateScore();
+   Track?.answer(key, index, item.recordPrompt || item.prompt, item.select.value, item.answer, item.select.value === item.answer, count, fields.length);
+   if (count === fields.length) Track?.finish(key, count, fields.length);
+  });
+ }
+ reset.addEventListener("click", () => {
+  if (Track) Track.reset(key);
+  fields.forEach(item => { item.select.value = ""; showFeedback(item); });
+  updateScore();
+ });
+ activities.set(key, saved => {
+  fields.forEach((item, index) => {
+   if (saved?.answers?.[index]) item.select.value = saved.answers[index].a;
+   showFeedback(item);
+   item.select.disabled = false;
+  });
+  updateScore();
+ });
+ fields.forEach(item => { item.select.disabled = true; });
+}
+function buildQuestions(root, key, items) {
+ buildActivity(root, key, items, (questions, section) =>
+  questions.map((item, index) => createItem(item, index, section, root)));
+}
+buildQuestions(byId("words"), "encoreWords", words.map(([prompt,answer,reason]) =>
+ ({prompt,answer,reason,options:words.map(word => word[1]).sort()})));
+buildQuestions(byId("forms"), "encoreForms", forms.map(([prompt,simple,continuous,correct,reason]) => {
+ const options = [simple, continuous, "Both work"];
+ return {prompt,options,answer:options[correct],reason};
+}));
+buildActivity(byId("gig"), "encoreGig", gig, (items,key) => {
+ const fields = [];
+ for (const passage of passages) {
+  const paragraph = make("p");
+  passage.forEach((part, index) => {
+   if (typeof part === "string") { paragraph.append(part); return; }
+   const [verb,options,correct,reason] = items[part];
+   const recordPrompt = passage[index - 1] + "___ (" + verb + ")" + passage[index + 1];
+   fields[part] = createItem({prompt:"(" + verb + ")",recordPrompt,options,answer:options[correct],reason}, part, key, paragraph);
+  });
+  byId("story").append(paragraph);
+ }
+ return fields;
+});
+byId("hide-reading").addEventListener("click", () => {
+ byId("reading").open = false;
+ byId("cues").focus();
+});
+function showRetell(done) {
+ byId("done").disabled = done;
+ byId("redo").hidden = !done;
+ byId("retell-status").textContent = done ? "Retell marked complete." : "";
+}
+byId("done").disabled = true;
+byId("done").addEventListener("click", () => {
+ Track?.answer("encoreRetell", 0, "Retell the Rodriguez story aloud", "Completed aloud", "Self-check", true, 1, 1);
+ Track?.finish("encoreRetell", 1, 1);
+ showRetell(true);
+});
+byId("redo").addEventListener("click", () => {
+ Track?.reset("encoreRetell");
+ showRetell(false);
+});
+boot();
+async function boot() {
+ // The repository loads Track. Keep the exercise usable in a standalone preview.
+ if (!Track) {
+  byId("save").textContent = "Standalone practice. Progress is available when you open this homework from your portal.";
+  for (const restore of activities.values()) restore();
+  showRetell(false);
+  return;
+ }
+ Track.onStatus(status => {
+  byId("save").textContent = !Track.online ? "Open from your student portal to share your progress." :
+   {saving:"Saving progress…",saved:"Progress saved.",offline:"Saved on this device. Sync will retry.",idle:"Progress saves as you go."}[status];
+ });
+ try {
+  const saved = await Track.init("encore");
+  for (const [key,restore] of activities) restore(saved[key]);
+  showRetell(Boolean(saved.encoreRetell?.final));
+ } catch {
+  for (const restore of activities.values()) restore();
+  showRetell(false);
+  byId("save").textContent = "Saved answers could not be loaded.";
+ }
+}
+</script>
+</body>
+</html>
