@@ -81,14 +81,13 @@ footer{padding:0 0 2rem}
 .candle-tray[hidden]{display:none}
 .candle-tray{display:flex;align-items:center;justify-content:space-between;gap:.75rem 1.25rem;flex-wrap:wrap;margin:0 0 1rem;padding:.8rem 1.1rem;background:#303b29;color:#fff3d8;border:1px solid #536045;border-radius:.85rem}
 .candle-tray p{margin:0}
-.candle-row{display:flex;align-items:end;gap:clamp(.55rem,2vw,1.1rem);min-height:3.5rem}
 .candle{position:relative;width:.9rem;height:2rem;border-radius:.25rem .25rem .14rem .14rem;background:linear-gradient(90deg,#748064,#a6ab92 58%,#778364)}
 .candle:nth-child(even){height:1.7rem}
 .candle::before{content:"";position:absolute;top:-.22rem;left:calc(50% - 1px);width:2px;height:.25rem;background:#b69970}
 .candle::after{content:"";position:absolute;left:50%;bottom:calc(100% + .15rem);width:.68rem;height:1rem;border-radius:70% 45% 55% 55%;background:radial-gradient(ellipse at 54% 72%,#fff9d6 13%,#ffd57a 49%,#e78233 95%);opacity:0;transform:translateX(-50%);transform-origin:50% 90%;box-shadow:0 0 .95rem .2rem #efa84c99;transition:opacity .18s}
 .candle.lit{background:linear-gradient(90deg,#d1b783,#fff2cf 56%,#e0c694)}
 .candle.lit::after{opacity:1;animation:candle-flicker 2.4s ease-in-out infinite}
-.candle:nth-child(even)::after{animation-delay:-.85s}
+.place-setting:nth-child(even) .candle::after{animation-delay:-.85s}
 @keyframes candle-flicker{0%,100%{transform:translateX(-50%) scale(1)}45%{transform:translateX(-55%) scale(1.09,.94)}70%{transform:translateX(-46%) scale(.94,1.06)}}
 .candle-tray.complete{background:#3c442c;border-color:#d4a95f;box-shadow:0 0 1.4rem #e4ae5a80;transition:background .4s,box-shadow .4s}
 @media(prefers-reduced-motion:reduce){.candle::after,.candle.lit::after,.candle-tray.complete{animation:none;transition:none}}
@@ -118,16 +117,29 @@ section h2{color:#473326}
 .vocab-status{min-height:1.55em}
 .vocab-rounds{display:flex;flex-wrap:wrap;gap:.45rem}
 .vocab-rounds button[aria-pressed="true"]{background:var(--tint);border-color:var(--accent)}
+.candle-tray{display:grid;grid-template-columns:minmax(0,1fr);gap:.45rem;padding:clamp(.6rem,2vw,1.05rem);background:repeating-linear-gradient(90deg,#303b29 0 12px,#34402d 12px 13px)}
+.table-runner{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:clamp(.18rem,1.2vw,.7rem);align-items:end;max-width:40rem;width:100%;margin:auto}
+.place-setting{display:grid;justify-items:center;gap:.3rem;min-width:0;padding-top:1.15rem}
+.place-setting .candle{height:clamp(.75rem,2vw,1.35rem);width:.65rem}
+.table-plate{display:grid;place-items:center;width:min(100%,3.9rem);aspect-ratio:1;border-radius:50%;border:1px solid #9fa789;background:#e3e6cd;box-shadow:inset 0 0 0 .22rem #5e6b49}
+.table-item{display:grid;place-items:center;width:76%;aspect-ratio:1;border-radius:50%;font-size:clamp(.8rem,3vw,1.55rem);opacity:0;transform:scale(.75);transition:opacity .3s ease,transform .3s ease}
+.place-setting.served .table-item{opacity:1;transform:scale(1)}
+.table-item.food{background-image:url(dishes.webp);background-size:300% 200%;background-repeat:no-repeat}
+.table-item.turkey{background-position:0 0}
+.table-item.stuffing{background-position:50% 0}
+.table-item.pie{background-position:100% 100%}
+#candle-status{text-align:center;font-size:.95rem}
+@media(prefers-reduced-motion:reduce){.table-item{transition:none}}
 </style>
 </head>
 <body>
 <header><h1 id="lesson-title">Thanksgiving Dinner</h1></header>
 <nav aria-label="Lesson stages">
-<a href="#welcome">Welcome</a><a href="#story">The story</a><a href="#menu">Plan the menu</a><a href="#thanks">Say thanks</a><a href="#eat">Let’s eat</a><a href="#after">After dinner</a>
+<a href="#welcome">Welcome</a><a href="#vocabulary">Vocabulary</a><a href="#story">The story</a><a href="#menu">Plan the menu</a><a href="#thanks">Say thanks</a><a href="#eat">Let’s eat</a><a href="#after">After dinner</a>
 </nav>
 <main>
 <div class="candle-tray" id="candle-tray" hidden>
-<div class="candle-row" id="candle-row" aria-hidden="true"></div>
+<div class="table-runner" id="table-runner" aria-hidden="true"></div>
 <p id="candle-status" role="status"></p>
 </div>
 <section id="welcome">
@@ -148,19 +160,19 @@ section h2{color:#473326}
 <p class="prompt" id="welcome-prompt" role="status">I’d bring … because …</p>
 </div></div>
 </section>
-<section id="story">
-<h2>The story behind Thanksgiving</h2>
-<p><a href="https://www.youtube.com/watch?v=Z6tK1fx8xTw" target="_blank" rel="noopener">Watch <i>What Is Thanksgiving?</i> on YouTube</a></p>
-<p><strong>First watch.</strong> Which three topics does the video talk about? <i>Dates · history · food · music · sports</i></p>
-<p><strong>Second watch.</strong> Both of you answer the same questions. Write a few words, then compare answers.</p>
-<ol>
-<li>When is Thanksgiving in the US?</li>
-<li>Where did the 1621 harvest celebration take place?</li>
-<li>Who took part? How long did it last?</li>
-<li>What’s the main dish? Can you name two other foods from the video?</li>
-</ol>
-<details><summary>Check the answers</summary><ol><li>The fourth Thursday in November.</li><li>Plymouth.</li><li>English settlers and Wampanoag people took part. The celebration lasted three days.</li><li>Turkey. Other foods mentioned include stuffing, mashed potatoes, gravy, cranberry sauce and pumpkin pie.</li></ol></details>
-<aside>The Wampanoag already had their own traditions of giving thanks. The 1621 harvest celebration is one part of the story of Thanksgiving. <a href="https://plimoth.org/for-students/homework-help/thanksgiving">Plimoth Patuxet Museums</a></aside>
+<section id="vocabulary">
+<h2>Vocabulary</h2>
+<p>Look at the word. Say what you think it means, then turn the card over to check.</p>
+<div class="prompt" id="word-card">
+<p id="flash-count"></p>
+<h3 id="flash-word"></h3>
+<div id="flash-back" hidden><p id="flash-meaning"></p><p><i id="flash-example"></i></p></div>
+</div>
+<div class="controls">
+<button type="button" id="flash-prev">Previous card</button>
+<button type="button" class="primary" id="flash-flip" aria-controls="flash-back" aria-expanded="false">Show meaning</button>
+<button type="button" id="flash-next">Next card</button>
+</div>
 <fieldset class="word-match">
 <legend><strong>Thanksgiving Words</strong></legend>
 <div id="vocab-rounds" class="vocab-rounds" aria-label="Vocabulary rounds">
@@ -178,6 +190,27 @@ section h2{color:#473326}
 <button type="button" class="primary" id="vocab-next">Next card</button>
 </div>
 </fieldset>
+</section>
+<section id="story">
+<h2>The story behind Thanksgiving</h2>
+<p><a href="https://www.youtube.com/watch?v=Z6tK1fx8xTw" target="_blank" rel="noopener">Watch <i>What Is Thanksgiving?</i> on YouTube</a></p>
+<p><strong>First watch.</strong> Which three topics does the video talk about? <i>Dates · history · food · music · sports</i></p>
+<p><strong>Second watch.</strong> Both of you answer the same questions. Write a few words, then compare answers.</p>
+<ol>
+<li>When is Thanksgiving in the US?</li>
+<li>Where did the 1621 harvest celebration take place?</li>
+<li>Who took part? How long did it last?</li>
+<li>What’s the main dish? Can you name two other foods from the video?</li>
+</ol>
+<details><summary>Check the answers</summary><ol><li>The fourth Thursday in November.</li><li>Plymouth.</li><li>English settlers and Wampanoag people took part. The celebration lasted three days.</li><li>Turkey. Other foods mentioned include stuffing, mashed potatoes, gravy, cranberry sauce and pumpkin pie.</li></ol></details>
+<aside>The Wampanoag already had their own traditions of giving thanks. The 1621 harvest celebration is one part of the story of Thanksgiving. <a href="https://plimoth.org/for-students/homework-help/thanksgiving">Plimoth Patuxet Museums</a></aside>
+
+<details>
+<summary>Optional · An evening in order</summary>
+<p>Imagine dinner at your host’s home. Which comes first? Put the four moments in order aloud, then compare with your partner.</p>
+<p><i>Offer leftovers · Give thanks · Welcome your guests · Serve dinner</i></p>
+<details><summary>Reveal one possible order</summary><p>Welcome your guests → Give thanks → Serve dinner → Offer leftovers.</p></details>
+</details>
 </section>
 <section id="menu">
 <h2>Plan the menu</h2>
@@ -201,6 +234,11 @@ section h2{color:#473326}
 <p id="table-menu" role="status"></p>
 </fieldset>
 <p>Present your menu together. Each of you explains one choice. <i>We chose … because …</i></p>
+<details>
+<summary>Optional · A guest is coming</summary>
+<p>Guest A, you’ve invited a vegetarian friend. Ask which dishes they can eat. Guest B, suggest a change to your menu. Then agree on one dish to offer.</p>
+<p><i>Is the gravy made with meat? · Could we serve … instead? · Would you like some …?</i></p>
+</details>
 </section>
 <section id="thanks">
 <h2>Say thanks</h2>
@@ -264,7 +302,7 @@ section h2{color:#473326}
 </div>
 </section>
 <div class="lesson-controls" id="lesson-controls" hidden>
-<button type="button" id="previous-stage">Previous</button>
+<button type="button" id="previous-stage">Back</button>
 <button type="button" class="primary" id="next-stage">Next stage</button>
 </div>
 </main>
@@ -419,19 +457,42 @@ tabs.forEach((tab, index) => {
 });
 
 const completedStages = new Set();
-const candles = tabs.map(() => {
+const tableDetails = {
+  welcome: {symbol:'🍽️'},
+  vocabulary: {symbol:'📋'},
+  story: {symbol:'🍂'},
+  menu: {photo:'stuffing'},
+  thanks: {symbol:'💛'},
+  eat: {photo:'turkey'},
+  after: {photo:'pie'}
+};
+const settings = panels.map(panel => {
+  const detail = tableDetails[panel.id];
+  const setting = document.createElement('div');
+  setting.className = 'place-setting';
   const candle = document.createElement('span');
   candle.className = 'candle';
-  get('candle-row').append(candle);
-  return candle;
+  const plate = document.createElement('span');
+  plate.className = 'table-plate';
+  const item = document.createElement('span');
+  item.className = detail.photo ? 'table-item food ' + detail.photo : 'table-item';
+  item.textContent = detail.symbol || '';
+  plate.append(item);
+  setting.append(candle, plate);
+  get('table-runner').append(setting);
+  return {setting, candle};
 });
 function updateCandles() {
-  candles.forEach((candle, index) => candle.classList.toggle('lit', completedStages.has(index)));
+  settings.forEach(({setting, candle}, index) => {
+    const complete = completedStages.has(index);
+    candle.classList.toggle('lit', complete);
+    setting.classList.toggle('served', complete);
+  });
   const allLit = completedStages.size === tabs.length;
   get('candle-tray').classList.toggle('complete', allLit);
   get('candle-status').textContent = allLit
-    ? 'All six candles are lit. Happy Thanksgiving!'
-    : completedStages.size + ' of ' + tabs.length + ' candles lit';
+    ? 'The table is set. Happy Thanksgiving!'
+    : completedStages.size + ' of ' + tabs.length + ' places set';
 }
 get('candle-tray').hidden = false;
 updateCandles();
@@ -452,11 +513,13 @@ function activateTab(index, focus = '', updateUrl = true) {
   get('previous-stage').disabled = index === 0;
   const last = index === tabs.length - 1;
   get('next-stage').disabled = last && completedStages.has(index);
-  get('next-stage').textContent = last ? 'Finish dinner' : 'Next · ' + tabs[index + 1].textContent;
+  get('next-stage').textContent = last ? 'Finish dinner' : 'Light candle and go to ' + tabs[index + 1].textContent;
   if (updateUrl && location.hash !== tabs[index].hash) history.pushState(null, '', tabs[index].hash);
   if (focus === 'tab') tabs[index].focus();
   if (focus === 'panel') {
-    panels[index].focus({preventScroll:true});
+    const heading = panels[index].querySelector('h2');
+    heading.tabIndex = -1;
+    heading.focus({preventScroll:true});
     stageNav.scrollIntoView({block:'start'});
   }
 }
@@ -531,6 +594,30 @@ const vocabulary = [
   ['side dish', 'Something served with the main course.', 'We’re serving mashed potatoes as a ___.', 'Two words. The first tells you where it goes on the plate.'],
   ['get together', 'Meet to spend time with other people.', 'We usually ___ at my aunt’s place for family celebrations.', 'Two words. Think of the opposite of being apart.']
 ];
+let flashIndex = 0;
+let flashOpen = false;
+function paintFlashcard() {
+  const [word, meaning, example] = vocabulary[flashIndex];
+  get('flash-count').textContent = (flashIndex + 1) + ' of ' + vocabulary.length;
+  get('flash-word').textContent = word;
+  get('flash-meaning').textContent = meaning;
+  get('flash-example').textContent = example.replace('___', word);
+  get('flash-back').hidden = !flashOpen;
+  get('flash-flip').textContent = flashOpen ? 'Hide meaning' : 'Show meaning';
+  get('flash-flip').setAttribute('aria-expanded', String(flashOpen));
+}
+get('flash-flip').addEventListener('click', () => {
+  flashOpen = !flashOpen;
+  paintFlashcard();
+});
+function stepFlashcard(direction) {
+  flashIndex = (flashIndex + direction + vocabulary.length) % vocabulary.length;
+  flashOpen = false;
+  paintFlashcard();
+}
+get('flash-prev').addEventListener('click', () => stepFlashcard(-1));
+get('flash-next').addEventListener('click', () => stepFlashcard(1));
+paintFlashcard();
 const speakingCards = [
   ['tradition', 'Guest A · Describe one food tradition in your family.', 'Guest B · Who started it, or how did it start?'],
   ['host', 'Guest B · Imagine you’re the host. How would you welcome a guest who has never been to Thanksgiving dinner?', 'Guest A · What would you say or offer first?'],
