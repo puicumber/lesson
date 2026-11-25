@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
 <title>After Work · Homework</title>
-<script src="../../assets/config.js?v=after-work-homework-1"></script>
+<script src="../../assets/config.js?v=after-work-homework-2"></script>
 <script src="../../assets/portal.js?v=3"></script>
 <script src="../../assets/track.js?v=3"></script>
 <style>
@@ -18,6 +18,10 @@ fieldset{border:0;border-top:1px solid #e3d6e5;padding:.6rem 0 0;margin:1.15rem 
 button:hover{background:#f5e9fa}button:focus-visible,summary:focus-visible{outline:3px solid #9e4a11;outline-offset:3px}
 button[aria-pressed=true][data-result=correct]{background:#e2f1df;color:#214c29}
 button[aria-pressed=true][data-result=retry]{background:#ffeddf;color:#792f16}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,15rem),1fr));gap:.65rem}
+.cards details{background:#f4eaf8;border-radius:.65rem;padding:.75rem}.cards p{margin:.55rem 0 0}
+form{display:flex;flex-wrap:wrap;gap:.5rem}input{flex:1;min-width:min(100%,14rem);font:inherit;padding:.45rem;border:1px solid #78558b;border-radius:.5rem}
+input:focus-visible{outline:3px solid #9e4a11;outline-offset:2px}
 .feedback{margin:.35rem 0;min-height:1.5em}.summary{font-weight:650}.cue{background:#f1e8f5;padding:.8rem;border-radius:.6rem}summary{cursor:pointer}
 </style>
 </head>
@@ -25,14 +29,36 @@ button[aria-pressed=true][data-result=retry]{background:#ffeddf;color:#792f16}
 <main>
 <header><p>Homework</p><h1>After Work</h1><p>Practise what you do after work and what to say when someone checks in.</p></header>
 <p id="save" role="status">Loading your answers…</p>
+<section aria-labelledby="cards-title">
+<h2 id="cards-title">Vocabulary cards</h2>
+<p>Say the English phrase first. Then open the card to check and read the example aloud.</p>
+<div class="cards">
+<details><summary lang="ru">Купить продукты по пути</summary><p><strong>pick up some groceries</strong></p><p>I pick up some groceries on my way home.</p></details>
+<details><summary lang="ru">Переодеться</summary><p><strong>get changed</strong></p><p>I get changed when I get home.</p></details>
+<details><summary lang="ru">Приготовить что-нибудь на скорую руку</summary><p><strong>make something quick</strong></p><p>I can make something quick for dinner.</p></details>
+<details><summary lang="ru">Заказать готовую еду</summary><p><strong>order takeaway</strong></p><p>Let’s order takeaway tonight.</p></details>
+<details><summary lang="ru">Лечь спать пораньше</summary><p><strong>have an early night</strong></p><p>I’m tired. I think I’ll have an early night.</p></details>
+<details><summary lang="ru">Хочется посмотреть комедию</summary><p><strong>I feel like watching a comedy.</strong></p><p>It’s Friday. I feel like watching a comedy.</p></details>
+</div>
+</section>
 <section id="awhVocab" aria-labelledby="vocab-title">
 <h2 id="vocab-title">On the way home</h2>
 <p>Choose the best phrase for each situation.</p>
 <div class="items"></div><p class="summary" role="status"></p><button type="button" class="reset" disabled>Start this exercise again</button>
 </section>
+<section id="awhRecall" aria-labelledby="recall-title">
+<h2 id="recall-title">Remember the phrase</h2>
+<p>Type the missing words. Use the clue in Russian, then press <strong>Check</strong>.</p>
+<div class="items"></div><p class="summary" role="status"></p><button type="button" class="reset" disabled>Start this exercise again</button>
+</section>
 <section id="awhCheckin" aria-labelledby="checkin-title">
 <h2 id="checkin-title">How are you doing?</h2>
 <p>Choose the reply that fits. Say it out loud.</p>
+<div class="items"></div><p class="summary" role="status"></p><button type="button" class="reset" disabled>Start this exercise again</button>
+</section>
+<section id="awhDialogue" aria-labelledby="dialogue-title">
+<h2 id="dialogue-title">A quick catch-up</h2>
+<p>Complete the conversation. Then read both parts aloud.</p>
 <div class="items"></div><p class="summary" role="status"></p><button type="button" class="reset" disabled>Start this exercise again</button>
 </section>
 <section>
@@ -56,15 +82,30 @@ const tasks = {
     ['You don’t want to cook. You call a restaurant for pizza.', ['Make something quick.', 'Order takeaway.', 'Pick up some groceries.'], 1],
     ['You’re tired and want to go to bed at nine.', ['Have an early night.', 'Get changed.', 'Order takeaway.'], 0]
   ],
+  awhRecall: [
+    ['I need milk. I’ll pick up some ___ on the way home. (продукты)', ['groceries'], 0],
+    ['First I get ___. Then I make dinner. (переодеваюсь)', ['changed'], 0],
+    ['I only have ten minutes. I’ll make something ___. (на скорую руку)', ['quick'], 0],
+    ['I don’t want to cook. Let’s order ___. (закажем готовую еду)', ['takeaway'], 0],
+    ['I’m tired. I’ll have an early ___. (лягу пораньше)', ['night'], 0],
+    ['I feel like ___ a comedy. (хочется посмотреть)', ['watching'], 0]
+  ],
   awhCheckin: [
     ['You had lots to do at work. You’re tired now.', ['Pretty good. I finished early.', 'I’m a bit tired. I had a busy day.', 'I’m doing well. I had a quiet day.'], 1],
     ['You finished work early and feel good.', ['I’m a bit tired. I didn’t sleep well.', 'I’m a little stressed. I had a busy day.', 'Pretty good. I finished work early.'], 2],
     ['You woke up three times last night.', ['I’m a bit tired. I didn’t sleep well.', 'Pretty good. I had a quiet day.', 'I’m doing well. I finished early.'], 0],
     ['You feel okay. It was calm at work today.', ['I’m tired. I had a busy day.', 'I’m okay. I had a quiet day.', 'I’m a bit tired. I didn’t sleep well.'], 1],
     ['“How are you doing?” “Pretty good. I had a quiet day.” Ask the question back.', ['Which day?', 'What time do you finish?', 'How about you?'], 2]
+  ],
+  awhDialogue: [
+    ['A: Hi! How are you doing? · B: I’m a bit ___. (устала)', ['tired'], 0],
+    ['A: Oh, how was work? · B: I had a ___ day. (суматошный день)', ['busy'], 0],
+    ['B: How ___ you? (а ты?)', ['about'], 0],
+    ['A: Pretty good. I finished work ___. (закончила пораньше)', ['early'], 0]
   ]
 };
 const tracker = window.Track;
+const normalize = value => value?.trim().toLowerCase().replace(/[.!?]+$/, '');
 const save = document.querySelector('#save');
 const exercises = Object.entries(tasks).map(([name, questions]) => {
   const section = document.getElementById(name);
@@ -72,7 +113,7 @@ const exercises = Object.entries(tasks).map(([name, questions]) => {
   const reset = section.querySelector('.reset');
   const answers = new Map();
   function scores() {
-    const points = questions.filter((question, index) => answers.get(index) === question[1][question[2]]).length;
+    const points = questions.filter((question, index) => normalize(answers.get(index)) === normalize(question[1][question[2]])).length;
     summary.textContent = answers.size ? points + ' / ' + questions.length + ' correct' : '';
     return points;
   }
@@ -81,53 +122,79 @@ const exercises = Object.entries(tasks).map(([name, questions]) => {
     field.disabled = true;
     const legend = document.createElement('legend');
     legend.textContent = question;
-    const options = document.createElement('div');
-    options.className = 'options';
+    const typed = choices.length === 1;
+    const options = document.createElement(typed ? 'form' : 'div');
+    if (!typed) options.className = 'options';
     const feedback = document.createElement('p');
     feedback.className = 'feedback';
     feedback.setAttribute('role', 'status');
     const correct = choices[correctIndex];
+    const isCorrect = choice => normalize(choice) === normalize(correct);
+    let input;
     function render(choice) {
-      for (const button of options.children) {
-        const selected = button.textContent === choice;
-        button.setAttribute('aria-pressed', String(selected));
-        button.dataset.result = selected && choice === correct ? 'correct' : 'retry';
-      }
-      feedback.textContent = choice === undefined ? '' : choice === correct ? 'Correct!' : 'Try again.';
-    }
-    for (const choice of choices) {
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.textContent = choice;
-      button.setAttribute('aria-pressed', 'false');
-      button.addEventListener('click', () => {
-        answers.set(index, choice);
-        render(choice);
-        const points = scores();
-        tracker?.answer(name, index, question, choice, correct, choice === correct, points, questions.length);
-        if (points / questions.length >= .8 && answers.size === questions.length) {
-          tracker?.finish(name, points, questions.length);
+      if (typed) {
+        input.value = choice ?? '';
+      } else {
+        for (const button of options.children) {
+          const selected = button.textContent === choice;
+          button.setAttribute('aria-pressed', String(selected));
+          button.dataset.result = selected && isCorrect(choice) ? 'correct' : 'retry';
         }
+      }
+      feedback.textContent = choice === undefined ? '' : isCorrect(choice) ? 'Correct!' : 'Try again.';
+    }
+    function submit(choice) {
+      answers.set(index, choice);
+      render(choice);
+      const points = scores();
+      tracker?.answer(name, index, question, choice, correct, isCorrect(choice), points, questions.length);
+      if (points / questions.length >= .8 && answers.size === questions.length) {
+        tracker?.finish(name, points, questions.length);
+      }
+    }
+    if (typed) {
+      input = document.createElement('input');
+      legend.id = name + '-question-' + index;
+      input.setAttribute('aria-labelledby', legend.id);
+      input.autocomplete = 'off';
+      input.spellcheck = false;
+      input.required = true;
+      const check = document.createElement('button');
+      check.type = 'submit';
+      check.textContent = 'Check';
+      options.addEventListener('submit', event => {
+        event.preventDefault();
+        if (input.value.trim()) submit(input.value.trim());
       });
-      options.append(button);
+      input.addEventListener('input', () => { feedback.textContent = ''; });
+      options.append(input, check);
+    } else {
+      for (const choice of choices) {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.textContent = choice;
+        button.setAttribute('aria-pressed', 'false');
+        button.addEventListener('click', () => submit(choice));
+        options.append(button);
+      }
     }
     field.append(legend, options, feedback);
     section.querySelector('.items').append(field);
-    return { field, render, choices };
+    return { field, render, choices, typed };
   });
   reset.addEventListener('click', () => {
     tracker?.reset(name);
     answers.clear();
     rows.forEach(row => row.render());
     scores();
-    rows[0].field.querySelector('button').focus();
+    rows[0].field.querySelector('input, button').focus();
   });
   return saved => {
     reset.disabled = false;
     rows.forEach((row, index) => {
       row.field.disabled = false;
       const choice = saved[name]?.answers?.[index]?.a;
-      if (row.choices.includes(choice)) {
+      if (typeof choice === 'string' && (row.typed || row.choices.includes(choice))) {
         answers.set(index, choice);
         row.render(choice);
       }
