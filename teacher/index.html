@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
 <link rel="stylesheet" href="../assets/portal.css?v=2">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.js"></script>
-<script src="../assets/config.js?v=21"></script>
+<script src="../assets/config.js?v=encore-registry-22"></script>
 <script src="../assets/portal.js?v=5"></script>
 <style>
   .form input, .form select { block-size: 44px; box-sizing: border-box; min-inline-size: 0; }
@@ -185,7 +185,7 @@ function draw(){
   if (!$("recForm").hasAttribute("aria-busy")) recStudent.onchange();
 }
 const URLSET={movement:"move",adverbs:"adv","grivas-28":"g28","grivas-30":"g30","grivas-33":"g33","reading-1":"read1","return-to-earth":"rte","grivas-36":"g36"};
-function guessSet(u){if(Portal.speakTask(u||""))return"speak";u=(u||"").split(/[?#]/)[0].replace(/\/index\.html$/,"").replace(/\/+$/,"");const seg=u.split("/").pop();
+function guessSet(u){u=(u||"").trim();if(Portal.speakTask(u))return"speak";u=u.split(/[?#]/)[0].replace(/\/index\.html$/,"").replace(/\/+$/,"");const seg=u.split("/").pop();
   if(ACT[seg])return seg;if(URLSET[seg]&&ACT[URLSET[seg]])return URLSET[seg];
   return Object.keys(ACT).find(k=>u.includes("/"+k+"/")||u.includes("/"+k+"-"))||null}
 async function repairSets(){const fix=M.filter(m=>!hasSet(m.activity)&&guessSet(m.url));for(const m of fix){m.activity=guessSet(m.url);try{await db.from("materials").update({activity:m.activity}).eq("id",m.id)}catch(e){}}}
@@ -401,10 +401,11 @@ const SITE=/^https:\/\/puicumber\.github\.io\/lesson\//;
 function siteLink(u){const m=(u||"").match(/^https?:\/\/(?:www\.)?github\.com\/puicumber\/lesson\/(?:blob|tree)\/[^/]+\/(.*?)(?:\/?index\.html)?\/?(?:[?#].*)?$/i);
   return m?"https://puicumber.github.io/lesson/"+(m[1]?m[1]+"/":""):null}
 let warnArmed=false,warnSig="";
-function linkProblem(){const k=$("mAct").value.trim(),u=$("mUrl").value.trim();if(!u)return null;
+function materialSet(){const manual=$("mAct").value.trim();return actManual&&hasSet(manual)?manual:guessSet($("mUrl").value)}
+function linkProblem(){const k=materialSet(),u=$("mUrl").value.trim();if(!u)return null;
   if(!SITE.test(u))return{site:false,set:hasSet(k)};
   if(!hasSet(k))return{site:true,set:false};return null}
-function showAct(){const k=$("mAct").value.trim(),u=$("mUrl").value.trim();
+function showAct(){const k=materialSet(),u=$("mUrl").value.trim();
   $("actInfo").textContent=k==="speak"?"Speaking task ✓ (answers are recorded)":k&&ACT[k]?`Exercise set: ${k} ✓ (${Object.values(ACT[k]).join(", ")})`:u?"No exercise set for this link.":"Exercise set: paste a link and it will be detected automatically.";
   const w=$("linkWarn"),p=linkProblem(),sig=u+"|"+k;if(sig!==warnSig){warnSig=sig;warnArmed=false;$("matForm").querySelector("button[type=submit]").textContent="Add"}
   if(!p){w.hidden=true;w.innerHTML="";return}
@@ -414,8 +415,9 @@ function showAct(){const k=$("mAct").value.trim(),u=$("mUrl").value.trim();
     :`⚠ <b>No exercise set found</b> for this site page. If the page has exercises, choose the set below, otherwise progress won't show. Pages without exercises are fine.`;
   w.hidden=false;if(p.site)$("actDetails").open=true;
   const b=$("fixLink");if(b)b.onclick=()=>{$("mUrl").value=fix;actManual=false;autoAct()}}
-function autoAct(){if(!actManual)$("mAct").value=guessSet($("mUrl").value)||"";showAct()}
-["input","change","paste","blur"].forEach(ev=>$("mUrl").addEventListener(ev,()=>setTimeout(autoAct,0)));
+function autoAct(){if(!actManual)$("mAct").value=materialSet()||"";showAct()}
+["input","change","blur"].forEach(ev=>$("mUrl").addEventListener(ev,autoAct));
+window.addEventListener("pageshow",autoAct);
 $("mAct").addEventListener("input",()=>{actManual=!!$("mAct").value.trim();showAct()});
 $("matForm").addEventListener("reset",()=>{actManual=false;setTimeout(showAct,0)});
 $("dClose").onclick=()=>$("detail").hidden=true;
@@ -447,7 +449,7 @@ function answers(x,m,s,rs){const r=rs.find(z=>z.details&&z.details.answers&&Obje
   $("ansBox").hidden=false;$("ansBox").scrollIntoView({behavior:"smooth"})}
 $("matForm").onsubmit=async e=>{e.preventDefault();
   if(linkProblem()&&!warnArmed){warnArmed=true;$("matForm").querySelector("button[type=submit]").textContent="Add anyway";$("linkWarn").scrollIntoView({behavior:"smooth",block:"center"});return}
-  const row={student_code:$("mStudent").value,title:$("mTitle").value.trim(),url:$("mUrl").value.trim(),kind:$("mKind").value,activity:(hasSet($("mAct").value.trim())?$("mAct").value.trim():guessSet($("mUrl").value)),due:$("mDue").value||null,note:$("mNote").value.trim()||null};
+  const row={student_code:$("mStudent").value,title:$("mTitle").value.trim(),url:$("mUrl").value.trim(),kind:$("mKind").value,activity:materialSet(),due:$("mDue").value||null,note:$("mNote").value.trim()||null};
   const {error}=await db.from("materials").insert(row);$("matMsg").textContent=error?"Error: "+error.message:`Added "${row.title}".`+(!SITE.test(row.url)?" ⚠ Not a site link: no progress will be tracked.":!row.activity?" ⚠ No exercise set.":"");
   if(!error){e.target.reset();await load()}};
 $("stForm").onsubmit=async e=>{e.preventDefault();const name=$("sName").value.trim();const code=slug(name)+"-"+rand();
