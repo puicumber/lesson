@@ -5,6 +5,7 @@ window.PORTAL_CONFIG = {
 };
 // Exercises inside each material, used to show progress
 window.PORTAL_ACTIVITIES = {
+  "after-work-homework": { awhVocab: "After-work vocabulary", awhCheckin: "How are you doing?" },
   encore: { encoreWords: "Music vocabulary", encoreForms: "Narrative tenses", encoreGig: "The gig", encoreRetell: "Rodriguez oral retell" },
   "grivas-unit-2": { g2_forms: "Word choice", g2_patterns: "Patterns & similes", g2_rewrite: "Key word transformations" },
   money: { cards: "Flashcards", nouns: "Nouns", verbs: "Verbs", preps: "Prepositions", phrasal: "Phrasal verbs", spell: "Spelling" },
