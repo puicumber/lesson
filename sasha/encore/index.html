@@ -122,7 +122,9 @@ const passages = [
  ["When the engineer ", 4, " play for the opening number, an old demo came through the speakers. Someone ", 5, " the wrong file earlier that day. Maya ", 6, " the first line when the sound suddenly ", 7, "."],
  ["The engineer ", 8, " the right recording, and Maya started again. The band ", 9, " the song to a huge cheer."]
 ];
-const Track = window.Track;
+// A direct link is a clean preview, even if this browser remembers a portal.
+const portalCode = new URLSearchParams(location.search).get("c")?.trim();
+const Track = portalCode ? window.Track : undefined;
 const activities = new Map();
 const byId = id => document.getElementById(id);
 const screens = Array.from(document.querySelectorAll("nav a"), link => ({
@@ -160,6 +162,7 @@ function createItem(item, index, section, mount) {
  select.append(new Option("Choose…", ""));
  select.options[0].disabled = true;
  item.options.forEach(option => select.append(new Option(option, option)));
+ select.value = "";
  const feedback = make("span");
  feedback.className = "feedback";
  feedback.id = select.id + "-feedback";
@@ -209,7 +212,8 @@ function buildActivity(root, key, items, render) {
  });
  activities.set(key, saved => {
   fields.forEach((item, index) => {
-   if (saved?.answers?.[index]) item.select.value = saved.answers[index].a;
+   const savedAnswer = saved?.answers?.[index]?.a;
+   item.select.value = item.options.includes(savedAnswer) ? savedAnswer : "";
    showFeedback(item);
    item.select.disabled = false;
   });
@@ -264,7 +268,7 @@ boot();
 async function boot() {
  // The repository loads Track. Keep the exercise usable in a standalone preview.
  if (!Track) {
-  byId("save").textContent = "Standalone practice. Progress is available when you open this homework from your portal.";
+  byId("save").textContent = "Preview. Open this homework from your student portal to save and share your answers.";
   for (const restore of activities.values()) restore();
   showRetell(false);
   return;
