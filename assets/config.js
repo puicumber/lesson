@@ -5,6 +5,7 @@ window.PORTAL_CONFIG = {
 };
 // Exercises inside each material, used to show progress
 window.PORTAL_ACTIVITIES = {
+  "grivas-42-43": { g4243_rewrite: "CPE Part 4", g4243_sort: "Sort the payment phrases", g4243_gaps: "Complete the collocation", g4243_choose: "Choose the wording" },
   "after-work-homework": { awhVocab: "After-work vocabulary", awhCheckin: "How are you doing?", awhRecall: "Remember the phrase", awhDialogue: "A quick catch-up" },
   encore: { encoreWords: "Music vocabulary", encoreForms: "Narrative tenses", encoreGig: "The gig", encoreRetell: "Rodriguez oral retell" },
   "grivas-unit-2": { g2_forms: "Word choice", g2_patterns: "Patterns & similes", g2_rewrite: "Key word transformations" },
